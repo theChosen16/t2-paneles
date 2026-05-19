@@ -231,19 +231,19 @@ def create_presentation():
     if style_id_element is not None:
         style_id_element.text = '{5940675A-B579-460E-94D1-54222C63F5DA}'
     
-    table.columns[0].width = Inches(2.0)
+    table.columns[0].width = Inches(2.6)
     table.columns[1].width = Inches(1.2)
     table.columns[2].width = Inches(1.8)
-    table.columns[3].width = Inches(4.3)
+    table.columns[3].width = Inches(3.7)
     table.columns[4].width = Inches(2.8)
     
     headers = ["Tecnología", "Eficiencia", "Coef. Temp. (Pmp)", "Comportamiento en Desierto", "Decisión / Rol"]
     data = [
-        ["m-Si / x-Si", "17% - 21%", "-0.40 %/°C (Malo)", "Grandes pérdidas por calor (baja tolerancia).", "SELECCIONADO (Línea Base)"],
-        ["HIT", "20% - 22%", "-0.26 %/°C (Excelente)", "Mantiene alta producción bajo estrés térmico.", "SELECCIONADO (Premium)"],
-        ["CdTe", "15% - 18%", "-0.28 %/°C (Excelente)", "Excelente desempeño, pero posee toxicidad por Cd.", "DESCARTADO (Menor contraste)"],
-        ["CIGS", "14% - 16%", "-0.35 %/°C (Bueno)", "Pérdidas moderadas; susceptible a la humedad.", "DESCARTADO (Sin contraste extremo)"],
-        ["a-Si (Película Fina)", "6% - 10%", "-0.20 %/°C (Excelente)", "Baja eficiencia base y fuerte degradación inicial.", "DESCARTADO (Inviable comercial)"]
+        ["m-Si / x-Si\n(Silicio Monocristalino / Cristalino)", "17% - 21%", "-0.40 %/°C (Malo)", "Grandes pérdidas por calor (baja tolerancia).", "SELECCIONADO (Línea Base)"],
+        ["HIT\n(Heterounión con Capa Fina Intrínseca)", "20% - 22%", "-0.26 %/°C (Excelente)", "Mantiene alta producción bajo estrés térmico.", "SELECCIONADO (Premium)"],
+        ["CdTe\n(Teluro de Cadmio)", "15% - 18%", "-0.28 %/°C (Excelente)", "Excelente desempeño, pero posee toxicidad por Cd.", "DESCARTADO (Menor contraste)"],
+        ["CIGS\n(Seleniuro de Cobre, Indio y Galio)", "14% - 16%", "-0.35 %/°C (Bueno)", "Pérdidas moderadas; susceptible a la humedad.", "DESCARTADO (Sin contraste extremo)"],
+        ["a-Si (Película Fina)\n(Silicio Amorfo)", "6% - 10%", "-0.20 %/°C (Excelente)", "Baja eficiencia base y fuerte degradación inicial.", "DESCARTADO (Inviable comercial)"]
     ]
     
     for c in range(cols):
