@@ -145,7 +145,7 @@ def procesar_fase1(file_path, output_dir):
     plt.close()
     
     # Histograma Temperatura Celda
-    plt.figure(figsize=(10, 5))
+    plt.figure(figsize=(10, 7.5))
     hist_color = '#E8A838' if module_name == 'HIT' else '#007ACC'
     df[df['poa_global'] > 10]['temp_cell'].hist(bins=50, color=hist_color, alpha=0.8, edgecolor='none')
     plt.title(f'Distribución de Temperatura de Celda (Horas de Sol) - {module_name}', fontsize=13, fontweight='bold', pad=15)
