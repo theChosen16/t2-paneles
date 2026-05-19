@@ -152,13 +152,17 @@ def gen_extra_results():
         plt.scatter(subset['temp_cell'], eff_norm, alpha=0.06, label=label_name, s=5, color=color)
         
     plt.title('Análisis de Degradación Térmica: HIT vs m-Si', fontsize=14, fontweight='bold', pad=15)
-    plt.xlabel('Temperatura de Celda (°C)', fontsize=12)
-    plt.ylabel('Potencia Normalizada', fontsize=12)
-    plt.legend(fontsize=11)
+    plt.xlabel('Temperatura de Celda (°C)', fontsize=15, labelpad=10)
+    plt.ylabel('Potencia Normalizada', fontsize=15, labelpad=10)
+    plt.xticks(fontsize=13)
+    plt.yticks(fontsize=13)
+    leg = plt.legend(fontsize=13)
+    for lh in leg.legend_handles:
+        lh.set_alpha(1.0)
     plt.grid(True, linestyle=':', alpha=0.5)
     plt.ylim(0.75, 1.05)
     plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'degradacion_termica_scatter.png'), transparent=True, dpi=150)
+    plt.savefig(os.path.join(output_dir, 'degradacion_termica_scatter.png'), transparent=True, dpi=150, bbox_inches='tight')
     plt.close()
 
     print(f"Ciclo 3: Gráficos reconstruidos (IV Curves, Perfil, PR Comparativo y Degradación corregidos en Dark Mode y Transparentes).")
