@@ -330,9 +330,13 @@ def create_presentation():
     add_panel(slide, MARGIN + Inches(5.5) + GAP, Inches(1.2), Inches(6.2), Inches(5.5), title="Absorción en Celda (Pérdidas Ópticas)")
     add_text(slide, MARGIN + Inches(5.5) + GAP + Inches(0.2), Inches(1.7), Inches(5.8), Inches(0.35),
              "Modela la radiación real que penetra y es absorbida por la celda:", size=15)
-    add_latex_equation(slide, 
-                       r"\frac{S}{S_{ref}} = \frac{G_b}{G_{ref}} \cdot R_{beam} \cdot K_{\tau\alpha,b} + \frac{G_d}{G_{ref}} \cdot K_{\tau\alpha,d} \cdot \left(\frac{1 + \cos(\beta)}{2}\right) + \frac{G}{G_{ref}} \cdot \rho \cdot K_{\tau\alpha,g} \cdot \left(\frac{1 - \cos(\beta)}{2}\right)", 
-                       MARGIN + Inches(5.5) + GAP + Inches(0.2), Inches(2.20), Inches(0.35))
+    eq_multiline = (
+        r"$\frac{S}{S_{ref}} = \frac{G_b}{G_{ref}} \cdot R_{beam} \cdot K_{\tau\alpha,b}$" + "\n" +
+        r"$\quad + \frac{G_d}{G_{ref}} \cdot K_{\tau\alpha,d} \cdot \left(\frac{1 + \cos(\beta)}{2}\right)$" + "\n" +
+        r"$\quad + \frac{G}{G_{ref}} \cdot \rho \cdot K_{\tau\alpha,g} \cdot \left(\frac{1 - \cos(\beta)}{2}\right)$"
+    )
+    add_latex_equation(slide, eq_multiline, 
+                       MARGIN + Inches(5.5) + GAP + Inches(0.2), Inches(2.10), Inches(0.95), max_width=Inches(5.8))
     abs_glossary = (
         "Donde:\n"
         "• _S_ / _S_[_ref_]: Irradiancia efectiva y de referencia (1000 W/m²).\n"
