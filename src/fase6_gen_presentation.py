@@ -1,7 +1,8 @@
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-from pptx.enum.text import PP_ALIGN
+from pptx.enum.text import PP_ALIGN, MSO_VERTICAL_ANCHOR
+from pptx.oxml.ns import qn
 import os
 
 # --- Configuración del Sistema de Diseño ---
@@ -128,11 +129,18 @@ def create_presentation():
     table_shape = slide.shapes.add_table(rows, cols, left, top, width, height)
     table = table_shape.table
     
-    table.columns[0].width = Inches(2.2) # Tecnología
-    table.columns[1].width = Inches(1.3) # Eficiencia
-    table.columns[2].width = Inches(2.0) # Coef. Temp
-    table.columns[3].width = Inches(4.4) # Comportamiento en Desierto
-    table.columns[4].width = Inches(2.6) # Decisión / Rol
+    # Aplicar estilo "No Style, Table Grid" para eliminar bordes blancos toscos por defecto
+    tbl = table_shape._element.graphic.graphicData.tbl
+    tblPr = tbl.tblPr
+    style_id_element = tblPr.find(qn('a:tableStyleId'))
+    if style_id_element is not None:
+        style_id_element.text = '{5940675A-B579-460E-94D1-54222C63F5DA}'
+    
+    table.columns[0].width = Inches(2.0) # Tecnología
+    table.columns[1].width = Inches(1.2) # Eficiencia
+    table.columns[2].width = Inches(1.8) # Coef. Temp
+    table.columns[3].width = Inches(4.3) # Comportamiento en Desierto
+    table.columns[4].width = Inches(2.8) # Decisión / Rol
     
     headers = ["Tecnología", "Eficiencia", "Coef. Temp. (Pmp)", "Comportamiento en Desierto", "Decisión / Rol"]
     data = [
@@ -147,9 +155,13 @@ def create_presentation():
         cell = table.cell(0, c)
         cell.text = headers[c]
         cell.fill.solid()
-        cell.fill.fore_color.rgb = ACCENT_BLUE
+        cell.fill.fore_color.rgb = RGBColor(0x2C, 0x2C, 0x48) # Encabezado marino premium
+        cell.vertical_anchor = MSO_VERTICAL_ANCHOR.MIDDLE
         for p in cell.text_frame.paragraphs:
-            p.font.bold, p.font.size, p.font.color.rgb, p.alignment = True, Pt(13), TEXT_WHITE, PP_ALIGN.CENTER
+            p.font.bold = True
+            p.font.size = Pt(13)
+            p.font.color.rgb = ACCENT_GOLD
+            p.alignment = PP_ALIGN.CENTER
             
     for r in range(1, rows):
         row_data = data[r-1]
@@ -158,12 +170,31 @@ def create_presentation():
             cell = table.cell(r, c)
             cell.text = row_data[c]
             cell.fill.solid()
-            cell.fill.fore_color.rgb = RGBColor(0x22, 0x22, 0x48) if is_selected else RGBColor(0x1B, 0x1B, 0x2E)
+            # Fila seleccionada vs descartada
+            if is_selected:
+                cell.fill.fore_color.rgb = RGBColor(0x28, 0x28, 0x4B) # Lighter Dark Navy
+            else:
+                cell.fill.fore_color.rgb = RGBColor(0x1F, 0x1F, 0x33) # Darker Dark Navy
+            
+            cell.vertical_anchor = MSO_VERTICAL_ANCHOR.MIDDLE
             for p in cell.text_frame.paragraphs:
-                p.font.size = Pt(10 if c == 3 else 11)
-                p.font.color.rgb = ACCENT_GOLD if (is_selected and c == 4) else TEXT_WHITE
-                if c in [0, 4]: p.font.bold = True
-                if c in [1, 2, 4]: p.alignment = PP_ALIGN.CENTER
+                p.font.size = Pt(10.5 if c == 3 else 11.5)
+                
+                # Resaltar colores según selección
+                if is_selected:
+                    p.font.color.rgb = ACCENT_GOLD if c == 4 else TEXT_WHITE
+                else:
+                    p.font.color.rgb = RGBColor(0xBB, 0xBB, 0xBB) if c == 4 else TEXT_WHITE
+                
+                if c in [0, 4]: 
+                    p.font.bold = True
+                
+                # Alineación adaptativa
+                if c in [1, 2, 4]: 
+                    p.alignment = PP_ALIGN.CENTER
+                else: 
+                    p.alignment = PP_ALIGN.LEFT
+                    
     add_footer(slide, 3, TOTAL_SLIDES)
 
     # --- SLIDE 4: Metodología ---
