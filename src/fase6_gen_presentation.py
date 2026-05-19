@@ -216,21 +216,24 @@ def create_presentation():
     add_title(slide, "Recurso Solar: Transposición y Absorción")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Fórmulas POA (Perez) y Absorción")
     
-    eq_text = r"""1. Irradiancia en Plano de Arreglo (POA):
-$$G_{poa} = G_b \cdot R_{beam} + G_d \cdot \left(\frac{1 + \cos(\beta)}{2}\right) + G \cdot \rho \cdot \left(\frac{1 - \cos(\beta)}{2}\right)$$
-
-2. Irradiancia Absorbida por Celdas (S):
-$$\frac{S}{S_{ref}} = \frac{G_b}{G_{ref}} \cdot R_{beam} \cdot K_{\tau\alpha,b} + \frac{G_d}{G_{ref}} \cdot K_{\tau\alpha,d} \cdot \left(\frac{1 + \cos(\beta)}{2}\right) + \frac{G}{G_{ref}} \cdot \rho \cdot K_{\tau\alpha,g} \cdot \left(\frac{1 - \cos(\beta)}{2}\right)$$
-
-Donde $S_{ref} = G_{ref} = 1000\text{ W/m}^2$ en condiciones SRC."""
+    eq_text = (
+        "1. Irradiancia en Plano de Arreglo (POA):\n"
+        "   G_poa = G_b · R_beam + G_d · [(1 + cos(β)) / 2] + G · ρ · [(1 - cos(β)) / 2]\n\n"
+        "2. Irradiancia Absorbida por Celdas (S):\n"
+        "   S / S_ref = (G_b / G_ref) · R_beam · K_τα,b + (G_d / G_ref) · K_τα,d · [(1 + cos(β)) / 2] + "
+        "(G / G_ref) · ρ · K_τα,g · [(1 - cos(β)) / 2]\n\n"
+        "Donde S_ref = G_ref = 1000 W/m² en condiciones de referencia (SRC)."
+    )
     add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), eq_text, size=13, color=ACCENT_GOLD)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Glosario de Términos")
-    glossary = r"""• $G_b \; / \; G_d \; / \; G$: Irradiancia directa, difusa y global horizontal ($\text{W/m}^2$).
-• $\beta$ (Tilt): Ángulo de inclinación del panel ($22.91^\circ$ optimizado).
-• $\rho$ (Albedo): Reflectancia del suelo árido desértico ($\sim 0.20$).
-• $R_{beam}$: Factor de transposición geométrica para radiación directa.
-• $K_{\tau\alpha,b} \; / \; K_{\tau\alpha,d} \; / \; K_{\tau\alpha,g}$: Modificadores por ángulo de incidencia (IAM) para componente directa, difusa y del suelo."""
+    glossary = (
+        "• G_b / G_d / G: Irradiancia directa, difusa y global horizontal (W/m²).\n"
+        "• β (Tilt): Ángulo de inclinación del panel (22.91° optimizado).\n"
+        "• ρ (Albedo): Reflectancia del suelo árido desértico (~0.20).\n"
+        "• R_beam: Factor de transposición geométrica para radiación directa.\n"
+        "• K_τα,b / K_τα,d / K_τα,g: Modificadores por ángulo de incidencia (IAM) para componente directa, difusa y del suelo."
+    )
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), glossary, size=13)
     add_footer(slide, 5, TOTAL_SLIDES)
 
@@ -240,31 +243,30 @@ Donde $S_{ref} = G_{ref} = 1000\text{ W/m}^2$ en condiciones SRC."""
     add_title(slide, "Modificadores Ópticos: IAM y Masa de Aire")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Modificador por Ángulo de Incidencia (IAM)")
     
-    iam_text = r"""Ecuación física basada en Ley de Snell y Bouguer:
-$$K_{\tau\alpha}(\theta) = \frac{\tau(\theta)}{\tau(0)}$$
-
-$$\tau(\theta) = e^{-\frac{K \cdot L}{\cos(\theta_r)}} \cdot \left[ 1 - \frac{1}{2} \left( \frac{\sin^2(\theta_r - \theta)}{\sin^2(\theta_r + \theta)} + \frac{\tan^2(\theta_r - \theta)}{\tan^2(\theta_r + \theta)} \right) \right]$$
-
-$$\theta_r = \arcsin\left(\frac{\sin(\theta)}{n}\right)$$
-
-Donde:
-• $\theta$: Ángulo de incidencia solar.
-• $n = 1.526$ (Índice de refracción del vidrio templado).
-• $K = 4\text{ m}^{-1}$ (Absorción del vidrio).
-• $L = 2\text{ mm}$ (Espesor típico del vidrio)."""
+    iam_text = (
+        "Ecuación física basada en Ley de Snell y Bouguer:\n\n"
+        "   K_τα(θ) = τ(θ) / τ(0)\n\n"
+        "   τ(θ) = e^(-K·L / cos(θ_r)) · [ 1 - 0.5 · ( sin²(θ_r - θ)/sin²(θ_r + θ) + tan²(θ_r - θ)/tan²(θ_r + θ) ) ]\n\n"
+        "   θ_r = arcsin( sin(θ) / n )\n\n"
+        "Donde:\n"
+        "• θ: Ángulo de incidencia solar.\n"
+        "• n = 1.526 (Índice de refracción del vidrio templado).\n"
+        "• K = 4 m⁻¹ (Absorción del vidrio).\n"
+        "• L = 2 mm (Espesor típico del vidrio)."
+    )
     add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), iam_text, size=11, color=ACCENT_GOLD)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Modificador por Masa de Aire (AM)")
-    am_text = r"""Corrige el desajuste del espectro solar según el espesor de la atmósfera atravesada:
-$$\frac{M}{M_{ref}} = a_0 + a_1 \cdot AM + a_2 \cdot AM^2 + a_3 \cdot AM^3 + a_4 \cdot AM^4$$
-
-$$AM = \frac{1}{\cos(\theta_z) + 0.5057 \cdot (96.08 - \theta_z)^{-1.634}}$$
-
-Donde:
-• $AM$: Masa de aire absoluta.
-• $\theta_z$: Ángulo cenital del sol.
-• $a_0, a_1, a_2, a_3, a_4$: Coeficientes empíricos espectrales.
-• $M_{ref}$: Transmitancia espectral a STC ($AM\;1.5g$)."""
+    am_text = (
+        "Corrige el desajuste del espectro solar según el espesor de la atmósfera atravesada:\n\n"
+        "   M / M_ref = a₀ + a₁·AM + a₂·AM² + a₃·AM³ + a₄·AM⁴\n\n"
+        "   AM = 1 / [ cos(θ_z) + 0.5057 · (96.08 - θ_z)⁻¹.⁶³⁴ ]\n\n"
+        "Donde:\n"
+        "• AM: Masa de aire absoluta.\n"
+        "• θ_z: Ángulo cenital del sol.\n"
+        "• a₀, a₁, a₂, a₃, a₄: Coeficientes empíricos espectrales.\n"
+        "• M_ref: Transmitancia espectral a STC (AM 1.5g)."
+    )
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), am_text, size=12)
     add_footer(slide, 6, TOTAL_SLIDES)
 
@@ -282,15 +284,15 @@ Donde:
     add_title(slide, "Temperatura de Celda (Sandia SAPM)")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Ecuación del Modelo Térmico")
     
-    thermal_eq = r"""La temperatura interna de la celda ($T_c$) depende del recurso solar y del viento:
-
-$$T_c = G_{poa} \cdot e^{a + b \cdot v_w} + T_a + \left(\frac{G_{poa}}{1000}\right) \cdot \Delta T$$
-
-Donde:
-• $T_c \; / \; T_a$: Temperatura de celda y ambiental ($^\circ\text{C}$).
-• $G_{poa}$: Irradiancia en el plano del panel ($\text{W/m}^2$).
-• $v_w$: Velocidad del viento ($\text{m/s}$).
-• $a, b, \Delta T$: Parámetros empíricos del encapsulado."""
+    thermal_eq = (
+        "La temperatura interna de la celda (T_c) depende del recurso solar y del viento:\n\n"
+        "   T_c = G_poa · e^(a + b · v_w) + T_a + (G_poa / 1000) · ΔT\n\n"
+        "Donde:\n"
+        "• T_c / T_a: Temperatura de celda y ambiental (°C).\n"
+        "• G_poa: Irradiancia en el plano del panel (W/m²).\n"
+        "• v_w: Velocidad del viento (m/s).\n"
+        "• a, b, ΔT: Parámetros empíricos del encapsulado."
+    )
     add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), thermal_eq, size=14, color=ACCENT_GOLD)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Coeficientes por Tecnología")
@@ -329,26 +331,27 @@ Donde:
     add_title(slide, "Modelo de 5 Parámetros: Diodo Simple (SDM)")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Ecuación del Circuito Equivalente")
     
-    sdm_eq = r"""El módulo se modela como un circuito equivalente de un diodo y pérdidas óhmicas:
-
-$$I = I_L - I_0 \cdot \left[ \exp\left(\frac{V + I \cdot R_s}{a}\right) - 1 \right] - \frac{V + I \cdot R_s}{R_{sh}}$$
-
-El factor de idealidad térmico ($a$) se define formalmente como:
-
-$$a = \frac{N_s \cdot n_I \cdot k \cdot T_c}{q}$$"""
+    sdm_eq = (
+        "El módulo se modela como un circuito equivalente de un diodo y pérdidas óhmicas:\n\n"
+        "   I = I_L - I_₀ · [ exp((V + I·R_s) / a) - 1 ] - (V + I·R_s) / R_sh\n\n"
+        "El factor de idealidad térmico (a) se define formalmente como:\n\n"
+        "   a = (N_s · n_I · k · T_c) / q"
+    )
     add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), sdm_eq, size=14, color=ACCENT_GOLD)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Glosario de Parámetros Físicos")
-    sdm_glossary = r"""• $I \; / \; V$: Corriente y voltaje de salida (A, V).
-• $I_L$: Corriente fotogenerada por irradiancia (A).
-• $I_0$: Corriente de saturación inversa del diodo (A).
-• $R_s$: Resistencia serie de pérdidas ($\Omega$).
-• $R_{sh}$: Resistencia paralelo o shunt de fugas ($\Omega$).
-• $N_s$: Número de celdas en serie (m-Si: 36, HIT: 72).
-• $n_I$: Factor de idealidad del diodo.
-• $k$: Constante de Boltzmann ($1.3806 \times 10^{-23}\text{ J/K}$).
-• $q$: Carga elemental del electrón ($1.6022 \times 10^{-19}\text{ C}$).
-• $T_c$: Temperatura de celda absoluta (K)."""
+    sdm_glossary = (
+        "• I / V: Corriente y voltaje de salida (A, V).\n"
+        "• I_L: Corriente fotogenerada por irradiancia (A).\n"
+        "• I_₀: Corriente de saturación inversa del diodo (A).\n"
+        "• R_s: Resistencia serie de pérdidas (Ω).\n"
+        "• R_sh: Resistencia paralelo o shunt de fugas (Ω).\n"
+        "• N_s: Número de celdas en serie (m-Si: 36, HIT: 72).\n"
+        "• n_I: Factor de idealidad del diodo.\n"
+        "• k: Constante de Boltzmann (1.3806 × 10⁻²³ J/K).\n"
+        "• q: Carga elemental del electrón (1.6022 × 10⁻¹⁹ C).\n"
+        "• T_c: Temperatura de celda absoluta (K)."
+    )
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), sdm_glossary, size=12)
     add_footer(slide, 10, TOTAL_SLIDES)
 
@@ -358,26 +361,26 @@ $$a = \frac{N_s \cdot n_I \cdot k \cdot T_c}{q}$$"""
     add_title(slide, "Extracción de Parámetros de Referencia")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Sistema No-Lineal de 5 Ecuaciones")
     
-    src_eq = r"""Se extraen $a_{ref}$, $I_{L,ref}$, $I_{0,ref}$, $R_{s,ref}$, $R_{sh,ref}$ en STC:
-
-1. Cortocircuito ($I_{sc}$): $V = 0$, $I = I_{sc,ref}$
-2. Circuito Abierto ($V_{oc}$): $I = 0$, $V = V_{oc,ref}$
-3. Máxima Potencia (MPP): $I = I_{mp,ref}$, $V = V_{mp,ref}$
-4. Pendiente en MPP ($\frac{dP}{dV} = 0$):
-   $$\left.\frac{dI}{dV}\right|_{mp} = -\frac{I_{mp,ref}}{V_{mp,ref}}$$
-5. Coeficiente térmico de $V_{oc}$: $\beta_{Voc} = \frac{\partial V_{oc}}{\partial T_c}$"""
+    src_eq = (
+        "Se extraen a_ref, I_L,ref, I_₀,ref, R_s,ref, R_sh,ref en STC:\n\n"
+        "1. Cortocircuito (I_sc): V = 0, I = I_sc,ref\n"
+        "2. Circuito Abierto (V_oc): I = 0, V = V_oc,ref\n"
+        "3. Máxima Potencia (MPP): I = I_mp,ref, V = V_mp,ref\n"
+        "4. Pendiente en MPP (dP/dV = 0):\n"
+        "   dI/dV|_mpp = -I_mp,ref / V_mp,ref\n"
+        "5. Coeficiente térmico de V_oc: β_Voc = ∂V_oc / ∂T_c"
+    )
     add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), src_eq, size=13, color=ACCENT_GOLD)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Ecuación de la Derivada Analítica en MPP")
-    deriv_eq = r"""Para acoplar $R_s$ y el factor de idealidad, se implementa la derivada analítica obtenida del circuito:
-
-$$\left.\frac{dI}{dV}\right|_{mp} = -\frac{A + B}{1 + R_s \cdot A + R_s \cdot B}$$
-
-Donde:
-  $$A = \frac{I_0}{a} \cdot e^{\frac{V_{mp} + I_{mp} \cdot R_s}{a}}$$
-  $$B = \frac{1}{R_{sh}}$$
-
-La optimización se realiza mediante ajuste de mínimos cuadrados con bounds físicos ($R_s > 0, n_I \in [1, 2]$)."""
+    deriv_eq = (
+        "Para acoplar R_s y el factor de idealidad, se implementa la derivada analítica obtenida del circuito:\n\n"
+        "   dI/dV|_mpp = -(A + B) / (1 + R_s · A + R_s · B)\n\n"
+        "Donde:\n"
+        "   A = (I_₀ / a) · exp((V_mp + I_mp · R_s) / a)\n"
+        "   B = 1 / R_sh\n\n"
+        "La optimización se realiza mediante ajuste de mínimos cuadrados con bounds físicos (R_s > 0, n_I ∈ [1, 2])."
+    )
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), deriv_eq, size=12)
     add_footer(slide, 11, TOTAL_SLIDES)
 
@@ -387,20 +390,19 @@ La optimización se realiza mediante ajuste de mínimos cuadrados con bounds fí
     add_title(slide, "Escalamiento a Condiciones Reales")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Dependencias con (G, Tc) de De Soto")
     
-    scale_eq = r"""1. Factor de Idealidad:
-$$\frac{a}{a_{ref}} = \frac{T_c}{T_{ref}}$$
-
-2. Corriente de Saturación Inversa ($I_0$):
-$$\frac{I_0}{I_{0,ref}} = \left(\frac{T_c}{T_{ref}}\right)^3 \cdot \exp\left[ \frac{E_{g,ref}}{k \cdot T_{ref}} - \frac{E_g}{k \cdot T_c} \right]$$
-
-3. Energía de Bandgap ($E_g$):
-$$\frac{E_g}{E_{g,ref}} = 1 - 0.0002677 \cdot (T_c - T_{ref})$$
-Donde $E_{g,ref} = 1.121\text{ eV}$ para Silicio a 25°C.
-
-4. Corriente Fotogenerada ($I_L$):
-$$I_L = \left(\frac{S}{S_{ref}}\right) \cdot \left(\frac{M}{M_{ref}}\right) \cdot \left[ I_{L,ref} + \alpha_{Isc} \cdot (T_c - T_{ref}) \right]$$
-
-5. Resistencia Shunt: $$R_{sh} = R_{sh,ref} \cdot \left(\frac{S_{ref}}{S}\right)$$$"""
+    scale_eq = (
+        "1. Factor de Idealidad:\n"
+        "   a / a_ref = T_c / T_ref\n\n"
+        "2. Corriente de Saturación Inversa (I_₀):\n"
+        "   I_₀ / I_₀,ref = (T_c / T_ref)³ · exp[ E_g,ref / (k · T_ref) - E_g / (k · T_c) ]\n\n"
+        "3. Energía de Bandgap (E_g):\n"
+        "   E_g / E_g,ref = 1 - 0.0002677 · (T_c - T_ref)\n"
+        "   Donde E_g,ref = 1.121 eV para Silicio a 25°C.\n\n"
+        "4. Corriente Fotogenerada (I_L):\n"
+        "   I_L = (S / S_ref) · (M / M_ref) · [ I_L,ref + α_Isc · (T_c - T_ref) ]\n\n"
+        "5. Resistencia Shunt:\n"
+        "   R_sh = R_sh,ref · (S_ref / S)"
+    )
     add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), scale_eq, size=12, color=ACCENT_GOLD)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Suposiciones Físicas Justificadas")
@@ -443,15 +445,15 @@ $$I_L = \left(\frac{S}{S_{ref}}\right) \cdot \left(\frac{M}{M_{ref}}\right) \cdo
     add_title(slide, "Performance Ratio: Evaluación de Desempeño")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Ecuación Matemática del PR")
     
-    pr_eq = r"""El Performance Ratio (PR) evalúa la eficiencia neta del sistema fotovoltaico:
-
-$$PR = \frac{\sum P_{mp,SDM}(G, T_c)}{\sum \left[ P_{STC} \cdot \left(\frac{G_{poa}}{1000}\right) \right]}$$
-
-Donde:
-• $P_{mp,SDM}$: Potencia MPP simulada hora a hora con De Soto (W).
-• $P_{STC}$: Potencia nominal a STC (m-Si: 46.68 W | HIT: 217.52 W).
-• $G_{poa}$: Irradiancia calculada en el plano del panel ($\text{W/m}^2$).
-• $1000$: Irradiancia de referencia a STC ($\text{W/m}^2$)."""
+    pr_eq = (
+        "El Performance Ratio (PR) evalúa la eficiencia neta del sistema fotovoltaico:\n\n"
+        "   PR = Σ P_mp,SDM(G, T_c) / Σ [ P_STC · (G_poa / 1000) ]\n\n"
+        "Donde:\n"
+        "• P_mp,SDM: Potencia MPP simulada hora a hora con De Soto (W).\n"
+        "• P_STC: Potencia nominal a STC (m-Si: 46.68 W | HIT: 217.52 W).\n"
+        "• G_poa: Irradiancia calculada en el plano del panel (W/m²).\n"
+        "• 1000: Irradiancia de referencia a STC (W/m²)."
+    )
     add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), pr_eq, size=14, color=ACCENT_GOLD)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Significado Físico del PR")
