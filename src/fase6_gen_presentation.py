@@ -55,7 +55,7 @@ def add_panel(slide, left, top, width, height, title=""):
         p = box.text_frame.paragraphs[0]
         p.text = title
         p.font.bold = True
-        p.font.size = Pt(14)
+        p.font.size = Pt(18)  # Aumentado de 14 a 18 para mejor legibilidad
         p.font.color.rgb = ACCENT_GOLD
     
     return rect
@@ -77,7 +77,7 @@ def add_image(slide, img_path, left, top, width=None, height=None):
         return slide.shapes.add_picture(img_path, left, top, width=width, height=height)
     return None
 
-def add_latex_equation(slide, formula_text, left, top, height, color='#E8A838', dpi=300):
+def add_latex_equation(slide, formula_text, left, top, height, color='#E8A838', dpi=300, max_width=Inches(5.5)):
     import os
     import matplotlib.pyplot as plt
     from PIL import Image
@@ -122,8 +122,14 @@ def add_latex_equation(slide, formula_text, left, top, height, color='#E8A838', 
     aspect_ratio = img.width / img.height
     width = height * aspect_ratio
     
+    # Restricción de ancho máximo de columna: si supera max_width, se auto-escala proporcionalmente
+    if width > max_width:
+        width = max_width
+        height = width / aspect_ratio
+    
     # Insertar la imagen en el slide
     slide.shapes.add_picture(file_path, left, top, width=width, height=height)
+
 
 def create_presentation():
     prs = Presentation()
@@ -137,13 +143,13 @@ def create_presentation():
     add_text(slide, MARGIN, Inches(1.8), SLIDE_WIDTH - 2*MARGIN, Inches(1.5), 
              "Evaluación de Tecnologías Fotovoltaicas en el Desierto de Atacama", size=36, bold=True, color=ACCENT_GOLD, align=PP_ALIGN.CENTER)
     add_text(slide, MARGIN, Inches(3.2), SLIDE_WIDTH - 2*MARGIN, Inches(0.8), 
-             "Modelamiento Eléctrico mediante el Modelo de 5 Parámetros de De Soto", size=20, align=PP_ALIGN.CENTER)
+             "Modelamiento Eléctrico mediante el Modelo de 5 Parámetros de De Soto", size=22, align=PP_ALIGN.CENTER)
     
     names_text = ("Integrantes / Estudiantes:\n"
                   "Laury Gualdron  |  Sebastian Marin  |  Alejandro Hernández\n\n"
                   "Profesor Guía: Carlos Cardenas\n"
                   "ELI556 — Modelamiento y Análisis de Sistemas PV  |  Grupo Alta Tensión (AT)")
-    add_text(slide, MARGIN, Inches(4.5), SLIDE_WIDTH - 2*MARGIN, Inches(1.8), names_text, size=15, color=TEXT_WHITE, align=PP_ALIGN.CENTER)
+    add_text(slide, MARGIN, Inches(4.5), SLIDE_WIDTH - 2*MARGIN, Inches(1.8), names_text, size=16, color=TEXT_WHITE, align=PP_ALIGN.CENTER)
     add_footer(slide, 1, TOTAL_SLIDES)
 
     # --- SLIDE 2: Motivación ---
@@ -152,17 +158,17 @@ def create_presentation():
     add_title(slide, "¿Por qué el Desierto de Atacama?")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="El Recurso Solar más Extremo")
     add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4), 
-             "• Irradiancia GHI anual > 2900 kWh/m² (máxima mundial).\n"
-             "• Cielos extremadamente limpios con baja atenuación.\n"
-             "• Altitud elevada (>= 2400 m.s.n.m.): mayor radiación directa y UV.\n"
-             "• Coordenadas del estudio: Latitud -22.91°, Longitud -68.20°.", size=17)
+             "• Irradiancia GHI anual > 2900 kWh/m² (máxima mundial).\n\n"
+             "• Cielos extremadamente limpios con baja atenuación.\n\n"
+             "• Altitud elevada (>= 2400 m.s.n.m.): mayor radiación directa y UV.\n\n"
+             "• Coordenadas del estudio: Latitud -22.91°, Longitud -68.20°.", size=18)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="El Desafío Térmico desértico")
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4), 
-             "• Las celdas solares operan a temperaturas > 65°C a mediodía.\n"
-             "• La potencia y el voltaje decaen fuertemente con el calor.\n"
-             "• La eficiencia térmica es el factor dominante en pérdidas.\n"
-             "• Pregunta: ¿Qué tecnología resiste mejor este estrés extremo?", size=17)
+             "• Las celdas solares operan a temperaturas > 65°C a mediodía.\n\n"
+             "• La potencia y el voltaje decaen fuertemente con el calor.\n\n"
+             "• La eficiencia térmica es el factor dominante en pérdidas.\n\n"
+             "• Pregunta: ¿Qué tecnología resiste mejor este estrés extremo?", size=18)
     add_footer(slide, 2, TOTAL_SLIDES)
 
     # --- SLIDE 3: Comparativa de Tecnologías ---
@@ -206,7 +212,7 @@ def create_presentation():
         cell.vertical_anchor = MSO_VERTICAL_ANCHOR.MIDDLE
         for p in cell.text_frame.paragraphs:
             p.font.bold = True
-            p.font.size = Pt(13)
+            p.font.size = Pt(14)  # Aumentado de 13 a 14
             p.font.color.rgb = ACCENT_GOLD
             p.alignment = PP_ALIGN.CENTER
             
@@ -224,7 +230,7 @@ def create_presentation():
             
             cell.vertical_anchor = MSO_VERTICAL_ANCHOR.MIDDLE
             for p in cell.text_frame.paragraphs:
-                p.font.size = Pt(10.5 if c == 3 else 11.5)
+                p.font.size = Pt(13 if c == 3 else 14)  # Aumentado para mejor legibilidad
                 if is_selected:
                     p.font.color.rgb = ACCENT_GOLD if c == 4 else TEXT_WHITE
                 else:
@@ -250,7 +256,7 @@ def create_presentation():
               "3. Modelamiento Térmico: Modelo Sandia SAPM para estimación dinámica de la Temperatura de Celda (Tc).\n\n"
               "4. Caracterización Eléctrica: Extracción de los 5 parámetros De Soto en SRC usando Scipy Optimize.\n\n"
               "5. Simulación de Desempeño: Traslado de parámetros a operación y cómputo de PR minutal anual.")
-    add_text(slide, MARGIN + Inches(0.5), Inches(1.8), SLIDE_WIDTH - 2*MARGIN - Inches(1), Inches(4.5), method, size=18)
+    add_text(slide, MARGIN + Inches(0.5), Inches(1.8), SLIDE_WIDTH - 2*MARGIN - Inches(1), Inches(4.5), method, size=19) # Aumentado de 18 a 19
     add_footer(slide, 4, TOTAL_SLIDES)
 
     # --- SLIDE 5: Recurso Solar (LaTeX) ---
@@ -259,33 +265,33 @@ def create_presentation():
     add_title(slide, "Recurso Solar: Transposición y Absorción")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Fórmulas POA (Perez) y Absorción")
     
-    # 1. Irradiancia en Plano de Arreglo (POA)
+    # 1. Irradiancia en Plano de Arreglo (POA) - Aumentada altura y tamaño de letra
     add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
-             "1. Irradiancia en Plano de Arreglo (POA):", size=13, color=TEXT_WHITE)
+             "1. Irradiancia en Plano de Arreglo (POA):", size=16, color=TEXT_WHITE)
     add_latex_equation(slide, 
                        r"G_{poa} = G_b \cdot R_{beam} + G_d \cdot \left(\frac{1 + \cos(\beta)}{2}\right) + G \cdot \rho \cdot \left(\frac{1 - \cos(\beta)}{2}\right)", 
-                       MARGIN + Inches(0.3), Inches(2.1), Inches(0.38))
+                       MARGIN + Inches(0.3), Inches(2.10), Inches(0.50))
     
-    # 2. Irradiancia Absorbida por Celdas (S) - Altura optimizada a 0.3 para evitar que desborde de la columna
+    # 2. Irradiancia Absorbida por Celdas (S) - Altura maximizada a 0.33 para aprovechar espacio sin desbordar
     add_text(slide, MARGIN + Inches(0.2), Inches(2.8), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
-             "2. Irradiancia Absorbida por Celdas (S):", size=13, color=TEXT_WHITE)
+             "2. Irradiancia Absorbida por Celdas (S):", size=16, color=TEXT_WHITE)
     add_latex_equation(slide, 
                        r"\frac{S}{S_{ref}} = \frac{G_b}{G_{ref}} \cdot R_{beam} \cdot K_{\tau\alpha,b} + \frac{G_d}{G_{ref}} \cdot K_{\tau\alpha,d} \cdot \left(\frac{1 + \cos(\beta)}{2}\right) + \frac{G}{G_{ref}} \cdot \rho \cdot K_{\tau\alpha,g} \cdot \left(\frac{1 - \cos(\beta)}{2}\right)", 
-                       MARGIN + Inches(0.3), Inches(3.2), Inches(0.30))
+                       MARGIN + Inches(0.3), Inches(3.25), Inches(0.33))
     
     # Donde S_ref ...
     add_text(slide, MARGIN + Inches(0.2), Inches(4.1), COLUMN_WIDTH - Inches(0.4), Inches(2.0),
-             "Donde S_ref = G_ref = 1000 W/m² en condiciones de referencia (SRC).", size=13, color=ACCENT_GOLD)
+             "Donde S_ref = G_ref = 1000 W/m² en condiciones de referencia (SRC).", size=15, color=ACCENT_GOLD)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Glosario de Términos")
     glossary = (
-        "• G_b / G_d / G: Irradiancia directa, difusa y global horizontal (W/m²).\n"
-        "• β (Tilt): Ángulo de inclinación del panel (22.91° optimizado).\n"
-        "• ρ (Albedo): Reflectancia del suelo árido desértico (~0.20).\n"
-        "• R_beam: Factor de transposición geométrica para radiación directa.\n"
-        "• K_τα,b / K_τα,d / K_τα,g: Modificadores por ángulo de incidencia (IAM) para componente directa, difusa y del suelo."
+        "• G_b / G_d / G: Irradiancia directa, difusa y global horizontal (W/m²).\n\n"
+        "• β (Tilt): Ángulo de inclinación del panel (22.91° optimizado).\n\n"
+        "• ρ (Albedo): Reflectancia del suelo árido desértico (~0.20).\n\n"
+        "• R_beam: Factor de transposición geométrica para radiación directa.\n\n"
+        "• K_ta,b / K_ta,d / K_ta,g: Modificadores por IAM para directa, difusa y suelo."
     )
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), glossary, size=13)
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(4.5), glossary, size=15) # Aumentado a 15
     add_footer(slide, 5, TOTAL_SLIDES)
 
     # --- SLIDE 6: Modificadores IAM y Air Mass (LaTeX) ---
@@ -295,35 +301,32 @@ def create_presentation():
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Modificador por Ángulo de Incidencia (IAM)")
     
     add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
-             "Ecuación física basada en Ley de Snell y Bouguer:", size=12)
-    add_latex_equation(slide, r"K_{\tau\alpha}(\theta) = \frac{\tau(\theta)}{\tau(0)}", MARGIN + Inches(0.3), Inches(2.1), Inches(0.34))
-    # Altura optimizada a 0.34 para evitar que desborde de la columna
-    add_latex_equation(slide, r"\tau(\theta) = e^{-\frac{K \cdot L}{\cos(\theta_r)}} \cdot \left[ 1 - \frac{1}{2} \left( \frac{\sin^2(\theta_r - \theta)}{\sin^2(\theta_r + \theta)} + \frac{\tan^2(\theta_r - \theta)}{\tan^2(\theta_r + \theta)} \right) \right]", MARGIN + Inches(0.3), Inches(2.6), Inches(0.34))
-    add_latex_equation(slide, r"\theta_r = \arcsin\left(\frac{\sin(\theta)}{n}\right)", MARGIN + Inches(0.3), Inches(3.25), Inches(0.3))
+             "Ecuación física basada en Ley de Snell y Bouguer:", size=15)
+    add_latex_equation(slide, r"K_{\tau\alpha}(\theta) = \frac{\tau(\theta)}{\tau(0)}", MARGIN + Inches(0.3), Inches(2.1), Inches(0.45))
+    # Altura optimizada a 0.38 para maximizar tamaño visual sin desborde
+    add_latex_equation(slide, r"\tau(\theta) = e^{-\frac{K \cdot L}{\cos(\theta_r)}} \cdot \left[ 1 - \frac{1}{2} \left( \frac{\sin^2(\theta_r - \theta)}{\sin^2(\theta_r + \theta)} + \frac{\tan^2(\theta_r - \theta)}{\tan^2(\theta_r + \theta)} \right) \right]", MARGIN + Inches(0.3), Inches(2.6), Inches(0.38))
+    add_latex_equation(slide, r"\theta_r = \arcsin\left(\frac{\sin(\theta)}{n}\right)", MARGIN + Inches(0.3), Inches(3.05), Inches(0.40))
     
     iam_details = (
         "Donde:\n"
-        "• θ: Ángulo de incidencia solar.\n"
-        "• n = 1.526 (Índice de refracción del vidrio templado).\n"
-        "• K = 4 m⁻¹ (Absorción del vidrio).\n"
-        "• L = 2 mm (Espesor típico del vidrio)."
+        "• θ: Ángulo de incidencia  |  n = 1.526 (Índice refracción vidrio).\n"
+        "• K = 4 m⁻¹ (Absorción del vidrio)  |  L = 2 mm (Espesor vidrio)."
     )
-    add_text(slide, MARGIN + Inches(0.2), Inches(3.7), COLUMN_WIDTH - Inches(0.4), Inches(2.5), iam_details, size=11, color=ACCENT_GOLD)
+    add_text(slide, MARGIN + Inches(0.2), Inches(3.9), COLUMN_WIDTH - Inches(0.4), Inches(2.5), iam_details, size=14, color=ACCENT_GOLD)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Modificador por Masa de Aire (AM)")
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
-             "Corrige el desajuste del espectro solar según la atmósfera atravesada:", size=12)
-    add_latex_equation(slide, r"\frac{M}{M_{ref}} = a_0 + a_1 \cdot AM + a_2 \cdot AM^2 + a_3 \cdot AM^3 + a_4 \cdot AM^4", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.2), Inches(0.34))
-    add_latex_equation(slide, r"AM = \frac{1}{\cos(\theta_z) + 0.5057 \cdot (96.08 - \theta_z)^{-1.634}}", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.75), Inches(0.4))
+             "Corrige el desajuste del espectro solar según la atmósfera atravesada:", size=15)
+    add_latex_equation(slide, r"\frac{M}{M_{ref}} = a_0 + a_1 \cdot AM + a_2 \cdot AM^2 + a_3 \cdot AM^3 + a_4 \cdot AM^4", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.15), Inches(0.38))
+    add_latex_equation(slide, r"AM = \frac{1}{\cos(\theta_z) + 0.5057 \cdot (96.08 - \theta_z)^{-1.634}}", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.65), Inches(0.48))
     
     am_details = (
         "Donde:\n"
-        "• AM: Masa de aire absoluta.\n"
-        "• θ_z: Ángulo cenital del sol.\n"
+        "• AM: Masa de aire absoluta  |  θ_z: Ángulo cenital del sol.\n"
         "• a₀, a₁, a₂, a₃, a₄: Coeficientes empíricos espectrales.\n"
         "• M_ref: Transmitancia espectral a STC (AM 1.5g)."
     )
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(3.4), COLUMN_WIDTH - Inches(0.4), Inches(3.0), am_details, size=12)
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(3.45), COLUMN_WIDTH - Inches(0.4), Inches(3.0), am_details, size=15)
     add_footer(slide, 6, TOTAL_SLIDES)
 
     # --- SLIDE 7: Perfil Diario (Imagen) ---
@@ -341,8 +344,8 @@ def create_presentation():
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Ecuación del Modelo Térmico")
     
     add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
-             "La temperatura interna de la celda (Tc) depende del recurso solar y del viento:", size=13)
-    add_latex_equation(slide, r"T_c = G_{poa} \cdot e^{a + b \cdot v_w} + T_a + \left(\frac{G_{poa}}{1000}\right) \cdot \Delta T", MARGIN + Inches(0.3), Inches(2.2), Inches(0.45))
+             "La temperatura interna de la celda (Tc) depende del recurso solar y del viento:", size=16)
+    add_latex_equation(slide, r"T_c = G_{poa} \cdot e^{a + b \cdot v_w} + T_a + \left(\frac{G_{poa}}{1000}\right) \cdot \Delta T", MARGIN + Inches(0.3), Inches(2.15), Inches(0.48))
     
     thermal_details = (
         "Donde:\n"
@@ -351,21 +354,19 @@ def create_presentation():
         "• v_w: Velocidad del viento (m/s).\n"
         "• a, b, ΔT: Parámetros empíricos del encapsulado."
     )
-    add_text(slide, MARGIN + Inches(0.2), Inches(2.9), COLUMN_WIDTH - Inches(0.4), Inches(3.0), thermal_details, size=13, color=ACCENT_GOLD)
+    add_text(slide, MARGIN + Inches(0.2), Inches(2.85), COLUMN_WIDTH - Inches(0.4), Inches(3.0), thermal_details, size=15, color=ACCENT_GOLD)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Coeficientes por Tecnología")
     thermal_coef = (
         "Los parámetros empíricos varían según la disipación del marco y capas protectoras:\n\n"
         "1. Silicio Monocristalino (m-Si) — glass/polymer:\n"
-        "   • a = -3.56  |  b = -0.075\n"
-        "   • ΔT = 3.0 °C\n"
+        "   • a = -3.56  |  b = -0.075  |  ΔT = 3.0 °C\n"
         "   → Comportamiento: Disipación estándar, mayor calentamiento.\n\n"
         "2. Heterounión (HIT) — glass/glass:\n"
-        "   • a = -3.47  |  b = -0.059\n"
-        "   • ΔT = 3.0 °C\n"
+        "   • a = -3.47  |  b = -0.059  |  ΔT = 3.0 °C\n"
         "   → Comportamiento: Estructura de doble vidrio, retiene ligeramente más calor, pero se compensa por su bajo coeficiente térmico."
     )
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), thermal_coef, size=14)
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(4.5), thermal_coef, size=15)
     add_footer(slide, 8, TOTAL_SLIDES)
 
     # --- SLIDE 9: Histograma Térmico ---
@@ -377,10 +378,10 @@ def create_presentation():
     
     add_panel(slide, Inches(7.5), Inches(1.2), Inches(5.4), Inches(5.5), title="Comportamiento en Atacama")
     add_text(slide, Inches(7.7), Inches(1.8), Inches(5), Inches(4), 
-             "• Temperatura promedio diurna de celda: ~38°C a 45°C.\n"
-             "• Picos térmicos extremos superan los 65°C a mediodía en verano.\n"
-             "• Clima desértico seco reduce la convección natural del marco.\n"
-             "• Las altas temperaturas aumentan la corriente de saturación inversa (Io), reduciendo severamente el Voc.", size=16)
+             "• Temperatura promedio diurna de celda: ~38°C a 45°C.\n\n"
+             "• Picos térmicos extremos superan los 65°C a mediodía en verano.\n\n"
+             "• Clima desértico seco reduce la convección natural del marco.\n\n"
+             "• Las altas temperaturas aumentan la corriente de saturación inversa (Io), reduciendo severamente el Voc.", size=17) # Aumentado a 17
     add_footer(slide, 9, TOTAL_SLIDES)
 
     # --- SLIDE 10: Modelo de 5 Parámetros (SDM) (LaTeX) ---
@@ -390,19 +391,19 @@ def create_presentation():
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Ecuación del Circuito Equivalente")
     
     add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
-             "El módulo se modela como un circuito equivalente de un diodo y pérdidas óhmicas:", size=13)
-    # Altura optimizada a 0.34 para evitar que desborde de la columna
-    add_latex_equation(slide, r"I = I_L - I_0 \cdot \left[ \exp\left(\frac{V + I \cdot R_s}{a}\right) - 1 \right] - \frac{V + I \cdot R_s}{R_{sh}}", MARGIN + Inches(0.3), Inches(2.2), Inches(0.34))
+             "El módulo se modela como un circuito equivalente de un diodo y pérdidas óhmicas:", size=16)
+    # Altura optimizada a 0.38 para maximizar tamaño sin desbordar de la columna
+    add_latex_equation(slide, r"I = I_L - I_0 \cdot \left[ \exp\left(\frac{V + I \cdot R_s}{a}\right) - 1 \right] - \frac{V + I \cdot R_s}{R_{sh}}", MARGIN + Inches(0.3), Inches(2.15), Inches(0.38))
     
-    add_text(slide, MARGIN + Inches(0.2), Inches(2.9), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
-             "El factor de idealidad térmico (a) se define formalmente como:", size=13)
-    add_latex_equation(slide, r"a = \frac{N_s \cdot n_I \cdot k \cdot T_c}{q}", MARGIN + Inches(0.3), Inches(3.4), Inches(0.42))
+    add_text(slide, MARGIN + Inches(0.2), Inches(2.85), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
+             "El factor de idealidad térmico (a) se define formalmente como:", size=16)
+    add_latex_equation(slide, r"a = \frac{N_s \cdot n_I \cdot k \cdot T_c}{q}", MARGIN + Inches(0.3), Inches(3.3), Inches(0.50))
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Glosario de Parámetros Físicos")
     sdm_glossary = (
         "• I / V: Corriente y voltaje de salida (A, V).\n"
         "• I_L: Corriente fotogenerada por irradiancia (A).\n"
-        "• I_₀: Corriente de saturación inversa del diodo (A).\n"
+        "• I_0: Corriente de saturación inversa del diodo (A).\n"
         "• R_s: Resistencia serie de pérdidas (Ω).\n"
         "• R_sh: Resistencia paralelo o shunt de fugas (Ω).\n"
         "• N_s: Número de celdas en serie (m-Si: 36, HIT: 72).\n"
@@ -411,7 +412,7 @@ def create_presentation():
         "• q: Carga elemental del electrón (1.6022 × 10⁻¹⁹ C).\n"
         "• T_c: Temperatura de celda absoluta (K)."
     )
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), sdm_glossary, size=12)
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(4.5), sdm_glossary, size=15)
     add_footer(slide, 10, TOTAL_SLIDES)
 
     # --- SLIDE 11: Extracción en SRC (LaTeX) ---
@@ -425,25 +426,25 @@ def create_presentation():
              "1. Cortocircuito (I_sc): V = 0, I = I_sc,ref\n"
              "2. Circuito Abierto (V_oc): I = 0, V = V_oc,ref\n"
              "3. Máxima Potencia (MPP): I = I_mp,ref, V = V_mp,ref\n"
-             "4. Pendiente en MPP (dP/dV = 0):", size=12)
-    add_latex_equation(slide, r"\left.\frac{dI}{dV}\right|_{mp} = -\frac{I_{mp,ref}}{V_{mp,ref}}", MARGIN + Inches(0.3), Inches(3.1), Inches(0.4))
+             "4. Pendiente en MPP (dP/dV = 0):", size=15)
+    add_latex_equation(slide, r"\left.\frac{dI}{dV}\right|_{mp} = -\frac{I_{mp,ref}}{V_{mp,ref}}", MARGIN + Inches(0.3), Inches(3.05), Inches(0.50))
     
-    add_text(slide, MARGIN + Inches(0.2), Inches(3.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
-             "5. Coeficiente térmico de V_oc:", size=12)
-    add_latex_equation(slide, r"\beta_{Voc} = \frac{\partial V_{oc}}{\partial T_c}", MARGIN + Inches(0.3), Inches(4.1), Inches(0.36))
+    add_text(slide, MARGIN + Inches(0.2), Inches(3.65), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
+             "5. Coeficiente térmico de V_oc:", size=15)
+    add_latex_equation(slide, r"\beta_{Voc} = \frac{\partial V_{oc}}{\partial T_c}", MARGIN + Inches(0.3), Inches(4.05), Inches(0.45))
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Ecuación de la Derivada Analítica en MPP")
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
-             "Para acoplar Rs y el factor de idealidad, se implementa la derivada analítica obtenida del circuito:", size=12)
-    add_latex_equation(slide, r"\left.\frac{dI}{dV}\right|_{mp} = -\frac{A + B}{1 + R_s \cdot A + R_s \cdot B}", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.2), Inches(0.46))
+             "Para acoplar Rs y el factor de idealidad, se implementa la derivada analítica obtenida del circuito:", size=15)
+    add_latex_equation(slide, r"\left.\frac{dI}{dV}\right|_{mp} = -\frac{A + B}{1 + R_s \cdot A + R_s \cdot B}", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.1), Inches(0.52))
     
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(2.85), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
-             "Donde:", size=12)
-    add_latex_equation(slide, r"A = \frac{I_0}{a} \cdot e^{\frac{V_{mp} + I_{mp} \cdot R_s}{a}}", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(3.15), Inches(0.42))
-    add_latex_equation(slide, r"B = \frac{1}{R_{sh}}", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(3.75), Inches(0.3))
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(2.75), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
+             "Donde:", size=15)
+    add_latex_equation(slide, r"A = \frac{I_0}{a} \cdot e^{\frac{V_{mp} + I_{mp} \cdot R_s}{a}}", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(3.15), Inches(0.50))
+    add_latex_equation(slide, r"B = \frac{1}{R_{sh}}", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(3.75), Inches(0.40))
     
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(4.25), COLUMN_WIDTH - Inches(0.4), Inches(1.5),
-             "La optimización se realiza mediante ajuste de mínimos cuadrados con bounds físicos (R_s > 0, n_I ∈ [1, 2]).", size=12, color=ACCENT_GOLD)
+             "La optimización se realiza mediante ajuste de mínimos cuadrados con bounds físicos (R_s > 0, n_I ∈ [1, 2]).", size=14, color=ACCENT_GOLD)
     add_footer(slide, 11, TOTAL_SLIDES)
 
     # --- SLIDE 12: Ecuaciones de Escalado (LaTeX) ---
@@ -452,24 +453,24 @@ def create_presentation():
     add_title(slide, "Escalamiento a Condiciones Reales")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Dependencias con (G, Tc) de De Soto")
     
-    add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "1. Factor de Idealidad:", size=12)
-    add_latex_equation(slide, r"\frac{a}{a_{ref}} = \frac{T_c}{T_{ref}}", MARGIN + Inches(0.3), Inches(2.0), Inches(0.28))
+    add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "1. Factor de Idealidad:", size=15)
+    add_latex_equation(slide, r"\frac{a}{a_{ref}} = \frac{T_c}{T_{ref}}", MARGIN + Inches(0.3), Inches(2.05), Inches(0.35))
     
-    add_text(slide, MARGIN + Inches(0.2), Inches(2.35), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "2. Corriente de Saturación Inversa (Io):", size=12)
-    add_latex_equation(slide, r"\frac{I_0}{I_{0,ref}} = \left(\frac{T_c}{T_{ref}}\right)^3 \cdot \exp\left[ \frac{E_{g,ref}}{k \cdot T_{ref}} - \frac{E_g}{k \cdot T_c} \right]", MARGIN + Inches(0.3), Inches(2.65), Inches(0.35))
+    add_text(slide, MARGIN + Inches(0.2), Inches(2.45), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "2. Corriente de Saturación Inversa (Io):", size=15)
+    add_latex_equation(slide, r"\frac{I_0}{I_{0,ref}} = \left(\frac{T_c}{T_{ref}}\right)^3 \cdot \exp\left[ \frac{E_{g,ref}}{k \cdot T_{ref}} - \frac{E_g}{k \cdot T_c} \right]", MARGIN + Inches(0.3), Inches(2.80), Inches(0.42))
     
-    add_text(slide, MARGIN + Inches(0.2), Inches(3.1), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "3. Energía de Bandgap (Eg):", size=12)
-    add_latex_equation(slide, r"\frac{E_g}{E_{g,ref}} = 1 - 0.0002677 \cdot (T_c - T_{ref})", MARGIN + Inches(0.3), Inches(3.4), Inches(0.28))
+    add_text(slide, MARGIN + Inches(0.2), Inches(3.30), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "3. Energía de Bandgap (Eg):", size=15)
+    add_latex_equation(slide, r"\frac{E_g}{E_{g,ref}} = 1 - 0.0002677 \cdot (T_c - T_{ref})", MARGIN + Inches(0.3), Inches(3.65), Inches(0.36))
     
-    add_text(slide, MARGIN + Inches(0.2), Inches(3.75), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "4. Corriente Fotogenerada (IL):", size=12)
-    add_latex_equation(slide, r"I_L = \left(\frac{S}{S_{ref}}\right) \cdot \left(\frac{M}{M_{ref}}\right) \cdot \left[ I_{L,ref} + \alpha_{Isc} \cdot (T_c - T_{ref}) \right]", MARGIN + Inches(0.3), Inches(4.05), Inches(0.32))
+    add_text(slide, MARGIN + Inches(0.2), Inches(4.10), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "4. Corriente Fotogenerada (IL):", size=15)
+    add_latex_equation(slide, r"I_L = \left(\frac{S}{S_{ref}}\right) \cdot \left(\frac{M}{M_{ref}}\right) \cdot \left[ I_{L,ref} + \alpha_{Isc} \cdot (T_c - T_{ref}) \right]", MARGIN + Inches(0.3), Inches(4.45), Inches(0.38))
     
-    add_text(slide, MARGIN + Inches(0.2), Inches(4.45), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "5. Resistencia Shunt:", size=12)
-    add_latex_equation(slide, r"R_{sh} = R_{sh,ref} \cdot \left(\frac{S_{ref}}{S}\right)", MARGIN + Inches(0.3), Inches(4.75), Inches(0.28))
+    add_text(slide, MARGIN + Inches(0.2), Inches(4.90), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "5. Resistencia Shunt:", size=15)
+    add_latex_equation(slide, r"R_{sh} = R_{sh,ref} \cdot \left(\frac{S_{ref}}{S}\right)", MARGIN + Inches(0.3), Inches(5.25), Inches(0.35))
     
-    add_text(slide, MARGIN + Inches(0.2), Inches(5.15), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "Donde Eg,ref = 1.121 eV para Silicio a 25°C.", size=12, color=ACCENT_GOLD)
+    add_text(slide, MARGIN + Inches(0.2), Inches(5.70), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "Donde Eg,ref = 1.121 eV para Silicio a 25°C.", size=14, color=ACCENT_GOLD)
     
-    add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Suposiciones Físicas Justificadas")
+    add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Suposiciones Ficas Justificadas")
     scale_just = (
         "• R_s Constante: Se asume R_s = R_s,ref.\n"
         "  Justificación: De Soto (2006) demuestra mediante validaciones contra NIST que la variación térmica de R_s es de segundo orden y su efecto en la curva I-V es despreciable.\n\n"
@@ -477,7 +478,7 @@ def create_presentation():
         "  Sigue la relación inversamente proporcional con S para modelar cómo el aumento de portadores minoritarios abre caminos de fuga paralelos en la celda.\n\n"
         "• T_ref = 298.15 K (25°C)  |  S_ref = 1000 W/m²."
     )
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), scale_just, size=13)
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), scale_just, size=15)
     add_footer(slide, 12, TOTAL_SLIDES)
 
     # --- SLIDE 13: Validación curvas IV/PV ---
@@ -497,10 +498,10 @@ def create_presentation():
     
     add_panel(slide, Inches(7), Inches(1.2), Inches(5.9), Inches(5.5), title="Métricas de Ajuste")
     add_text(slide, Inches(7.2), Inches(1.8), Inches(5.5), Inches(4), 
-             "• Coeficiente de determinación R² > 0.99 para ambas tecnologías.\n"
-             "• RMSE < 5W en condiciones estándar.\n"
-             "• Validación cruzada: El modelo de De Soto reproduce con alta fidelidad las pérdidas por temperatura en celdas de silicio.\n"
-             "• Error máximo concentrado en la zona de codo a baja irradiancia.", size=16)
+             "• Coeficiente de determinación R² > 0.99 para ambas tecnologías.\n\n"
+             "• RMSE < 5W en condiciones estándar.\n\n"
+             "• Validación cruzada: El modelo de De Soto reproduce con alta fidelidad las pérdidas por temperatura en celdas de silicio.\n\n"
+             "• Error máximo concentrado en la zona de codo a baja irradiancia.", size=17) # Aumentado a 17
     add_footer(slide, 14, TOTAL_SLIDES)
 
     # --- SLIDE 15: Performance Ratio (Ecuación) (LaTeX) ---
@@ -510,8 +511,8 @@ def create_presentation():
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Ecuación Matemática del PR")
     
     add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
-             "El Performance Ratio (PR) evalúa la eficiencia neta del sistema fotovoltaico:", size=13)
-    add_latex_equation(slide, r"PR = \frac{\sum P_{mp,SDM}(G, T_c)}{\sum \left[ P_{STC} \cdot \left(\frac{G_{poa}}{1000}\right) \right]}", MARGIN + Inches(0.3), Inches(2.2), Inches(0.48))
+             "El Performance Ratio (PR) evalúa la eficiencia neta del sistema fotovoltaico:", size=16)
+    add_latex_equation(slide, r"PR = \frac{\sum P_{mp,SDM}(G, T_c)}{\sum \left[ P_{STC} \cdot \left(\frac{G_{poa}}{1000}\right) \right]}", MARGIN + Inches(0.3), Inches(2.15), Inches(0.55))
     
     pr_details = (
         "Donde:\n"
@@ -520,7 +521,7 @@ def create_presentation():
         "• G_poa: Irradiancia calculada en el plano del panel (W/m²).\n"
         "• 1000: Irradiancia de referencia a STC (W/m²)."
     )
-    add_text(slide, MARGIN + Inches(0.2), Inches(2.9), COLUMN_WIDTH - Inches(0.4), Inches(3.0), pr_details, size=13, color=ACCENT_GOLD)
+    add_text(slide, MARGIN + Inches(0.2), Inches(2.9), COLUMN_WIDTH - Inches(0.4), Inches(3.0), pr_details, size=15, color=ACCENT_GOLD)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Significado Físico del PR")
     pr_phys = (
@@ -532,7 +533,7 @@ def create_presentation():
         "  3. Pérdidas por Atenuación Espectral (Masa de Aire).\n"
         "  4. Pérdidas Óhmicas Internas (Resistencia Serie Rs)."
     )
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), pr_phys, size=14)
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(4.5), pr_phys, size=16) # Aumentado a 16
     add_footer(slide, 15, TOTAL_SLIDES)
 
     # --- SLIDE 16: PR Mensual ---
@@ -553,7 +554,7 @@ def create_presentation():
     add_panel(slide, Inches(8.3), Inches(1.2), Inches(4.6), Inches(5.5), title="Observación Científica")
     add_text(slide, Inches(8.5), Inches(1.8), Inches(4.2), Inches(4.5), 
              "• HIT (Naranja): Pendiente suave. Su bajo coeficiente térmico (-0.26 %/°C) mantiene una alta eficiencia de conversión incluso a 65°C de celda.\n\n"
-             "• m-Si (Azul): Caída térmica severa. Su coeficiente térmico (-0.40 %/°C) penaliza fuertemente el voltaje en las horas pico de irradiancia desértica.", size=15)
+             "• m-Si (Azul): Caída térmica severa. Su coeficiente térmico (-0.40 %/°C) penaliza fuertemente el voltaje en las horas pico de irradiancia desértica.", size=17) # Aumentado a 17
     add_footer(slide, 17, TOTAL_SLIDES)
 
     # --- SLIDE 18: Resultados Anuales y Veredicto ---
@@ -563,12 +564,12 @@ def create_presentation():
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Veredicto Técnico")
     
     verdict = (
-        "• Performance Ratio Anual m-Si: 84.53%\n"
+        "• Performance Ratio Anual m-Si: 84.53%\n\n"
         "• Performance Ratio Anual HIT: 86.92%\n\n"
         "• Ganancia Neta en PR: +2.39% a favor de HIT.\n\n"
         "El módulo HIT entrega un 2.39% más de energía útil por cada watt pico instalado, gracias a su menor caída térmica bajo el calor extremo del Desierto de Atacama en 2026."
     )
-    add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), verdict, size=17, bold=True, color=ACCENT_GOLD)
+    add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), verdict, size=18, bold=True, color=ACCENT_GOLD) # Aumentado a 18
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Impacto en Proyectos a Gran Escala")
     impact_text = (
@@ -577,7 +578,7 @@ def create_presentation():
         "• La ganancia de +2.39% de la tecnología HIT equivale a ~6,000 MWh/año adicionales de facturación neta.\n\n"
         "• Se justifica técnicamente la inversión en tecnología premium HIT para climas desérticos de alta irradiancia y alta temperatura."
     )
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), impact_text, size=15)
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), impact_text, size=17) # Aumentado a 17
     add_footer(slide, 18, TOTAL_SLIDES)
 
     # --- SLIDE 19: Conclusiones y Trabajos Futuros ---
@@ -592,7 +593,7 @@ def create_presentation():
         "3. La tecnología HIT supera en un 2.39% de PR anual al silicio monocristalino estándar.\n\n"
         "4. El coeficiente de temperatura es el factor dominante en el diseño solar desértico."
     )
-    add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), concl, size=15, color=ACCENT_GOLD)
+    add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), concl, size=17, color=ACCENT_GOLD) # Aumentado a 17
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Trabajos Futuros")
     futur = (
@@ -601,7 +602,7 @@ def create_presentation():
         "• Pérdidas por acumulación de polvo (soiling) en el Desierto de Atacama.\n\n"
         "• Análisis de costo nivelado LCOE para evaluar el retorno de la inversión de paneles premium HIT."
     )
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), futur, size=14)
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), futur, size=16) # Aumentado a 16
     add_footer(slide, 19, TOTAL_SLIDES)
 
     # --- SLIDE 20: Referencias ---
@@ -614,7 +615,7 @@ def create_presentation():
             "• pvlib-python Library documentation & community contributors.\n\n"
             "• Marion, B. et al. (2014). \"Cocoa, Florida Data Set for Validating PV Models.\" NREL Technical Report.\n\n"
             "Agradecimientos al Departamento de Electrotecnia de la UTFSM.")
-    add_text(slide, MARGIN, Inches(2), SLIDE_WIDTH - 2*MARGIN, Inches(4), refs, size=16)
+    add_text(slide, MARGIN, Inches(2), SLIDE_WIDTH - 2*MARGIN, Inches(4), refs, size=18) # Aumentado a 18
     add_footer(slide, 20, TOTAL_SLIDES)
 
     # --- Guardar ---
