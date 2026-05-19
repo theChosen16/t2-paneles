@@ -560,11 +560,11 @@ def create_presentation():
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Validación: Potencia Medida vs. Simulada")
-    add_panel(slide, MARGIN, Inches(1.2), Inches(6.5), Inches(5.5), title="Correlación de Potencia")
-    add_image(slide, 'output/Fase2_Resultados/val_scatter_HIT.png', MARGIN + Inches(0.2), Inches(1.8), width=Inches(4.5))
+    add_panel(slide, MARGIN, Inches(1.2), Inches(6.4), Inches(5.5), title="Correlación de Potencia")
+    add_image(slide, 'output/Fase2_Resultados/val_scatter_HIT.png', MARGIN + Inches(0.2), Inches(1.70), width=Inches(6.0), height=Inches(4.50))
     
-    add_panel(slide, Inches(7), Inches(1.2), Inches(5.9), Inches(5.5), title="Métricas de Ajuste")
-    add_text(slide, Inches(7.2), Inches(1.8), Inches(5.5), Inches(4), 
+    add_panel(slide, Inches(7.4), Inches(1.2), Inches(5.1), Inches(5.5), title="Métricas de Ajuste")
+    add_text(slide, Inches(7.6), Inches(1.8), Inches(4.7), Inches(4.5), 
              "• Coeficiente de determinación R² > 0.99 para ambas tecnologías.\n\n"
              "• RMSE < 5W en condiciones estándar.\n\n"
              "• Validación cruzada: El modelo de De Soto reproduce con alta fidelidad las pérdidas por temperatura en celdas de silicio.\n\n"
@@ -580,16 +580,16 @@ def create_presentation():
     add_panel(slide, MARGIN, Inches(1.2), SLIDE_WIDTH - 2*MARGIN, Inches(2.2), title="Ecuación Matemática del PR")
     add_text(slide, MARGIN + Inches(0.2), Inches(1.65), SLIDE_WIDTH - 2*MARGIN - Inches(0.4), Inches(0.35),
              "El Performance Ratio (_PR_) evalúa la eficiencia neta del sistema fotovoltaico frente a condiciones de referencia STC:", size=15)
-    add_latex_equation(slide, r"PR = \frac{\sum P_{mp,SDM}(G, T_c)}{\sum \left[ P_{STC} \cdot \left(\frac{G_{poa}}{1000}\right) \right]}", MARGIN + Inches(1.8), Inches(2.15), Inches(0.55))
+    add_latex_equation(slide, r"PR = \frac{\sum_{t=1}^{N} V_{mp,t}(G_t, T_{c,t}) \cdot I_{mp,t}(G_t, T_{c,t})}{\sum_{t=1}^{N} \left[ P_{STC} \cdot \left(\frac{G_{poa,t}}{G_{ref}}\right) \right]}", MARGIN + Inches(1.5), Inches(2.05), Inches(0.85), max_width=Inches(8.73))
     
     # Segmento Inferior: Dos Paneles
     # Panel Izquierdo: Glosario
     add_panel(slide, MARGIN, Inches(3.6), Inches(5.2), Inches(3.1), title="Glosario de Variables")
     pr_details = (
-        "• _P_[_mp,SDM_]: Potencia MPP simulada hora a hora con De Soto^[1]^ (W).\n"
+        "• _V_[_mp,t_] / _I_[_mp,t_]: Tensión y corriente MPP horarias del SDM^[1]^.\n"
         "• _P_[_STC_]: Potencia nominal en STC (m-Si: 46.68 W | HIT: 217.52 W).\n"
-        "• _G_[_poa_]: Irradiancia calculada en el plano del panel (W/m²).\n"
-        "• 1000: Irradiancia de referencia a STC (W/m²)."
+        "• _G_[_poa,t_]: Irradiancia temporal en el plano del panel (W/m²).\n"
+        "• _G_[_ref_]: Irradiancia de referencia a STC (1000 W/m²)."
     )
     add_text(slide, MARGIN + Inches(0.2), Inches(4.10), Inches(4.8), Inches(2.3), pr_details, size=14, color=ACCENT_GOLD)
     
