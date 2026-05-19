@@ -188,7 +188,7 @@ def create_presentation():
     add_text(slide, MARGIN, Inches(1.8), SLIDE_WIDTH - 2*MARGIN, Inches(1.5), 
              "Evaluación de Tecnologías Fotovoltaicas en el Desierto de Atacama", size=36, bold=True, color=ACCENT_GOLD, align=PP_ALIGN.CENTER)
     add_text(slide, MARGIN, Inches(3.2), SLIDE_WIDTH - 2*MARGIN, Inches(0.8), 
-             "Modelamiento Eléctrico mediante el Modelo de 5 Parámetros de De Soto", size=22, align=PP_ALIGN.CENTER)
+             "Modelamiento Eléctrico mediante el Modelo de 5 Parámetros de De Soto^[1]^", size=22, align=PP_ALIGN.CENTER)
     
     names_text = ("Integrantes / Estudiantes:\n"
                   "Laury Gualdron  |  Sebastian Marin  |  Alejandro Hernández\n\n"
@@ -220,7 +220,7 @@ def create_presentation():
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "¿Por qué m-Si y HIT? Comparativa de la Base de Datos")
-    add_panel(slide, MARGIN, Inches(1.2), SLIDE_WIDTH - 2*MARGIN, Inches(5.5), title="Familias Tecnológicas en Dataset Cocoa (NREL)")
+    add_panel(slide, MARGIN, Inches(1.2), SLIDE_WIDTH - 2*MARGIN, Inches(5.5), title="Familias Tecnológicas en Dataset Cocoa (NREL) ^[5]^")
     
     rows, cols = 6, 5
     left, top = MARGIN + Inches(0.2), Inches(1.8)
@@ -296,11 +296,11 @@ def create_presentation():
     apply_slide_background(slide)
     add_title(slide, "Metodología: Pipeline de Simulación")
     add_panel(slide, MARGIN, Inches(1.2), SLIDE_WIDTH - 2*MARGIN, Inches(5.5), title="Flujo de Procesamiento Automatizado")
-    method = ("1. Ingesta de Datos: Dataset NREL Cocoa (mediciones experimentales reales).\n\n"
+    method = ("1. Ingesta de Datos: Dataset NREL Cocoa^[5]^ (mediciones experimentales reales).\n\n"
               "2. Filtro de Emulación Geográfica: Traslación temporal (desfase de 6 meses) y re-localización espacial.\n\n"
-              "3. Modelamiento Térmico: Modelo Sandia SAPM para estimación dinámica de la Temperatura de Celda (Tc).\n\n"
-              "4. Caracterización Eléctrica: Extracción de los 5 parámetros De Soto en SRC usando Scipy Optimize.\n\n"
-              "5. Simulación de Desempeño: Traslado de parámetros a operación y cómputo de PR minutal anual.")
+              "3. Modelamiento Térmico: Modelo Sandia SAPM^[2]^ para estimación dinámica de la Temperatura de Celda (_T_[_c_]).\n\n"
+              "4. Caracterización Eléctrica: Extracción de los 5 parámetros De Soto^[1]^ en SRC usando Scipy Optimize.\n\n"
+              "5. Simulación de Desempeño: Traslado de parámetros a operación y cómputo de _PR_ minutal anual usando pvlib-python^[4]^.")
     add_text(slide, MARGIN + Inches(0.5), Inches(1.8), SLIDE_WIDTH - 2*MARGIN - Inches(1), Inches(4.5), method, size=19) # Aumentado de 18 a 19
     add_footer(slide, 4, TOTAL_SLIDES)
 
@@ -343,7 +343,7 @@ def create_presentation():
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Modificadores Ópticos: IAM y Masa de Aire")
-    add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Modificador por Ángulo de Incidencia (IAM)")
+    add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Modificador por Ángulo de Incidencia (IAM) ^[2]^")
     
     add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
              "Ecuación física basada en Ley de Snell y Bouguer:", size=15)
@@ -358,7 +358,7 @@ def create_presentation():
     )
     add_text(slide, MARGIN + Inches(0.2), Inches(3.80), COLUMN_WIDTH - Inches(0.4), Inches(2.5), iam_details, size=14, color=ACCENT_GOLD)
     
-    add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Modificador por Masa de Aire (AM)")
+    add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Modificador por Masa de Aire (AM) ^[2]^")
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
              "Corrige el desajuste del espectro solar según la atmósfera atravesada:", size=15)
     add_latex_equation(slide, r"\frac{M}{M_{ref}} = a_0 + a_1 \cdot AM + a_2 \cdot AM^2 + a_3 \cdot AM^3 + a_4 \cdot AM^4", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.45), Inches(0.38))
@@ -384,7 +384,7 @@ def create_presentation():
     # --- SLIDE 8: Modelamiento Térmico (LaTeX) ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
-    add_title(slide, "Temperatura de Celda (Sandia SAPM)")
+    add_title(slide, "Temperatura de Celda (Sandia SAPM) ^[2]^")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Ecuación del Modelo Térmico")
     
     add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
@@ -431,7 +431,7 @@ def create_presentation():
     # --- SLIDE 10: Modelo de 5 Parámetros (SDM) (LaTeX) ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
-    add_title(slide, "Modelo de 5 Parámetros: Diodo Simple (SDM)")
+    add_title(slide, "Modelo de 5 Parámetros: Diodo Simple (SDM) ^[1]^")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Ecuación del Circuito Equivalente")
     
     add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
@@ -466,7 +466,7 @@ def create_presentation():
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Sistema No-Lineal de 5 Ecuaciones")
     
     add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(1.3),
-             "Se extraen _a_[_ref_], _I_[_L,ref_], _I_[_0,ref_], _R_[_s,ref_], _R_[_sh,ref_] en STC:\n\n"
+             "Se extraen _a_[_ref_], _I_[_L,ref_], _I_[_0,ref_], _R_[_s,ref_], _R_[_sh,ref_] en STC^[1]^:\n\n"
              "1. Cortocircuito (_I_[_sc_]): _V_ = 0, _I_ = _I_[_sc,ref_]\n"
              "2. Circuito Abierto (_V_[_oc_]): _I_ = 0, _V_ = _V_[_oc,ref_]\n"
              "3. Máxima Potencia (MPP): _I_ = _I_[_mp,ref_], _V_ = _V_[_mp,ref_]\n"
@@ -495,7 +495,7 @@ def create_presentation():
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Escalamiento a Condiciones Reales")
-    add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Dependencias con (G, Tc) de De Soto")
+    add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Dependencias con (G, Tc) de De Soto ^[1]^")
     
     add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "1. Factor de Idealidad:", size=15)
     add_latex_equation(slide, r"\frac{a}{a_{ref}} = \frac{T_c}{T_{ref}}", MARGIN + Inches(0.3), Inches(2.05), Inches(0.35))
@@ -517,7 +517,7 @@ def create_presentation():
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Suposiciones Ficas Justificadas")
     scale_just = (
         "• _R_[_s_] Constante: Se asume _R_[_s_] = _R_[_s,ref_].\n"
-        "  Justificación: De Soto (2006) demuestra mediante validaciones contra NIST que la variación térmica de _R_[_s_] es de segundo orden y su efecto en la curva _I_-_V_ es despreciable.\n\n"
+        "  Justificación: De Soto (2006)^[1]^ demuestra mediante validaciones contra NIST que la variación térmica de _R_[_s_] es de segundo orden y su efecto en la curva _I_-_V_ es despreciable.\n\n"
         "• _R_[_sh_] dependiente de la Irradiancia Absorbida:\n"
         "  Sigue la relación inversamente proporcional con _S_ para modelar cómo el aumento de portadores minoritarios abre caminos de fuga paralelos en la celda.\n\n"
         "• _T_[_ref_] = 298.15 K (25°C)  |  _S_[_ref_] = 1000 W/m²."
@@ -560,7 +560,7 @@ def create_presentation():
     
     pr_details = (
         "Donde:\n"
-        "• _P_[_mp,SDM_]: Potencia MPP simulada hora a hora con De Soto (W).\n"
+        "• _P_[_mp,SDM_]: Potencia MPP simulada hora a hora con De Soto^[1]^ (W).\n"
         "• _P_[_STC_]: Potencia nominal a STC (m-Si: 46.68 W | HIT: 217.52 W).\n"
         "• _G_[_poa_]: Irradiancia calculada en el plano del panel (W/m²).\n"
         "• 1000: Irradiancia de referencia a STC (W/m²)."
@@ -653,11 +653,11 @@ def create_presentation():
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Referencias y Agradecimientos")
-    refs = ("• De Soto, W., Klein, S.A., Beckman, W.A. (2006). \"Improvement and validation of a model for photovoltaic array performance.\" Solar Energy 80 (2006) 78–88.\n\n"
-            "• Sandia National Laboratories - Photovoltaic Array Performance Model (Sandia Report SAND2004-3535).\n\n"
-            "• NREL Cocoa Dataset - Experimental Measurements for Model Validation.\n\n"
-            "• pvlib-python Library documentation & community contributors.\n\n"
-            "• Marion, B. et al. (2014). \"Cocoa, Florida Data Set for Validating PV Models.\" NREL Technical Report.\n\n"
+    refs = ("1. De Soto, W., Klein, S.A., Beckman, W.A. (2006). \"Improvement and validation of a model for photovoltaic array performance.\" Solar Energy 80 (2006) 78–88.\n\n"
+            "2. Sandia National Laboratories - Photovoltaic Array Performance Model (Sandia Report SAND2004-3535).\n\n"
+            "3. NREL Cocoa Dataset - Experimental Measurements for Model Validation.\n\n"
+            "4. pvlib-python Library documentation & community contributors.\n\n"
+            "5. Marion, B. et al. (2014). \"Cocoa, Florida Data Set for Validating PV Models.\" NREL Technical Report.\n\n"
             "Agradecimientos al Departamento de Electrotecnia de la UTFSM.")
     add_text(slide, MARGIN, Inches(2), SLIDE_WIDTH - 2*MARGIN, Inches(4), refs, size=18) # Aumentado a 18
     add_footer(slide, 20, TOTAL_SLIDES)
