@@ -40,7 +40,7 @@ def gen_extra_results():
     os.makedirs(output_dir, exist_ok=True)
     
     # --- GRÁFICO 1: Curvas I-V y P-V en SRC ---
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14.7, 7.0))
     
     for mod in ['mSi', 'HIT']:
         p = params[mod]
@@ -82,7 +82,7 @@ def gen_extra_results():
     ax2.set_ylim(0, 250)
     
     plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, 'curvas_iv_pv_src.png'), transparent=True, dpi=150)
+    plt.savefig(os.path.join(output_dir, 'curvas_iv_pv_src.png'), transparent=True, dpi=150, bbox_inches='tight')
     plt.close()
     
     # --- GRÁFICO 2: Perfil de un Día Despejado ---

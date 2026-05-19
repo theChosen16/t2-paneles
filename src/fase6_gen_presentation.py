@@ -331,9 +331,11 @@ def create_presentation():
     add_text(slide, MARGIN + Inches(5.5) + GAP + Inches(0.2), Inches(1.7), Inches(5.8), Inches(0.35),
              "Modela la radiación real que penetra y es absorbida por la celda:", size=15)
     eq_multiline = (
-        r"$\frac{S}{S_{ref}} = \frac{G_b}{G_{ref}} \cdot R_{beam} \cdot K_{\tau\alpha,b}$" + "\n" +
-        r"$\quad + \frac{G_d}{G_{ref}} \cdot K_{\tau\alpha,d} \cdot \left(\frac{1 + \cos(\beta)}{2}\right)$" + "\n" +
-        r"$\quad + \frac{G}{G_{ref}} \cdot \rho \cdot K_{\tau\alpha,g} \cdot \left(\frac{1 - \cos(\beta)}{2}\right)$"
+        r"$\begin{array}{rl}" + "\n" +
+        r"\frac{S}{S_{ref}} = & \frac{G_b}{G_{ref}} \cdot R_{beam} \cdot K_{\tau\alpha,b} \\" + "\n" +
+        r"& + \frac{G_d}{G_{ref}} \cdot K_{\tau\alpha,d} \cdot \left(\frac{1 + \cos(\beta)}{2}\right) \\" + "\n" +
+        r"& + \frac{G}{G_{ref}} \cdot \rho \cdot K_{\tau\alpha,g} \cdot \left(\frac{1 - \cos(\beta)}{2}\right)" + "\n" +
+        r"\end{array}$"
     )
     add_latex_equation(slide, eq_multiline, 
                        MARGIN + Inches(5.5) + GAP + Inches(0.2), Inches(2.05), Inches(1.40), max_width=Inches(5.8))
@@ -553,7 +555,7 @@ def create_presentation():
     apply_slide_background(slide)
     add_title(slide, "Validación: Reconstrucción Curvas IV en SRC")
     add_panel(slide, MARGIN, Inches(1.2), SLIDE_WIDTH - 2*MARGIN, Inches(5.8))
-    add_image(slide, 'output/Extra_Resultados/curvas_iv_pv_src.png', Inches(1.66), Inches(1.4), width=Inches(10))
+    add_image(slide, 'output/Extra_Resultados/curvas_iv_pv_src.png', Inches(1.0), Inches(1.35), width=Inches(11.33), height=Inches(5.4))
     add_footer(slide, 13, TOTAL_SLIDES)
 
     # --- SLIDE 14: Validación Scatter ---
