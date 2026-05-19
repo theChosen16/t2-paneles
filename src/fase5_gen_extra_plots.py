@@ -60,11 +60,12 @@ def gen_extra_results():
         
         I_pts = np.array(I_pts)
         color = '#007ACC' if mod == 'mSi' else '#E8A838'
-        ax1.plot(V_pts, I_pts, label=f'{mod} (SRC)', linewidth=3.5, color=color)
+        label_name = 'm-Si (SRC)' if mod == 'mSi' else 'HIT (SRC)'
+        ax1.plot(V_pts, I_pts, label=label_name, linewidth=3.5, color=color)
         ax1.scatter(p['Vmp_ref'], p['Imp_ref'], color='red', s=60, zorder=5, edgecolor='white')
         
         P_pts = V_pts * I_pts
-        ax2.plot(V_pts, P_pts, label=f'{mod} (SRC)', linewidth=3.5, color=color)
+        ax2.plot(V_pts, P_pts, label=label_name, linewidth=3.5, color=color)
         ax2.scatter(p['Vmp_ref'], p['Pmp_ref'], color='red', s=60, zorder=5, edgecolor='white')
     
     ax1.set_title('Curvas I-V en Condiciones SRC', fontsize=14, fontweight='bold', pad=15)
@@ -126,7 +127,7 @@ def gen_extra_results():
     pr_hit = df_hit_time['pmp_teorica'].resample('ME').sum() / df_hit_time['p_ideal_stc'].resample('ME').sum()
     
     plt.figure(figsize=(10, 6))
-    plt.plot(range(1, 13), pr_msi.values, marker='o', label='PR mSi', linewidth=3, color='#007ACC', markersize=8)
+    plt.plot(range(1, 13), pr_msi.values, marker='o', label='PR m-Si', linewidth=3, color='#007ACC', markersize=8)
     plt.plot(range(1, 13), pr_hit.values, marker='o', label='PR HIT', linewidth=3, color='#E8A838', markersize=8)
     plt.title('Performance Ratio Mensual en Atacama (Simulación 2026)', fontsize=14, fontweight='bold', pad=15)
     plt.xlabel('Mes', fontsize=12)
@@ -147,9 +148,10 @@ def gen_extra_results():
         subset = df[mask]
         eff_norm = (subset['pmp_teorica'] / (subset['poa_global'] / 1000)) / p_stc
         color = '#007ACC' if mod == 'mSi' else '#E8A838'
-        plt.scatter(subset['temp_cell'], eff_norm, alpha=0.06, label=mod, s=5, color=color)
+        label_name = 'm-Si' if mod == 'mSi' else 'HIT'
+        plt.scatter(subset['temp_cell'], eff_norm, alpha=0.06, label=label_name, s=5, color=color)
         
-    plt.title('Análisis de Degradación Térmica: HIT vs mSi', fontsize=14, fontweight='bold', pad=15)
+    plt.title('Análisis de Degradación Térmica: HIT vs m-Si', fontsize=14, fontweight='bold', pad=15)
     plt.xlabel('Temperatura de Celda (°C)', fontsize=12)
     plt.ylabel('Potencia Normalizada', fontsize=12)
     plt.legend(fontsize=11)

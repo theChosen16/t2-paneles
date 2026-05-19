@@ -68,7 +68,7 @@ def add_formatted_paragraph(tf, text, font_size=14, default_color=TEXT_WHITE, is
     p.font.color.rgb = default_color
     
     import re
-    tokens = re.split(r'(\_[^_]+\_|\[[^\]]+\]|\^[^^]+\^)', text)
+    tokens = re.split(r'(\*\*[^*]+\*\*|\_[^_]+\_|\[[^\]]+\]|\^[^^]+\^)', text)
     
     for token in tokens:
         if not token:
@@ -77,7 +77,11 @@ def add_formatted_paragraph(tf, text, font_size=14, default_color=TEXT_WHITE, is
         run.font.size = Pt(font_size)
         run.font.color.rgb = default_color
         
-        if token.startswith('_') and token.endswith('_'):
+        if token.startswith('**') and token.endswith('**'):
+            inner = token[2:-2]
+            run.text = inner
+            run.font.bold = True
+        elif token.startswith('_') and token.endswith('_'):
             inner = token[1:-1]
             run.text = inner
             run.font.italic = True
@@ -358,10 +362,10 @@ def create_presentation():
     add_text(slide, MARGIN + Inches(0.2), Inches(4.30), COLUMN_WIDTH - Inches(0.4), Inches(2.0), iam_details, size=15, color=ACCENT_GOLD)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Modificador por Masa de Aire (AM) ^[2]^")
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.65), COLUMN_WIDTH - Inches(0.4), Inches(0.55),
              "Corrige el desajuste del espectro solar según la atmósfera atravesada:", size=15)
-    add_latex_equation(slide, r"\frac{M}{M_{ref}} = a_0 + a_1 \cdot AM + a_2 \cdot AM^2 + a_3 \cdot AM^3 + a_4 \cdot AM^4", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.20), Inches(0.40))
-    add_latex_equation(slide, r"AM = \frac{1}{\cos(\theta_z) + 0.5057 \cdot (96.08 - \theta_z)^{-1.634}}", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.95), Inches(0.48))
+    add_latex_equation(slide, r"\frac{M}{M_{ref}} = a_0 + a_1 \cdot AM + a_2 \cdot AM^2 + a_3 \cdot AM^3 + a_4 \cdot AM^4", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.35), Inches(0.40))
+    add_latex_equation(slide, r"AM = \frac{1}{\cos(\theta_z) + 0.5057 \cdot (96.08 - \theta_z)^{-1.634}}", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(3.10), Inches(0.48))
     
     am_details = (
         "Donde:\n"
@@ -369,7 +373,7 @@ def create_presentation():
         "• _a_[_0_], _a_[_1_], _a_[_2_], _a_[_3_], _a_[_4_]: Coeficientes empíricos espectrales.\n"
         "• _M_[_ref_]: Transmitancia espectral a STC (AM 1.5g)."
     )
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(3.95), COLUMN_WIDTH - Inches(0.4), Inches(2.5), am_details, size=15)
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(4.10), COLUMN_WIDTH - Inches(0.4), Inches(2.5), am_details, size=15)
     add_footer(slide, 6, TOTAL_SLIDES)
 
     # --- SLIDE 7: Perfil Diario (Imagen) ---
@@ -446,7 +450,7 @@ def create_presentation():
     add_panel(slide, MARGIN, Inches(3.6), Inches(5.4), Inches(3.1), title="Factor de Idealidad Térmico (a)")
     add_text(slide, MARGIN + Inches(0.2), Inches(4.0), Inches(5.0), Inches(0.35),
              "El factor de idealidad térmico se define formalmente como:", size=15)
-    add_latex_equation(slide, r"a = \frac{N_s \cdot n_I \cdot k \cdot T_c}{q}", MARGIN + Inches(0.5), Inches(4.45), Inches(0.48))
+    add_latex_equation(slide, r"a = \frac{N_s \cdot n_I \cdot k \cdot T_c}{q}", MARGIN + Inches(0.5), Inches(4.55), Inches(0.48))
     add_text(slide, MARGIN + Inches(0.2), Inches(5.25), Inches(5.0), Inches(1.0),
              "Donde _N_[_s_] es el número de celdas en serie (m-Si: 36, HIT: 72).", size=14, color=ACCENT_GOLD)
     
