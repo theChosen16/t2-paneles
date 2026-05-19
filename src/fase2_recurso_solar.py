@@ -148,12 +148,12 @@ def procesar_fase1(file_path, output_dir):
     plt.figure(figsize=(10, 7.5))
     hist_color = '#E8A838' if module_name == 'HIT' else '#007ACC'
     df[df['poa_global'] > 10]['temp_cell'].hist(bins=50, color=hist_color, alpha=0.8, edgecolor='none')
-    plt.title(f'Distribución de Temperatura de Celda (Horas de Sol) - {module_name}', fontsize=13, fontweight='bold', pad=15)
+    # plt.title(f'Distribución de Temperatura de Celda (Horas de Sol) - {module_name}', fontsize=13, fontweight='bold', pad=15)
     plt.xlabel('Temperatura Celda (°C)', fontsize=11)
     plt.ylabel('Frecuencia', fontsize=11)
     plt.grid(linestyle=':', alpha=0.5)
     plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, f'temp_hist_{module_name}.png'), transparent=True, dpi=150)
+    plt.savefig(os.path.join(output_dir, f'temp_hist_{module_name}.png'), transparent=True, dpi=150, bbox_inches='tight')
     plt.close()
     
     recurso_total = df['poa_global'].sum() / 1000

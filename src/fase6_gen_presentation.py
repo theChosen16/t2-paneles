@@ -428,7 +428,7 @@ def create_presentation():
     apply_slide_background(slide)
     add_title(slide, "Resultados Térmicos: Distribución Anual Tc")
     add_panel(slide, MARGIN, Inches(1.2), Inches(7), Inches(5.5), title="Distribución de Temperatura de Celda")
-    add_image(slide, 'output/Fase1_Resultados/temp_hist_HIT.png', Inches(1.0), Inches(1.65), width=Inches(6.6), height=Inches(4.95))
+    add_image(slide, 'output/Fase1_Resultados/temp_hist_HIT.png', Inches(1.10), Inches(1.65), width=Inches(6.4), height=Inches(4.80))
     
     add_panel(slide, Inches(7.5), Inches(1.2), Inches(5.4), Inches(5.5), title="Comportamiento en Atacama")
     add_text(slide, Inches(7.7), Inches(1.8), Inches(5), Inches(4), 
@@ -476,31 +476,34 @@ def create_presentation():
     
     # Columna 1: Extracción STC (Más estrecha)
     add_panel(slide, MARGIN, Inches(1.2), Inches(5.0), Inches(5.5), title="Extracción en STC ^[1]^")
-    add_text(slide, MARGIN + Inches(0.2), Inches(1.7), Inches(4.6), Inches(1.5),
+    add_text(slide, MARGIN + Inches(0.2), Inches(1.70), Inches(4.6), Inches(1.60),
              "Se extraen _a_[_ref_], _I_[_L,ref_], _I_[_0,ref_], _R_[_s,ref_], _R_[_sh,ref_] en STC:\n\n"
              "1. Cortocircuito: _V_ = 0, _I_ = _I_[_sc,ref_]\n"
              "2. Circuito Abierto: _I_ = 0, _V_ = _V_[_oc,ref_]\n"
              "3. Máxima Potencia: _I_ = _I_[_mp,ref_], _V_ = _V_[_mp,ref_]\n"
-             "4. Pendiente en MPP (d_P_/d_V_ = 0):", size=14)
-    add_latex_equation(slide, r"\left.\frac{dI}{dV}\right|_{mp} = -\frac{I_{mp,ref}}{V_{mp,ref}}", MARGIN + Inches(0.2), Inches(3.55), Inches(0.42), max_width=Inches(4.6))
+             "4. Pendiente en MPP (d_P_/d_V_ = 0):", size=15)
+    add_latex_equation(slide, r"\left.\frac{dI}{dV}\right|_{mp} = -\frac{I_{mp,ref}}{V_{mp,ref}}", MARGIN + Inches(0.2), Inches(3.40), Inches(0.65), max_width=Inches(4.6))
     
-    add_text(slide, MARGIN + Inches(0.2), Inches(4.15), Inches(4.6), Inches(0.35),
-             "5. Coeficiente térmico de _V_[_oc_]:", size=14)
-    add_latex_equation(slide, r"\beta_{Voc} = \frac{\partial V_{oc}}{\partial T_c}", MARGIN + Inches(0.2), Inches(4.55), Inches(0.40), max_width=Inches(4.6))
+    add_text(slide, MARGIN + Inches(0.2), Inches(4.25), Inches(4.6), Inches(0.35),
+             "5. Coeficiente térmico de _V_[_oc_]:", size=15)
+    add_latex_equation(slide, r"\beta_{Voc} = \frac{\partial V_{oc}}{\partial T_c}", MARGIN + Inches(0.2), Inches(4.70), Inches(0.65), max_width=Inches(4.6))
+    
+    add_text(slide, MARGIN + Inches(0.2), Inches(5.60), Inches(4.6), Inches(0.9),
+             "→ Parámetros base para el escalado dinámico a las condiciones reales de Atacama.", size=14, color=ACCENT_GOLD)
     
     # Columna 2: Derivada Analítica en MPP (Más ancha)
     add_panel(slide, MARGIN + Inches(5.0) + GAP, Inches(1.2), Inches(6.7), Inches(5.5), title="Derivada Analítica en MPP")
-    add_text(slide, MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(1.7), Inches(6.3), Inches(0.6),
-             "Para acoplar _R_[_s_] y el factor de idealidad, se implementa la derivada analítica obtenida del circuito:", size=14)
-    add_latex_equation(slide, r"\left.\frac{dI}{dV}\right|_{mp} = -\frac{A + B}{1 + R_s \cdot A + R_s \cdot B}", MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(2.35), Inches(0.48))
+    add_text(slide, MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(1.70), Inches(6.3), Inches(0.6),
+             "Para acoplar _R_[_s_] y el factor de idealidad, se implementa la derivada analítica obtenida del circuito:", size=15)
+    add_latex_equation(slide, r"\left.\frac{dI}{dV}\right|_{mp} = -\frac{A + B}{1 + R_s \cdot A + R_s \cdot B}", MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(2.40), Inches(0.68))
     
-    add_text(slide, MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(3.10), Inches(6.3), Inches(0.35),
-             "Donde los coeficientes se definen como:", size=14)
-    add_latex_equation(slide, r"A = \frac{I_0}{a} \cdot e^{\frac{V_{mp} + I_{mp} \cdot R_s}{a}}", MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(3.55), Inches(0.45))
-    add_latex_equation(slide, r"B = \frac{1}{R_{sh}}", MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(4.15), Inches(0.35))
+    add_text(slide, MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(3.25), Inches(6.3), Inches(0.35),
+             "Donde los coeficientes se definen como:", size=15)
+    add_latex_equation(slide, r"A = \frac{I_0}{a} \cdot e^{\frac{V_{mp} + I_{mp} \cdot R_s}{a}}", MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(3.70), Inches(0.55))
+    add_latex_equation(slide, r"B = \frac{1}{R_{sh}}", MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(4.35), Inches(0.45))
     
-    add_text(slide, MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(4.85), Inches(6.3), Inches(1.0),
-             "La optimización se realiza mediante ajuste de mínimos cuadrados con bounds físicos (_R_[_s_] > 0, _n_[_I_] ∈ [1, 2]).", size=14, color=ACCENT_GOLD)
+    add_text(slide, MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(4.95), Inches(6.3), Inches(1.2),
+             "La optimización se realiza mediante ajuste de mínimos cuadrados con bounds físicos (_R_[_s_] > 0, _n_[_I_] ∈ [1, 2]).", size=15, color=ACCENT_GOLD)
     add_footer(slide, 11, TOTAL_SLIDES)
 
     # --- SLIDE 12: Ecuaciones de Escalado (LaTeX) ---
@@ -510,29 +513,29 @@ def create_presentation():
     
     # Columna 1: Corrientes y Factor de Idealidad
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Corrientes y Factor de Idealidad ^[1]^")
-    add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "1. Corriente Fotogenerada (_I_[_L_]):", size=15)
-    add_latex_equation(slide, r"I_L = \left(\frac{S}{S_{ref}}\right) \cdot \left(\frac{M}{M_{ref}}\right) \cdot \left[ I_{L,ref} + \alpha_{Isc} \cdot (T_c - T_{ref}) \right]", MARGIN + Inches(0.3), Inches(2.05), Inches(0.38))
+    add_text(slide, MARGIN + Inches(0.2), Inches(1.70), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "1. Corriente Fotogenerada (_I_[_L_]):", size=15)
+    add_latex_equation(slide, r"I_L = \left(\frac{S}{S_{ref}}\right) \cdot \left(\frac{M}{M_{ref}}\right) \cdot \left[ I_{L,ref} + \alpha_{Isc} \cdot (T_c - T_{ref}) \right]", MARGIN + Inches(0.3), Inches(2.05), Inches(0.55))
     
-    add_text(slide, MARGIN + Inches(0.2), Inches(2.70), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "2. Corriente de Saturación Inversa (_I_[_0_]):", size=15)
-    add_latex_equation(slide, r"\frac{I_0}{I_{0,ref}} = \left(\frac{T_c}{T_{ref}}\right)^3 \cdot \exp\left[ \frac{E_{g,ref}}{k \cdot T_{ref}} - \frac{E_g}{k \cdot T_c} \right]", MARGIN + Inches(0.3), Inches(3.05), Inches(0.42))
+    add_text(slide, MARGIN + Inches(0.2), Inches(2.75), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "2. Corriente de Saturación Inversa (_I_[_0_]):", size=15)
+    add_latex_equation(slide, r"\frac{I_0}{I_{0,ref}} = \left(\frac{T_c}{T_{ref}}\right)^3 \cdot \exp\left[ \frac{E_{g,ref}}{k \cdot T_{ref}} - \frac{E_g}{k \cdot T_c} \right]", MARGIN + Inches(0.3), Inches(3.10), Inches(0.58))
     
-    add_text(slide, MARGIN + Inches(0.2), Inches(3.80), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "3. Factor de Idealidad térmico (_a_):", size=15)
-    add_latex_equation(slide, r"\frac{a}{a_{ref}} = \frac{T_c}{T_{ref}}", MARGIN + Inches(0.3), Inches(4.15), Inches(0.35))
+    add_text(slide, MARGIN + Inches(0.2), Inches(3.85), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "3. Factor de Idealidad térmico (_a_):", size=15)
+    add_latex_equation(slide, r"\frac{a}{a_{ref}} = \frac{T_c}{T_{ref}}", MARGIN + Inches(0.3), Inches(4.20), Inches(0.55))
     
     scale_notes = (
         "Donde:\n"
         "• _T_[_ref_] = 298.15 K (25°C)  |  _S_[_ref_] = 1000 W/m².\n"
         "• _M_[_ref_]: Transmitancia espectral a STC."
     )
-    add_text(slide, MARGIN + Inches(0.2), Inches(4.80), COLUMN_WIDTH - Inches(0.4), Inches(2.0), scale_notes, size=15, color=ACCENT_GOLD)
+    add_text(slide, MARGIN + Inches(0.2), Inches(5.00), COLUMN_WIDTH - Inches(0.4), Inches(1.5), scale_notes, size=15, color=ACCENT_GOLD)
     
     # Columna 2: Resistencias y Energía de Bandgap
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Resistencias y Energía de Bandgap ^[1]^")
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "4. Resistencia Shunt (_R_[_sh_]):", size=15)
-    add_latex_equation(slide, r"R_{sh} = R_{sh,ref} \cdot \left(\frac{S_{ref}}{S}\right)", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.05), Inches(0.35))
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.70), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "4. Resistencia Shunt (_R_[_sh_]):", size=15)
+    add_latex_equation(slide, r"R_{sh} = R_{sh,ref} \cdot \left(\frac{S_{ref}}{S}\right)", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.05), Inches(0.55))
     
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(2.70), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "5. Energía de Bandgap del Silicio (_E_[_g_]):", size=15)
-    add_latex_equation(slide, r"\frac{E_g}{E_{g,ref}} = 1 - 0.0002677 \cdot (T_c - T_{ref})", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(3.05), Inches(0.36))
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(2.75), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "5. Energía de Bandgap del Silicio (_E_[_g_]):", size=15)
+    add_latex_equation(slide, r"\frac{E_g}{E_{g,ref}} = 1 - 0.0002677 \cdot (T_c - T_{ref})", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(3.10), Inches(0.55))
     
     scale_just = (
         "Suposiciones Físicas Justificadas:\n"
@@ -542,7 +545,7 @@ def create_presentation():
         "  Sigue la relación inversamente proporcional con _S_ para modelar fugas asociadas a portadores minoritarios.\n\n"
         "• _E_[_g,ref_] = 1.121 eV para Silicio a 25°C."
     )
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(3.80), COLUMN_WIDTH - Inches(0.4), Inches(3.0), scale_just, size=15)
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(3.85), COLUMN_WIDTH - Inches(0.4), Inches(2.70), scale_just, size=15)
     add_footer(slide, 12, TOTAL_SLIDES)
 
     # --- SLIDE 13: Validación curvas IV/PV ---
