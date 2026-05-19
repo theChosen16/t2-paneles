@@ -15,8 +15,8 @@ TEXT_WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 MARGIN = Inches(0.4)
 SLIDE_WIDTH = Inches(13.333)
 SLIDE_HEIGHT = Inches(7.5)
-COLUMN_WIDTH = (SLIDE_WIDTH - (3 * MARGIN)) / 2
 GAP = Inches(0.3)
+COLUMN_WIDTH = (SLIDE_WIDTH - 2 * MARGIN - GAP) / 2
 
 def apply_slide_background(slide):
     background = slide.background
@@ -326,22 +326,22 @@ def create_presentation():
     )
     add_text(slide, MARGIN + Inches(0.2), Inches(3.20), Inches(5.1), Inches(3.0), poa_glossary, size=15, color=ACCENT_GOLD)
     
-    # Columna 2: Absorción en la Celda (S) (Ancho calibrado a 6.2")
-    add_panel(slide, MARGIN + Inches(5.5) + GAP, Inches(1.2), Inches(6.2), Inches(5.5), title="Absorción en Celda (Pérdidas Ópticas)")
-    add_text(slide, MARGIN + Inches(5.5) + GAP + Inches(0.2), Inches(1.7), Inches(5.8), Inches(0.35),
+    # Columna 2: Absorción en la Celda (S) (Ancho calibrado a 6.733" para perfecta simetría)
+    add_panel(slide, MARGIN + Inches(5.5) + GAP, Inches(1.2), Inches(6.733), Inches(5.5), title="Absorción en Celda (Pérdidas Ópticas)")
+    add_text(slide, MARGIN + Inches(5.5) + GAP + Inches(0.2), Inches(1.7), Inches(6.333), Inches(0.35),
              "Modela la radiación real que penetra y es absorbida por la celda:", size=15)
     # Ecuación de absorción en 3 líneas alineadas perfectamente al signo igual
     x_base = MARGIN + Inches(5.5) + GAP + Inches(0.2)
-    add_latex_equation(slide, r"\frac{S}{S_{ref}} = \frac{G_b}{G_{ref}} \cdot R_{beam} \cdot K_{\tau\alpha,b}", x_base, Inches(2.05), Inches(0.42), max_width=Inches(5.8))
-    add_latex_equation(slide, r"+ \frac{G_d}{G_{ref}} \cdot K_{\tau\alpha,d} \cdot \left(\frac{1 + \cos(\beta)}{2}\right)", x_base + Inches(0.95), Inches(2.50), Inches(0.42), max_width=Inches(4.85))
-    add_latex_equation(slide, r"+ \frac{G}{G_{ref}} \cdot \rho \cdot K_{\tau\alpha,g} \cdot \left(\frac{1 - \cos(\beta)}{2}\right)", x_base + Inches(0.95), Inches(2.95), Inches(0.42), max_width=Inches(4.85))
+    add_latex_equation(slide, r"\frac{S}{S_{ref}} = \frac{G_b}{G_{ref}} \cdot R_{beam} \cdot K_{\tau\alpha,b}", x_base, Inches(2.05), Inches(0.42), max_width=Inches(6.333))
+    add_latex_equation(slide, r"+ \frac{G_d}{G_{ref}} \cdot K_{\tau\alpha,d} \cdot \left(\frac{1 + \cos(\beta)}{2}\right)", x_base + Inches(0.95), Inches(2.50), Inches(0.42), max_width=Inches(5.383))
+    add_latex_equation(slide, r"+ \frac{G}{G_{ref}} \cdot \rho \cdot K_{\tau\alpha,g} \cdot \left(\frac{1 - \cos(\beta)}{2}\right)", x_base + Inches(0.95), Inches(2.95), Inches(0.42), max_width=Inches(5.383))
     abs_glossary = (
         "Donde:\n"
         "• _S_ / _S_[_ref_]: Irradiancia efectiva y de referencia (1000 W/m²).\n"
         "• _K_[_τα,b_] / _K_[_τα,d_] / _K_[_τα,g_]: Modificadores por IAM para directa, difusa y albedo.\n"
         "• Incorpora las pérdidas ópticas por ángulo de incidencia^[2]^."
     )
-    add_text(slide, MARGIN + Inches(5.5) + GAP + Inches(0.2), Inches(3.65), Inches(5.8), Inches(2.6), abs_glossary, size=16)
+    add_text(slide, MARGIN + Inches(5.5) + GAP + Inches(0.2), Inches(3.65), Inches(6.333), Inches(2.6), abs_glossary, size=16)
     add_footer(slide, 5, TOTAL_SLIDES)
 
     # --- SLIDE 6: Modificadores IAM y Air Mass (LaTeX) ---
@@ -408,8 +408,8 @@ def create_presentation():
     )
     add_text(slide, MARGIN + Inches(0.2), Inches(4.10), Inches(4.6), Inches(2.3), thermal_details, size=15, color=ACCENT_GOLD)
     
-    # Panel Derecho (Coeficientes)
-    add_panel(slide, MARGIN + Inches(5.0) + GAP, Inches(3.6), Inches(6.7), Inches(3.1), title="Coeficientes Empíricos por Tecnología")
+    # Panel Derecho (Coeficientes) (Ancho calibrado a 7.233" para perfecta simetría)
+    add_panel(slide, MARGIN + Inches(5.0) + GAP, Inches(3.6), Inches(7.233), Inches(3.1), title="Coeficientes Empíricos por Tecnología")
     thermal_coef = (
         "• **Silicio Monocristalino (m-Si) — glass/polymer:**\n"
         "  _a_ = -3.56  |  _b_ = -0.075  |  _ΔT_ = 3.0 °C\n"
@@ -418,18 +418,18 @@ def create_presentation():
         "  _a_ = -3.47  |  _b_ = -0.059  |  _ΔT_ = 3.0 °C\n"
         "  → Comportamiento: Retiene más calor, pero se compensa por su bajo coeficiente térmico."
     )
-    add_text(slide, MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(4.10), Inches(6.3), Inches(2.3), thermal_coef, size=14)
+    add_text(slide, MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(4.10), Inches(6.833), Inches(2.3), thermal_coef, size=14)
     add_footer(slide, 8, TOTAL_SLIDES)
 
     # --- SLIDE 9: Histograma Térmico ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Resultados Térmicos: Distribución Anual Tc")
-    add_panel(slide, MARGIN, Inches(1.2), Inches(7), Inches(5.5), title="Distribución de Temperatura de Celda")
-    add_image(slide, 'output/Fase1_Resultados/temp_hist_HIT.png', Inches(0.90), Inches(1.65), width=Inches(6.2), height=Inches(4.65))
+    add_panel(slide, MARGIN, Inches(1.2), Inches(6.9), Inches(5.5), title="Distribución de Temperatura de Celda")
+    add_image(slide, 'output/Fase1_Resultados/temp_hist_HIT.png', Inches(0.75), Inches(1.65), width=Inches(6.2), height=Inches(4.65))
     
-    add_panel(slide, Inches(7.5), Inches(1.2), Inches(5.4), Inches(5.5), title="Comportamiento en Atacama")
-    add_text(slide, Inches(7.7), Inches(1.8), Inches(5), Inches(4), 
+    add_panel(slide, Inches(7.6), Inches(1.2), Inches(5.333), Inches(5.5), title="Comportamiento en Atacama")
+    add_text(slide, Inches(7.8), Inches(1.8), Inches(4.933), Inches(4), 
              "• Temperatura promedio diurna de celda: ~38°C a 45°C.\n\n"
              "• Picos térmicos extremos superan los 65°C a mediodía en verano.\n\n"
              "• Clima desértico seco reduce la convección natural del marco.\n\n"
@@ -457,14 +457,14 @@ def create_presentation():
              "Donde _N_[_s_] es el número de celdas en serie (m-Si: 36, HIT: 72).", size=14, color=ACCENT_GOLD)
     
     # Panel Derecho: Glosario de Parámetros Físicos
-    add_panel(slide, MARGIN + Inches(5.4) + GAP, Inches(3.6), Inches(6.3), Inches(3.1), title="Glosario de Parámetros Físicos")
+    add_panel(slide, Inches(6.1), Inches(3.6), Inches(6.833), Inches(3.1), title="Glosario de Parámetros Físicos")
     sdm_glossary = (
         "• _I_ / _V_: Corriente y voltaje de salida (A, V).\n"
         "• _I_[_L_] / _I_[_0_]: Corrientes fotogenerada y de saturación (A).\n"
         "• _R_[_s_] / _R_[_sh_]: Resistencia serie (pérdidas) y paralelo (fugas) (Ω).\n"
         "• _k_ / _q_ / _T_[_c_]: Constante de Boltzmann, carga elemental y Temp. (K)."
     )
-    add_text(slide, MARGIN + Inches(5.4) + GAP + Inches(0.2), Inches(4.0), Inches(5.9), Inches(2.3), sdm_glossary, size=14)
+    add_text(slide, Inches(6.3), Inches(4.0), Inches(6.433), Inches(2.3), sdm_glossary, size=14)
     add_footer(slide, 10, TOTAL_SLIDES)
 
     # --- SLIDE 11: Extracción en SRC (LaTeX) ---
@@ -490,17 +490,17 @@ def create_presentation():
              "→ Parámetros base para el escalado dinámico a las condiciones reales de Atacama.", size=14, color=ACCENT_GOLD)
     
     # Columna 2: Derivada Analítica en MPP (Más ancha)
-    add_panel(slide, MARGIN + Inches(5.0) + GAP, Inches(1.2), Inches(6.7), Inches(5.5), title="Derivada Analítica en MPP")
-    add_text(slide, MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(1.70), Inches(6.3), Inches(0.6),
+    add_panel(slide, Inches(5.7), Inches(1.2), Inches(7.233), Inches(5.5), title="Derivada Analítica en MPP")
+    add_text(slide, Inches(5.9), Inches(1.70), Inches(6.833), Inches(0.6),
              "Para acoplar _R_[_s_] y el factor de idealidad, se implementa la derivada analítica obtenida del circuito:", size=15)
-    add_latex_equation(slide, r"\left.\frac{dI}{dV}\right|_{mp} = -\frac{A + B}{1 + R_s \cdot A + R_s \cdot B}", MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(2.40), Inches(0.68))
+    add_latex_equation(slide, r"\left.\frac{dI}{dV}\right|_{mp} = -\frac{A + B}{1 + R_s \cdot A + R_s \cdot B}", Inches(5.9), Inches(2.40), Inches(0.68), max_width=Inches(6.833))
     
-    add_text(slide, MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(3.25), Inches(6.3), Inches(0.35),
+    add_text(slide, Inches(5.9), Inches(3.25), Inches(6.833), Inches(0.35),
              "Donde los coeficientes se definen como:", size=15)
-    add_latex_equation(slide, r"A = \frac{I_0}{a} \cdot e^{\frac{V_{mp} + I_{mp} \cdot R_s}{a}}", MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(3.70), Inches(0.55))
-    add_latex_equation(slide, r"B = \frac{1}{R_{sh}}", MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(4.35), Inches(0.45))
+    add_latex_equation(slide, r"A = \frac{I_0}{a} \cdot e^{\frac{V_{mp} + I_{mp} \cdot R_s}{a}}", Inches(5.9), Inches(3.70), Inches(0.55), max_width=Inches(6.833))
+    add_latex_equation(slide, r"B = \frac{1}{R_{sh}}", Inches(5.9), Inches(4.35), Inches(0.45), max_width=Inches(6.833))
     
-    add_text(slide, MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(4.95), Inches(6.3), Inches(1.2),
+    add_text(slide, Inches(5.9), Inches(4.95), Inches(6.833), Inches(1.2),
              "La optimización se realiza mediante ajuste de mínimos cuadrados con bounds físicos (_R_[_s_] > 0, _n_[_I_] ∈ [1, 2]).", size=15, color=ACCENT_GOLD)
     add_footer(slide, 11, TOTAL_SLIDES)
 
@@ -558,11 +558,11 @@ def create_presentation():
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Validación: Potencia Medida vs. Simulada")
-    add_panel(slide, MARGIN, Inches(1.2), Inches(6.4), Inches(5.5), title="Correlación de Potencia")
-    add_image(slide, 'output/Fase2_Resultados/val_scatter_HIT.png', MARGIN + Inches(0.2), Inches(1.70), width=Inches(6.0), height=Inches(4.50))
+    add_panel(slide, MARGIN, Inches(1.2), Inches(6.6), Inches(5.5), title="Correlación de Potencia")
+    add_image(slide, 'output/Fase2_Resultados/val_scatter_HIT.png', Inches(0.7), Inches(1.70), width=Inches(6.0), height=Inches(4.50))
     
-    add_panel(slide, Inches(7.4), Inches(1.2), Inches(5.1), Inches(5.5), title="Métricas de Ajuste")
-    add_text(slide, Inches(7.6), Inches(1.8), Inches(4.7), Inches(4.5), 
+    add_panel(slide, Inches(7.3), Inches(1.2), Inches(5.633), Inches(5.5), title="Métricas de Ajuste")
+    add_text(slide, Inches(7.5), Inches(1.8), Inches(5.233), Inches(4.5), 
              "• Coeficiente de determinación R² > 0.99 para ambas tecnologías.\n\n"
              "• RMSE < 5W en condiciones estándar.\n\n"
              "• Validación cruzada: El modelo de De Soto reproduce con alta fidelidad las pérdidas por temperatura en celdas de silicio.\n\n"
@@ -592,14 +592,14 @@ def create_presentation():
     add_text(slide, MARGIN + Inches(0.2), Inches(4.10), Inches(4.8), Inches(2.3), pr_details, size=14, color=ACCENT_GOLD)
     
     # Panel Derecho: Pérdidas Penalizadas
-    add_panel(slide, MARGIN + Inches(5.2) + GAP, Inches(3.6), Inches(6.5), Inches(3.1), title="Pérdidas Penalizadas por el PR")
+    add_panel(slide, Inches(5.9), Inches(3.6), Inches(7.033), Inches(3.1), title="Pérdidas Penalizadas por el PR")
     pr_phys = (
         "• **Pérdidas Térmicas:** Caídas debidas a la elevada temperatura _T_[_c_].\n"
         "• **Pérdidas Ópticas:** Efectos reflectivos por ángulo de incidencia (IAM).\n"
         "• **Pérdidas Espectrales:** Desajustes causados por la Masa de Aire (AM).\n"
         "• **Pérdidas Óhmicas:** Pérdidas resistivas en la resistencia serie _R_[_s_]."
     )
-    add_text(slide, MARGIN + Inches(5.2) + GAP + Inches(0.2), Inches(4.10), Inches(6.1), Inches(2.3), pr_phys, size=15)
+    add_text(slide, Inches(6.1), Inches(4.10), Inches(6.633), Inches(2.3), pr_phys, size=15)
     add_footer(slide, 15, TOTAL_SLIDES)
 
     # --- SLIDE 16: PR Mensual ---
@@ -614,11 +614,11 @@ def create_presentation():
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Análisis: Sensibilidad Térmica Realizada")
-    add_panel(slide, MARGIN, Inches(1.2), Inches(8), Inches(5.5), title="Normalización por Potencia Nominal")
-    add_image(slide, 'output/Extra_Resultados/degradacion_termica_scatter.png', MARGIN + Inches(0.2), Inches(1.8), width=Inches(6.8))
+    add_panel(slide, MARGIN, Inches(1.2), Inches(7.6), Inches(5.5), title="Normalización por Potencia Nominal")
+    add_image(slide, 'output/Extra_Resultados/degradacion_termica_scatter.png', Inches(0.8), Inches(1.8), width=Inches(6.8))
     
-    add_panel(slide, Inches(8.3), Inches(1.2), Inches(4.6), Inches(5.5), title="Observación Científica")
-    add_text(slide, Inches(8.5), Inches(1.8), Inches(4.2), Inches(4.5), 
+    add_panel(slide, Inches(8.3), Inches(1.2), Inches(4.633), Inches(5.5), title="Observación Científica")
+    add_text(slide, Inches(8.5), Inches(1.8), Inches(4.233), Inches(4.5), 
              "• HIT (Naranja): Pendiente suave. Su bajo coeficiente térmico (-0.26 %/°C) mantiene una alta eficiencia de conversión incluso a 65°C de celda.\n\n"
              "• m-Si (Azul): Caída térmica severa. Su coeficiente térmico (-0.40 %/°C) penaliza fuertemente el voltaje en las horas pico de irradiancia desértica.", size=17) # Aumentado a 17
     add_footer(slide, 17, TOTAL_SLIDES)

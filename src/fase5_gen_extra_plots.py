@@ -105,7 +105,10 @@ def gen_extra_results():
         ax1.tick_params(axis='y', labelcolor='#E8A838')
         ax2.tick_params(axis='y', labelcolor='#FF4C4C')
         
-        plt.title('Perfil Dinámico Horario en el Desierto de Atacama', fontsize=14, fontweight='bold', pad=15)
+        # Combinar leyendas de ejes primario y secundario
+        lines1, labels1 = ax1.get_legend_handles_labels()
+        lines2, labels2 = ax2.get_legend_handles_labels()
+        ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper right', fontsize=11, framealpha=0.7)
         
         import matplotlib.dates as mdates
         ax1.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
@@ -129,7 +132,6 @@ def gen_extra_results():
     plt.figure(figsize=(14, 6.7))
     plt.plot(range(1, 13), pr_msi.values, marker='o', label='PR m-Si', linewidth=3, color='#007ACC', markersize=8)
     plt.plot(range(1, 13), pr_hit.values, marker='o', label='PR HIT', linewidth=3, color='#E8A838', markersize=8)
-    plt.title('Performance Ratio Mensual en Atacama (Simulación 2026)', fontsize=14, fontweight='bold', pad=15)
     plt.xlabel('Mes', fontsize=12)
     plt.ylabel('Performance Ratio', fontsize=12)
     plt.ylim(0.80, 0.96)
@@ -151,7 +153,6 @@ def gen_extra_results():
         label_name = 'm-Si' if mod == 'mSi' else 'HIT'
         plt.scatter(subset['temp_cell'], eff_norm, alpha=0.06, label=label_name, s=5, color=color)
         
-    plt.title('Análisis de Degradación Térmica: HIT vs m-Si', fontsize=14, fontweight='bold', pad=15)
     plt.xlabel('Temperatura de Celda (°C)', fontsize=15, labelpad=10)
     plt.ylabel('Potencia Normalizada', fontsize=15, labelpad=10)
     plt.xticks(fontsize=13)

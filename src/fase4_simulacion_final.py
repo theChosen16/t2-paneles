@@ -98,7 +98,7 @@ def simular_desempeno(module_name, params, df):
     # Comparación P_medida vs P_teorica (Scatter)
     plt.figure(figsize=(10, 7.5))
     scatter_color = '#E8A838' if module_name == 'HIT' else '#007ACC'
-    plt.scatter(df['pmp'], df['pmp_teorica'], alpha=0.08, s=3, color=scatter_color)
+    plt.scatter(df['pmp'], df['pmp_teorica'], alpha=0.08, s=3, color=scatter_color, label='Datos Minutales')
     plt.plot([0, df['pmp'].max()], [0, df['pmp'].max()], 'r--', linewidth=2, label='1:1 Relación')
     # plt.title(f'Validación Potencia: Medida vs Simulada - {module_name}', fontsize=12, fontweight='bold', pad=15)
     plt.xlabel('Pmp Medida (Florida) [W]', fontsize=16, labelpad=10)
@@ -106,7 +106,9 @@ def simular_desempeno(module_name, params, df):
     plt.xticks(fontsize=13)
     plt.yticks(fontsize=13)
     plt.grid(True, linestyle=':', alpha=0.5)
-    plt.legend(fontsize=13)
+    leg = plt.legend(fontsize=13)
+    for lh in leg.legend_handles:
+        lh.set_alpha(1.0)
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, f'val_scatter_{module_name}.png'), transparent=True, dpi=150, bbox_inches='tight')
     plt.close()

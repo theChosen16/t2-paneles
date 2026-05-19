@@ -136,8 +136,8 @@ def procesar_fase1(file_path, output_dir):
     plot_color = '#E8A838' if module_name == 'HIT' else '#007ACC'
     poa_monthly.plot(kind='bar', color=plot_color, edgecolor='white', alpha=0.9)
     plt.title(f'Recurso Solar Mensual POA - {module_name} (Atacama 2026)', fontsize=13, fontweight='bold', pad=15)
-    plt.ylabel('Irradiancia (kWh/m2)', fontsize=11)
-    plt.xlabel('Mes', fontsize=11)
+    plt.ylabel('Irradiancia (kWh/m2)', fontsize=16)
+    plt.xlabel('Mes', fontsize=16)
     plt.xticks(range(12), ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'], rotation=0)
     plt.grid(axis='y', linestyle=':', alpha=0.5)
     plt.tight_layout()
@@ -149,8 +149,8 @@ def procesar_fase1(file_path, output_dir):
     hist_color = '#E8A838' if module_name == 'HIT' else '#007ACC'
     df[df['poa_global'] > 10]['temp_cell'].hist(bins=50, color=hist_color, alpha=0.8, edgecolor='none')
     # plt.title(f'Distribución de Temperatura de Celda (Horas de Sol) - {module_name}', fontsize=13, fontweight='bold', pad=15)
-    plt.xlabel('Temperatura Celda (°C)', fontsize=11)
-    plt.ylabel('Frecuencia', fontsize=11)
+    plt.xlabel('Temperatura Celda (°C)', fontsize=16)
+    plt.ylabel('Frecuencia', fontsize=16)
     plt.grid(linestyle=':', alpha=0.5)
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, f'temp_hist_{module_name}.png'), transparent=True, dpi=150, bbox_inches='tight')
