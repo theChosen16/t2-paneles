@@ -305,35 +305,37 @@ def create_presentation():
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Recurso Solar: Transposición y Absorción")
-    add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Fórmulas POA (Perez) y Absorción")
     
-    # 1. Irradiancia en Plano de Arreglo (POA)
+    # Columna 1: Plano de Arreglo (POA)
+    add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Transposición POA (Modelo de Perez)")
     add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
-             "1. Irradiancia en Plano de Arreglo (_POA_):", size=16, color=TEXT_WHITE)
+             "Calcula la irradiancia incidente total en el panel inclinado:", size=15)
     add_latex_equation(slide, 
                        r"G_{poa} = G_b \cdot R_{beam} + G_d \cdot \left(\frac{1 + \cos(\beta)}{2}\right) + G \cdot \rho \cdot \left(\frac{1 - \cos(\beta)}{2}\right)", 
-                       MARGIN + Inches(0.3), Inches(2.10), Inches(0.50))
+                       MARGIN + Inches(0.3), Inches(2.20), Inches(0.50))
+    poa_glossary = (
+        "Donde:\n"
+        "• _G_[_b_] / _G_[_d_] / _G_: Irradiancia directa, difusa y global (W/m²).\n"
+        "• _β_ (Tilt): Ángulo de inclinación óptimo (22.91°).\n"
+        "• _ρ_ (Albedo): Reflectancia del suelo desértico (~0.20).\n"
+        "• _R_[_beam_]: Factor de transposición geométrica directa."
+    )
+    add_text(slide, MARGIN + Inches(0.2), Inches(3.20), COLUMN_WIDTH - Inches(0.4), Inches(3.0), poa_glossary, size=15, color=ACCENT_GOLD)
     
-    # 2. Irradiancia Absorbida por Celdas (S)
-    add_text(slide, MARGIN + Inches(0.2), Inches(3.00), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
-             "2. Irradiancia Absorbida por Celdas (_S_):", size=16, color=TEXT_WHITE)
+    # Columna 2: Absorción en la Celda (S)
+    add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Absorción en Celda (Pérdidas Ópticas)")
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
+             "Modela la radiación real que penetra y es absorbida por la celda:", size=15)
     add_latex_equation(slide, 
                        r"\frac{S}{S_{ref}} = \frac{G_b}{G_{ref}} \cdot R_{beam} \cdot K_{\tau\alpha,b} + \frac{G_d}{G_{ref}} \cdot K_{\tau\alpha,d} \cdot \left(\frac{1 + \cos(\beta)}{2}\right) + \frac{G}{G_{ref}} \cdot \rho \cdot K_{\tau\alpha,g} \cdot \left(\frac{1 - \cos(\beta)}{2}\right)", 
-                       MARGIN + Inches(0.3), Inches(3.45), Inches(0.33))
-    
-    # Donde S_ref ...
-    add_text(slide, MARGIN + Inches(0.2), Inches(4.45), COLUMN_WIDTH - Inches(0.4), Inches(2.0),
-             "Donde _S_[_ref_] = _G_[_ref_] = 1000 W/m² en condiciones de referencia (SRC).", size=15, color=ACCENT_GOLD)
-    
-    add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Glosario de Términos")
-    glossary = (
-        "• _G_[_b_] / _G_[_d_] / _G_: Irradiancia directa, difusa y global horizontal (W/m²).\n\n"
-        "• _β_ (Tilt): Ángulo de inclinación del panel (22.91° optimizado).\n\n"
-        "• _ρ_ (Albedo): Reflectancia del suelo árido desértico (~0.20).\n\n"
-        "• _R_[_beam_]: Factor de transposición geométrica para radiación directa.\n\n"
-        "• _K_[_τα,b_] / _K_[_τα,d_] / _K_[_τα,g_]: Modificadores por IAM para directa, difusa y suelo."
+                       MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.20), Inches(0.42))
+    abs_glossary = (
+        "Donde:\n"
+        "• _S_ / _S_[_ref_]: Irradiancia efectiva y de referencia (1000 W/m²).\n"
+        "• _K_[_τα,b_] / _K_[_τα,d_] / _K_[_τα,g_]: Modificadores por IAM para directa, difusa y albedo.\n"
+        "• Incorpora las pérdidas ópticas por ángulo de incidencia^[2]^."
     )
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(4.5), glossary, size=15)
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(3.20), COLUMN_WIDTH - Inches(0.4), Inches(3.0), abs_glossary, size=15)
     add_footer(slide, 5, TOTAL_SLIDES)
 
     # --- SLIDE 6: Modificadores IAM y Air Mass (LaTeX) ---
@@ -344,22 +346,22 @@ def create_presentation():
     
     add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
              "Ecuación física basada en Ley de Snell y Bouguer:", size=15)
-    add_latex_equation(slide, r"K_{\tau\alpha}(\theta) = \frac{\tau(\theta)}{\tau(0)}", MARGIN + Inches(0.3), Inches(2.15), Inches(0.45))
-    add_latex_equation(slide, r"\tau(\theta) = e^{-\frac{K \cdot L}{\cos(\theta_r)}} \cdot \left[ 1 - \frac{1}{2} \left( \frac{\sin^2(\theta_r - \theta)}{\sin^2(\theta_r + \theta)} + \frac{\tan^2(\theta_r - \theta)}{\tan^2(\theta_r + \theta)} \right) \right]", MARGIN + Inches(0.3), Inches(2.70), Inches(0.38))
-    add_latex_equation(slide, r"\theta_r = \arcsin\left(\frac{\sin(\theta)}{n}\right)", MARGIN + Inches(0.3), Inches(3.15), Inches(0.40))
+    add_latex_equation(slide, r"K_{\tau\alpha}(\theta) = \frac{\tau(\theta)}{\tau(0)}", MARGIN + Inches(0.3), Inches(2.10), Inches(0.45))
+    add_latex_equation(slide, r"\tau(\theta) = e^{-\frac{K \cdot L}{\cos(\theta_r)}} \cdot \left[ 1 - \frac{1}{2} \left( \frac{\sin^2(\theta_r - \theta)}{\sin^2(\theta_r + \theta)} + \frac{\tan^2(\theta_r - \theta)}{\tan^2(\theta_r + \theta)} \right) \right]", MARGIN + Inches(0.3), Inches(2.70), Inches(0.45))
+    add_latex_equation(slide, r"\theta_r = \arcsin\left(\frac{\sin(\theta)}{n}\right)", MARGIN + Inches(0.3), Inches(3.45), Inches(0.40))
     
     iam_details = (
         "Donde:\n"
         "• _θ_: Ángulo de incidencia  |  _n_ = 1.526 (Índice refracción vidrio).\n"
         "• _K_ = 4 m⁻¹ (Absorción del vidrio)  |  _L_ = 2 mm (Espesor vidrio)."
     )
-    add_text(slide, MARGIN + Inches(0.2), Inches(3.95), COLUMN_WIDTH - Inches(0.4), Inches(2.5), iam_details, size=14, color=ACCENT_GOLD)
+    add_text(slide, MARGIN + Inches(0.2), Inches(4.30), COLUMN_WIDTH - Inches(0.4), Inches(2.0), iam_details, size=15, color=ACCENT_GOLD)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Modificador por Masa de Aire (AM) ^[2]^")
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
              "Corrige el desajuste del espectro solar según la atmósfera atravesada:", size=15)
-    add_latex_equation(slide, r"\frac{M}{M_{ref}} = a_0 + a_1 \cdot AM + a_2 \cdot AM^2 + a_3 \cdot AM^3 + a_4 \cdot AM^4", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.40), Inches(0.38))
-    add_latex_equation(slide, r"AM = \frac{1}{\cos(\theta_z) + 0.5057 \cdot (96.08 - \theta_z)^{-1.634}}", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(3.05), Inches(0.48))
+    add_latex_equation(slide, r"\frac{M}{M_{ref}} = a_0 + a_1 \cdot AM + a_2 \cdot AM^2 + a_3 \cdot AM^3 + a_4 \cdot AM^4", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.20), Inches(0.40))
+    add_latex_equation(slide, r"AM = \frac{1}{\cos(\theta_z) + 0.5057 \cdot (96.08 - \theta_z)^{-1.634}}", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.95), Inches(0.48))
     
     am_details = (
         "Donde:\n"
@@ -367,7 +369,7 @@ def create_presentation():
         "• _a_[_0_], _a_[_1_], _a_[_2_], _a_[_3_], _a_[_4_]: Coeficientes empíricos espectrales.\n"
         "• _M_[_ref_]: Transmitancia espectral a STC (AM 1.5g)."
     )
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(4.30), COLUMN_WIDTH - Inches(0.4), Inches(3.0), am_details, size=15)
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(3.95), COLUMN_WIDTH - Inches(0.4), Inches(2.5), am_details, size=15)
     add_footer(slide, 6, TOTAL_SLIDES)
 
     # --- SLIDE 7: Perfil Diario (Imagen) ---
@@ -492,34 +494,42 @@ def create_presentation():
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Escalamiento a Condiciones Reales")
-    add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Dependencias con (G, Tc) de De Soto ^[1]^")
     
-    add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "1. Factor de Idealidad:", size=15)
-    add_latex_equation(slide, r"\frac{a}{a_{ref}} = \frac{T_c}{T_{ref}}", MARGIN + Inches(0.3), Inches(2.05), Inches(0.35))
+    # Columna 1: Corrientes y Factor de Idealidad
+    add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Corrientes y Factor de Idealidad ^[1]^")
+    add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "1. Corriente Fotogenerada (_I_[_L_]):", size=15)
+    add_latex_equation(slide, r"I_L = \left(\frac{S}{S_{ref}}\right) \cdot \left(\frac{M}{M_{ref}}\right) \cdot \left[ I_{L,ref} + \alpha_{Isc} \cdot (T_c - T_{ref}) \right]", MARGIN + Inches(0.3), Inches(2.05), Inches(0.38))
     
-    add_text(slide, MARGIN + Inches(0.2), Inches(2.45), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "2. Corriente de Saturación Inversa (_I_[_0_]):", size=15)
-    add_latex_equation(slide, r"\frac{I_0}{I_{0,ref}} = \left(\frac{T_c}{T_{ref}}\right)^3 \cdot \exp\left[ \frac{E_{g,ref}}{k \cdot T_{ref}} - \frac{E_g}{k \cdot T_c} \right]", MARGIN + Inches(0.3), Inches(2.80), Inches(0.42))
+    add_text(slide, MARGIN + Inches(0.2), Inches(2.70), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "2. Corriente de Saturación Inversa (_I_[_0_]):", size=15)
+    add_latex_equation(slide, r"\frac{I_0}{I_{0,ref}} = \left(\frac{T_c}{T_{ref}}\right)^3 \cdot \exp\left[ \frac{E_{g,ref}}{k \cdot T_{ref}} - \frac{E_g}{k \cdot T_c} \right]", MARGIN + Inches(0.3), Inches(3.05), Inches(0.42))
     
-    add_text(slide, MARGIN + Inches(0.2), Inches(3.30), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "3. Energía de Bandgap (_E_[_g_]):", size=15)
-    add_latex_equation(slide, r"\frac{E_g}{E_{g,ref}} = 1 - 0.0002677 \cdot (T_c - T_{ref})", MARGIN + Inches(0.3), Inches(3.65), Inches(0.36))
+    add_text(slide, MARGIN + Inches(0.2), Inches(3.80), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "3. Factor de Idealidad térmico (_a_):", size=15)
+    add_latex_equation(slide, r"\frac{a}{a_{ref}} = \frac{T_c}{T_{ref}}", MARGIN + Inches(0.3), Inches(4.15), Inches(0.35))
     
-    add_text(slide, MARGIN + Inches(0.2), Inches(4.10), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "4. Corriente Fotogenerada (_I_[_L_]):", size=15)
-    add_latex_equation(slide, r"I_L = \left(\frac{S}{S_{ref}}\right) \cdot \left(\frac{M}{M_{ref}}\right) \cdot \left[ I_{L,ref} + \alpha_{Isc} \cdot (T_c - T_{ref}) \right]", MARGIN + Inches(0.3), Inches(4.45), Inches(0.38))
-    
-    add_text(slide, MARGIN + Inches(0.2), Inches(4.90), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "5. Resistencia Shunt:", size=15)
-    add_latex_equation(slide, r"R_{sh} = R_{sh,ref} \cdot \left(\frac{S_{ref}}{S}\right)", MARGIN + Inches(0.3), Inches(5.25), Inches(0.35))
-    
-    add_text(slide, MARGIN + Inches(0.2), Inches(5.70), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "Donde _E_[_g,ref_] = 1.121 eV para Silicio a 25°C.", size=14, color=ACCENT_GOLD)
-    
-    add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Suposiciones Físicas Justificadas")
-    scale_just = (
-        "• _R_[_s_] Constante: Se asume _R_[_s_] = _R_[_s,ref_].\n"
-        "  Justificación: De Soto (2006)^[1]^ demuestra mediante validaciones contra NIST que la variación térmica de _R_[_s_] es de segundo orden y su efecto en la curva _I_-_V_ es despreciable.\n\n"
-        "• _R_[_sh_] dependiente de la Irradiancia Absorbida:\n"
-        "  Sigue la relación inversamente proporcional con _S_ para modelar cómo el aumento de portadores minoritarios abre caminos de fuga paralelos en la celda.\n\n"
-        "• _T_[_ref_] = 298.15 K (25°C)  |  _S_[_ref_] = 1000 W/m²."
+    scale_notes = (
+        "Donde:\n"
+        "• _T_[_ref_] = 298.15 K (25°C)  |  _S_[_ref_] = 1000 W/m².\n"
+        "• _M_[_ref_]: Transmitancia espectral a STC."
     )
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), scale_just, size=15)
+    add_text(slide, MARGIN + Inches(0.2), Inches(4.80), COLUMN_WIDTH - Inches(0.4), Inches(2.0), scale_notes, size=15, color=ACCENT_GOLD)
+    
+    # Columna 2: Resistencias y Energía de Bandgap
+    add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Resistencias y Energía de Bandgap ^[1]^")
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "4. Resistencia Shunt (_R_[_sh_]):", size=15)
+    add_latex_equation(slide, r"R_{sh} = R_{sh,ref} \cdot \left(\frac{S_{ref}}{S}\right)", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.05), Inches(0.35))
+    
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(2.70), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "5. Energía de Bandgap del Silicio (_E_[_g_]):", size=15)
+    add_latex_equation(slide, r"\frac{E_g}{E_{g,ref}} = 1 - 0.0002677 \cdot (T_c - T_{ref})", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(3.05), Inches(0.36))
+    
+    scale_just = (
+        "Suposiciones Físicas Justificadas:\n"
+        "• _R_[_s_] Constante: Se asume _R_[_s_] = _R_[_s,ref_].\n"
+        "  La variación térmica de _R_[_s_] es de segundo orden y su efecto en la curva _I_-_V_ es despreciable.\n\n"
+        "• _R_[_sh_] dependiente de la Irradiancia Absorbida:\n"
+        "  Sigue la relación inversamente proporcional con _S_ para modelar fugas asociadas a portadores minoritarios.\n\n"
+        "• _E_[_g,ref_] = 1.121 eV para Silicio a 25°C."
+    )
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(3.80), COLUMN_WIDTH - Inches(0.4), Inches(3.0), scale_just, size=15)
     add_footer(slide, 12, TOTAL_SLIDES)
 
     # --- SLIDE 13: Validación curvas IV/PV ---
