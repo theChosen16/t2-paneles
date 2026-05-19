@@ -428,7 +428,7 @@ def create_presentation():
     apply_slide_background(slide)
     add_title(slide, "Resultados Térmicos: Distribución Anual Tc")
     add_panel(slide, MARGIN, Inches(1.2), Inches(7), Inches(5.5), title="Distribución de Temperatura de Celda")
-    add_image(slide, 'output/Fase1_Resultados/temp_hist_HIT.png', Inches(1.10), Inches(1.65), width=Inches(6.4), height=Inches(4.80))
+    add_image(slide, 'output/Fase1_Resultados/temp_hist_HIT.png', Inches(0.90), Inches(1.65), width=Inches(6.2), height=Inches(4.65))
     
     add_panel(slide, Inches(7.5), Inches(1.2), Inches(5.4), Inches(5.5), title="Comportamiento en Atacama")
     add_text(slide, Inches(7.7), Inches(1.8), Inches(5), Inches(4), 
