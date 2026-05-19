@@ -22,3 +22,8 @@ temp/
 # System Files
 .DS_Store
 Thumbs.db
+
+# Temporary Outputs and Cache
+output/temp_latex/
+output/test/
+

@@ -77,6 +77,54 @@ def add_image(slide, img_path, left, top, width=None, height=None):
         return slide.shapes.add_picture(img_path, left, top, width=width, height=height)
     return None
 
+def add_latex_equation(slide, formula_text, left, top, height, color='#E8A838', dpi=300):
+    import os
+    import matplotlib.pyplot as plt
+    from PIL import Image
+    import hashlib
+    
+    # Carpeta temporal para las ecuaciones LaTeX
+    temp_dir = 'output/temp_latex'
+    os.makedirs(temp_dir, exist_ok=True)
+    
+    # Generar hash único para evitar re-renderizados innecesarios y acelerar la ejecución
+    h = hashlib.md5(f"{formula_text}_{color}".encode('utf-8')).hexdigest()
+    file_path = os.path.join(temp_dir, f"eq_{h}.png")
+    
+    if not os.path.exists(file_path):
+        # Crear figura sin fondo con proporciones estiradas (20 pulgadas de ancho) para evitar cortes en fórmulas largas
+        fig = plt.figure(figsize=(20, 1.8), facecolor='none')
+        ax = fig.add_axes([0, 0, 1, 1])
+        ax.axis('off')
+        
+        # Envolver en dólares si no lo está
+        math_text = formula_text if formula_text.startswith('$') else f"${formula_text}$"
+        
+        ax.text(0.5, 0.5, math_text, 
+                fontsize=24, 
+                color=color, 
+                ha='center', 
+                va='center',
+                math_fontfamily='cm') # Computer Modern (LaTeX look)
+                
+        plt.savefig(file_path, dpi=dpi, bbox_inches='tight', pad_inches=0.05, transparent=True)
+        plt.close(fig)
+        
+        # Recortar los bordes transparentes sobrantes usando Pillow
+        img = Image.open(file_path)
+        bbox = img.getbbox()
+        if bbox:
+            cropped = img.crop(bbox)
+            cropped.save(file_path)
+            
+    # Determinar la relación de aspecto para no distorsionar la imagen en la diapositiva
+    img = Image.open(file_path)
+    aspect_ratio = img.width / img.height
+    width = height * aspect_ratio
+    
+    # Insertar la imagen en el slide
+    slide.shapes.add_picture(file_path, left, top, width=width, height=height)
+
 def create_presentation():
     prs = Presentation()
     prs.slide_width = SLIDE_WIDTH
@@ -129,18 +177,17 @@ def create_presentation():
     table_shape = slide.shapes.add_table(rows, cols, left, top, width, height)
     table = table_shape.table
     
-    # Aplicar estilo "No Style, Table Grid" para eliminar bordes blancos toscos por defecto
     tbl = table_shape._element.graphic.graphicData.tbl
     tblPr = tbl.tblPr
     style_id_element = tblPr.find(qn('a:tableStyleId'))
     if style_id_element is not None:
         style_id_element.text = '{5940675A-B579-460E-94D1-54222C63F5DA}'
     
-    table.columns[0].width = Inches(2.0) # Tecnología
-    table.columns[1].width = Inches(1.2) # Eficiencia
-    table.columns[2].width = Inches(1.8) # Coef. Temp
-    table.columns[3].width = Inches(4.3) # Comportamiento en Desierto
-    table.columns[4].width = Inches(2.8) # Decisión / Rol
+    table.columns[0].width = Inches(2.0)
+    table.columns[1].width = Inches(1.2)
+    table.columns[2].width = Inches(1.8)
+    table.columns[3].width = Inches(4.3)
+    table.columns[4].width = Inches(2.8)
     
     headers = ["Tecnología", "Eficiencia", "Coef. Temp. (Pmp)", "Comportamiento en Desierto", "Decisión / Rol"]
     data = [
@@ -155,7 +202,7 @@ def create_presentation():
         cell = table.cell(0, c)
         cell.text = headers[c]
         cell.fill.solid()
-        cell.fill.fore_color.rgb = RGBColor(0x2C, 0x2C, 0x48) # Encabezado marino premium
+        cell.fill.fore_color.rgb = RGBColor(0x2C, 0x2C, 0x48)
         cell.vertical_anchor = MSO_VERTICAL_ANCHOR.MIDDLE
         for p in cell.text_frame.paragraphs:
             p.font.bold = True
@@ -170,17 +217,14 @@ def create_presentation():
             cell = table.cell(r, c)
             cell.text = row_data[c]
             cell.fill.solid()
-            # Fila seleccionada vs descartada
             if is_selected:
-                cell.fill.fore_color.rgb = RGBColor(0x28, 0x28, 0x4B) # Lighter Dark Navy
+                cell.fill.fore_color.rgb = RGBColor(0x28, 0x28, 0x4B)
             else:
-                cell.fill.fore_color.rgb = RGBColor(0x1F, 0x1F, 0x33) # Darker Dark Navy
+                cell.fill.fore_color.rgb = RGBColor(0x1F, 0x1F, 0x33)
             
             cell.vertical_anchor = MSO_VERTICAL_ANCHOR.MIDDLE
             for p in cell.text_frame.paragraphs:
                 p.font.size = Pt(10.5 if c == 3 else 11.5)
-                
-                # Resaltar colores según selección
                 if is_selected:
                     p.font.color.rgb = ACCENT_GOLD if c == 4 else TEXT_WHITE
                 else:
@@ -189,7 +233,6 @@ def create_presentation():
                 if c in [0, 4]: 
                     p.font.bold = True
                 
-                # Alineación adaptativa
                 if c in [1, 2, 4]: 
                     p.alignment = PP_ALIGN.CENTER
                 else: 
@@ -210,21 +253,29 @@ def create_presentation():
     add_text(slide, MARGIN + Inches(0.5), Inches(1.8), SLIDE_WIDTH - 2*MARGIN - Inches(1), Inches(4.5), method, size=18)
     add_footer(slide, 4, TOTAL_SLIDES)
 
-    # --- SLIDE 5: Recurso Solar (Fórmulas POA y S) ---
+    # --- SLIDE 5: Recurso Solar (LaTeX) ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Recurso Solar: Transposición y Absorción")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Fórmulas POA (Perez) y Absorción")
     
-    eq_text = (
-        "1. Irradiancia en Plano de Arreglo (POA):\n"
-        "   G_poa = G_b · R_beam + G_d · [(1 + cos(β)) / 2] + G · ρ · [(1 - cos(β)) / 2]\n\n"
-        "2. Irradiancia Absorbida por Celdas (S):\n"
-        "   S / S_ref = (G_b / G_ref) · R_beam · K_τα,b + (G_d / G_ref) · K_τα,d · [(1 + cos(β)) / 2] + "
-        "(G / G_ref) · ρ · K_τα,g · [(1 - cos(β)) / 2]\n\n"
-        "Donde S_ref = G_ref = 1000 W/m² en condiciones de referencia (SRC)."
-    )
-    add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), eq_text, size=13, color=ACCENT_GOLD)
+    # 1. Irradiancia en Plano de Arreglo (POA)
+    add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
+             "1. Irradiancia en Plano de Arreglo (POA):", size=13, color=TEXT_WHITE)
+    add_latex_equation(slide, 
+                       r"G_{poa} = G_b \cdot R_{beam} + G_d \cdot \left(\frac{1 + \cos(\beta)}{2}\right) + G \cdot \rho \cdot \left(\frac{1 - \cos(\beta)}{2}\right)", 
+                       MARGIN + Inches(0.3), Inches(2.1), Inches(0.38))
+    
+    # 2. Irradiancia Absorbida por Celdas (S) - Altura optimizada a 0.3 para evitar que desborde de la columna
+    add_text(slide, MARGIN + Inches(0.2), Inches(2.8), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
+             "2. Irradiancia Absorbida por Celdas (S):", size=13, color=TEXT_WHITE)
+    add_latex_equation(slide, 
+                       r"\frac{S}{S_{ref}} = \frac{G_b}{G_{ref}} \cdot R_{beam} \cdot K_{\tau\alpha,b} + \frac{G_d}{G_{ref}} \cdot K_{\tau\alpha,d} \cdot \left(\frac{1 + \cos(\beta)}{2}\right) + \frac{G}{G_{ref}} \cdot \rho \cdot K_{\tau\alpha,g} \cdot \left(\frac{1 - \cos(\beta)}{2}\right)", 
+                       MARGIN + Inches(0.3), Inches(3.2), Inches(0.30))
+    
+    # Donde S_ref ...
+    add_text(slide, MARGIN + Inches(0.2), Inches(4.1), COLUMN_WIDTH - Inches(0.4), Inches(2.0),
+             "Donde S_ref = G_ref = 1000 W/m² en condiciones de referencia (SRC).", size=13, color=ACCENT_GOLD)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Glosario de Términos")
     glossary = (
@@ -237,37 +288,42 @@ def create_presentation():
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), glossary, size=13)
     add_footer(slide, 5, TOTAL_SLIDES)
 
-    # --- SLIDE 6: Modificadores IAM y Air Mass ---
+    # --- SLIDE 6: Modificadores IAM y Air Mass (LaTeX) ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Modificadores Ópticos: IAM y Masa de Aire")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Modificador por Ángulo de Incidencia (IAM)")
     
-    iam_text = (
-        "Ecuación física basada en Ley de Snell y Bouguer:\n\n"
-        "   K_τα(θ) = τ(θ) / τ(0)\n\n"
-        "   τ(θ) = e^(-K·L / cos(θ_r)) · [ 1 - 0.5 · ( sin²(θ_r - θ)/sin²(θ_r + θ) + tan²(θ_r - θ)/tan²(θ_r + θ) ) ]\n\n"
-        "   θ_r = arcsin( sin(θ) / n )\n\n"
+    add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
+             "Ecuación física basada en Ley de Snell y Bouguer:", size=12)
+    add_latex_equation(slide, r"K_{\tau\alpha}(\theta) = \frac{\tau(\theta)}{\tau(0)}", MARGIN + Inches(0.3), Inches(2.1), Inches(0.34))
+    # Altura optimizada a 0.34 para evitar que desborde de la columna
+    add_latex_equation(slide, r"\tau(\theta) = e^{-\frac{K \cdot L}{\cos(\theta_r)}} \cdot \left[ 1 - \frac{1}{2} \left( \frac{\sin^2(\theta_r - \theta)}{\sin^2(\theta_r + \theta)} + \frac{\tan^2(\theta_r - \theta)}{\tan^2(\theta_r + \theta)} \right) \right]", MARGIN + Inches(0.3), Inches(2.6), Inches(0.34))
+    add_latex_equation(slide, r"\theta_r = \arcsin\left(\frac{\sin(\theta)}{n}\right)", MARGIN + Inches(0.3), Inches(3.25), Inches(0.3))
+    
+    iam_details = (
         "Donde:\n"
         "• θ: Ángulo de incidencia solar.\n"
         "• n = 1.526 (Índice de refracción del vidrio templado).\n"
         "• K = 4 m⁻¹ (Absorción del vidrio).\n"
         "• L = 2 mm (Espesor típico del vidrio)."
     )
-    add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), iam_text, size=11, color=ACCENT_GOLD)
+    add_text(slide, MARGIN + Inches(0.2), Inches(3.7), COLUMN_WIDTH - Inches(0.4), Inches(2.5), iam_details, size=11, color=ACCENT_GOLD)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Modificador por Masa de Aire (AM)")
-    am_text = (
-        "Corrige el desajuste del espectro solar según el espesor de la atmósfera atravesada:\n\n"
-        "   M / M_ref = a₀ + a₁·AM + a₂·AM² + a₃·AM³ + a₄·AM⁴\n\n"
-        "   AM = 1 / [ cos(θ_z) + 0.5057 · (96.08 - θ_z)⁻¹.⁶³⁴ ]\n\n"
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
+             "Corrige el desajuste del espectro solar según la atmósfera atravesada:", size=12)
+    add_latex_equation(slide, r"\frac{M}{M_{ref}} = a_0 + a_1 \cdot AM + a_2 \cdot AM^2 + a_3 \cdot AM^3 + a_4 \cdot AM^4", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.2), Inches(0.34))
+    add_latex_equation(slide, r"AM = \frac{1}{\cos(\theta_z) + 0.5057 \cdot (96.08 - \theta_z)^{-1.634}}", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.75), Inches(0.4))
+    
+    am_details = (
         "Donde:\n"
         "• AM: Masa de aire absoluta.\n"
         "• θ_z: Ángulo cenital del sol.\n"
         "• a₀, a₁, a₂, a₃, a₄: Coeficientes empíricos espectrales.\n"
         "• M_ref: Transmitancia espectral a STC (AM 1.5g)."
     )
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), am_text, size=12)
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(3.4), COLUMN_WIDTH - Inches(0.4), Inches(3.0), am_details, size=12)
     add_footer(slide, 6, TOTAL_SLIDES)
 
     # --- SLIDE 7: Perfil Diario (Imagen) ---
@@ -278,22 +334,24 @@ def create_presentation():
     add_image(slide, 'output/Extra_Resultados/perfil_dia_tipico.png', Inches(2.41), Inches(1.4), width=Inches(8.5))
     add_footer(slide, 7, TOTAL_SLIDES)
 
-    # --- SLIDE 8: Modelamiento Térmico ---
+    # --- SLIDE 8: Modelamiento Térmico (LaTeX) ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Temperatura de Celda (Sandia SAPM)")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Ecuación del Modelo Térmico")
     
-    thermal_eq = (
-        "La temperatura interna de la celda (T_c) depende del recurso solar y del viento:\n\n"
-        "   T_c = G_poa · e^(a + b · v_w) + T_a + (G_poa / 1000) · ΔT\n\n"
+    add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
+             "La temperatura interna de la celda (Tc) depende del recurso solar y del viento:", size=13)
+    add_latex_equation(slide, r"T_c = G_{poa} \cdot e^{a + b \cdot v_w} + T_a + \left(\frac{G_{poa}}{1000}\right) \cdot \Delta T", MARGIN + Inches(0.3), Inches(2.2), Inches(0.45))
+    
+    thermal_details = (
         "Donde:\n"
         "• T_c / T_a: Temperatura de celda y ambiental (°C).\n"
         "• G_poa: Irradiancia en el plano del panel (W/m²).\n"
         "• v_w: Velocidad del viento (m/s).\n"
         "• a, b, ΔT: Parámetros empíricos del encapsulado."
     )
-    add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), thermal_eq, size=14, color=ACCENT_GOLD)
+    add_text(slide, MARGIN + Inches(0.2), Inches(2.9), COLUMN_WIDTH - Inches(0.4), Inches(3.0), thermal_details, size=13, color=ACCENT_GOLD)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Coeficientes por Tecnología")
     thermal_coef = (
@@ -325,19 +383,20 @@ def create_presentation():
              "• Las altas temperaturas aumentan la corriente de saturación inversa (Io), reduciendo severamente el Voc.", size=16)
     add_footer(slide, 9, TOTAL_SLIDES)
 
-    # --- SLIDE 10: Modelo de 5 Parámetros (SDM) ---
+    # --- SLIDE 10: Modelo de 5 Parámetros (SDM) (LaTeX) ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Modelo de 5 Parámetros: Diodo Simple (SDM)")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Ecuación del Circuito Equivalente")
     
-    sdm_eq = (
-        "El módulo se modela como un circuito equivalente de un diodo y pérdidas óhmicas:\n\n"
-        "   I = I_L - I_₀ · [ exp((V + I·R_s) / a) - 1 ] - (V + I·R_s) / R_sh\n\n"
-        "El factor de idealidad térmico (a) se define formalmente como:\n\n"
-        "   a = (N_s · n_I · k · T_c) / q"
-    )
-    add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), sdm_eq, size=14, color=ACCENT_GOLD)
+    add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
+             "El módulo se modela como un circuito equivalente de un diodo y pérdidas óhmicas:", size=13)
+    # Altura optimizada a 0.34 para evitar que desborde de la columna
+    add_latex_equation(slide, r"I = I_L - I_0 \cdot \left[ \exp\left(\frac{V + I \cdot R_s}{a}\right) - 1 \right] - \frac{V + I \cdot R_s}{R_{sh}}", MARGIN + Inches(0.3), Inches(2.2), Inches(0.34))
+    
+    add_text(slide, MARGIN + Inches(0.2), Inches(2.9), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
+             "El factor de idealidad térmico (a) se define formalmente como:", size=13)
+    add_latex_equation(slide, r"a = \frac{N_s \cdot n_I \cdot k \cdot T_c}{q}", MARGIN + Inches(0.3), Inches(3.4), Inches(0.42))
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Glosario de Parámetros Físicos")
     sdm_glossary = (
@@ -355,55 +414,60 @@ def create_presentation():
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), sdm_glossary, size=12)
     add_footer(slide, 10, TOTAL_SLIDES)
 
-    # --- SLIDE 11: Extracción en SRC ---
+    # --- SLIDE 11: Extracción en SRC (LaTeX) ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Extracción de Parámetros de Referencia")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Sistema No-Lineal de 5 Ecuaciones")
     
-    src_eq = (
-        "Se extraen a_ref, I_L,ref, I_₀,ref, R_s,ref, R_sh,ref en STC:\n\n"
-        "1. Cortocircuito (I_sc): V = 0, I = I_sc,ref\n"
-        "2. Circuito Abierto (V_oc): I = 0, V = V_oc,ref\n"
-        "3. Máxima Potencia (MPP): I = I_mp,ref, V = V_mp,ref\n"
-        "4. Pendiente en MPP (dP/dV = 0):\n"
-        "   dI/dV|_mpp = -I_mp,ref / V_mp,ref\n"
-        "5. Coeficiente térmico de V_oc: β_Voc = ∂V_oc / ∂T_c"
-    )
-    add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), src_eq, size=13, color=ACCENT_GOLD)
+    add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(1.3),
+             "Se extraen a_ref, I_L,ref, I_0,ref, R_s,ref, R_sh,ref en STC:\n\n"
+             "1. Cortocircuito (I_sc): V = 0, I = I_sc,ref\n"
+             "2. Circuito Abierto (V_oc): I = 0, V = V_oc,ref\n"
+             "3. Máxima Potencia (MPP): I = I_mp,ref, V = V_mp,ref\n"
+             "4. Pendiente en MPP (dP/dV = 0):", size=12)
+    add_latex_equation(slide, r"\left.\frac{dI}{dV}\right|_{mp} = -\frac{I_{mp,ref}}{V_{mp,ref}}", MARGIN + Inches(0.3), Inches(3.1), Inches(0.4))
+    
+    add_text(slide, MARGIN + Inches(0.2), Inches(3.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
+             "5. Coeficiente térmico de V_oc:", size=12)
+    add_latex_equation(slide, r"\beta_{Voc} = \frac{\partial V_{oc}}{\partial T_c}", MARGIN + Inches(0.3), Inches(4.1), Inches(0.36))
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Ecuación de la Derivada Analítica en MPP")
-    deriv_eq = (
-        "Para acoplar R_s y el factor de idealidad, se implementa la derivada analítica obtenida del circuito:\n\n"
-        "   dI/dV|_mpp = -(A + B) / (1 + R_s · A + R_s · B)\n\n"
-        "Donde:\n"
-        "   A = (I_₀ / a) · exp((V_mp + I_mp · R_s) / a)\n"
-        "   B = 1 / R_sh\n\n"
-        "La optimización se realiza mediante ajuste de mínimos cuadrados con bounds físicos (R_s > 0, n_I ∈ [1, 2])."
-    )
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), deriv_eq, size=12)
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
+             "Para acoplar Rs y el factor de idealidad, se implementa la derivada analítica obtenida del circuito:", size=12)
+    add_latex_equation(slide, r"\left.\frac{dI}{dV}\right|_{mp} = -\frac{A + B}{1 + R_s \cdot A + R_s \cdot B}", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(2.2), Inches(0.46))
+    
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(2.85), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
+             "Donde:", size=12)
+    add_latex_equation(slide, r"A = \frac{I_0}{a} \cdot e^{\frac{V_{mp} + I_{mp} \cdot R_s}{a}}", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(3.15), Inches(0.42))
+    add_latex_equation(slide, r"B = \frac{1}{R_{sh}}", MARGIN + COLUMN_WIDTH + GAP + Inches(0.3), Inches(3.75), Inches(0.3))
+    
+    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(4.25), COLUMN_WIDTH - Inches(0.4), Inches(1.5),
+             "La optimización se realiza mediante ajuste de mínimos cuadrados con bounds físicos (R_s > 0, n_I ∈ [1, 2]).", size=12, color=ACCENT_GOLD)
     add_footer(slide, 11, TOTAL_SLIDES)
 
-    # --- SLIDE 12: Ecuaciones de Escalado ---
+    # --- SLIDE 12: Ecuaciones de Escalado (LaTeX) ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Escalamiento a Condiciones Reales")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Dependencias con (G, Tc) de De Soto")
     
-    scale_eq = (
-        "1. Factor de Idealidad:\n"
-        "   a / a_ref = T_c / T_ref\n\n"
-        "2. Corriente de Saturación Inversa (I_₀):\n"
-        "   I_₀ / I_₀,ref = (T_c / T_ref)³ · exp[ E_g,ref / (k · T_ref) - E_g / (k · T_c) ]\n\n"
-        "3. Energía de Bandgap (E_g):\n"
-        "   E_g / E_g,ref = 1 - 0.0002677 · (T_c - T_ref)\n"
-        "   Donde E_g,ref = 1.121 eV para Silicio a 25°C.\n\n"
-        "4. Corriente Fotogenerada (I_L):\n"
-        "   I_L = (S / S_ref) · (M / M_ref) · [ I_L,ref + α_Isc · (T_c - T_ref) ]\n\n"
-        "5. Resistencia Shunt:\n"
-        "   R_sh = R_sh,ref · (S_ref / S)"
-    )
-    add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), scale_eq, size=12, color=ACCENT_GOLD)
+    add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "1. Factor de Idealidad:", size=12)
+    add_latex_equation(slide, r"\frac{a}{a_{ref}} = \frac{T_c}{T_{ref}}", MARGIN + Inches(0.3), Inches(2.0), Inches(0.28))
+    
+    add_text(slide, MARGIN + Inches(0.2), Inches(2.35), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "2. Corriente de Saturación Inversa (Io):", size=12)
+    add_latex_equation(slide, r"\frac{I_0}{I_{0,ref}} = \left(\frac{T_c}{T_{ref}}\right)^3 \cdot \exp\left[ \frac{E_{g,ref}}{k \cdot T_{ref}} - \frac{E_g}{k \cdot T_c} \right]", MARGIN + Inches(0.3), Inches(2.65), Inches(0.35))
+    
+    add_text(slide, MARGIN + Inches(0.2), Inches(3.1), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "3. Energía de Bandgap (Eg):", size=12)
+    add_latex_equation(slide, r"\frac{E_g}{E_{g,ref}} = 1 - 0.0002677 \cdot (T_c - T_{ref})", MARGIN + Inches(0.3), Inches(3.4), Inches(0.28))
+    
+    add_text(slide, MARGIN + Inches(0.2), Inches(3.75), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "4. Corriente Fotogenerada (IL):", size=12)
+    add_latex_equation(slide, r"I_L = \left(\frac{S}{S_{ref}}\right) \cdot \left(\frac{M}{M_{ref}}\right) \cdot \left[ I_{L,ref} + \alpha_{Isc} \cdot (T_c - T_{ref}) \right]", MARGIN + Inches(0.3), Inches(4.05), Inches(0.32))
+    
+    add_text(slide, MARGIN + Inches(0.2), Inches(4.45), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "5. Resistencia Shunt:", size=12)
+    add_latex_equation(slide, r"R_{sh} = R_{sh,ref} \cdot \left(\frac{S_{ref}}{S}\right)", MARGIN + Inches(0.3), Inches(4.75), Inches(0.28))
+    
+    add_text(slide, MARGIN + Inches(0.2), Inches(5.15), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "Donde Eg,ref = 1.121 eV para Silicio a 25°C.", size=12, color=ACCENT_GOLD)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Suposiciones Físicas Justificadas")
     scale_just = (
@@ -439,22 +503,24 @@ def create_presentation():
              "• Error máximo concentrado en la zona de codo a baja irradiancia.", size=16)
     add_footer(slide, 14, TOTAL_SLIDES)
 
-    # --- SLIDE 15: Performance Ratio (Ecuación) ---
+    # --- SLIDE 15: Performance Ratio (Ecuación) (LaTeX) ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Performance Ratio: Evaluación de Desempeño")
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Ecuación Matemática del PR")
     
-    pr_eq = (
-        "El Performance Ratio (PR) evalúa la eficiencia neta del sistema fotovoltaico:\n\n"
-        "   PR = Σ P_mp,SDM(G, T_c) / Σ [ P_STC · (G_poa / 1000) ]\n\n"
+    add_text(slide, MARGIN + Inches(0.2), Inches(1.7), COLUMN_WIDTH - Inches(0.4), Inches(0.35),
+             "El Performance Ratio (PR) evalúa la eficiencia neta del sistema fotovoltaico:", size=13)
+    add_latex_equation(slide, r"PR = \frac{\sum P_{mp,SDM}(G, T_c)}{\sum \left[ P_{STC} \cdot \left(\frac{G_{poa}}{1000}\right) \right]}", MARGIN + Inches(0.3), Inches(2.2), Inches(0.48))
+    
+    pr_details = (
         "Donde:\n"
         "• P_mp,SDM: Potencia MPP simulada hora a hora con De Soto (W).\n"
         "• P_STC: Potencia nominal a STC (m-Si: 46.68 W | HIT: 217.52 W).\n"
         "• G_poa: Irradiancia calculada en el plano del panel (W/m²).\n"
         "• 1000: Irradiancia de referencia a STC (W/m²)."
     )
-    add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), pr_eq, size=14, color=ACCENT_GOLD)
+    add_text(slide, MARGIN + Inches(0.2), Inches(2.9), COLUMN_WIDTH - Inches(0.4), Inches(3.0), pr_details, size=13, color=ACCENT_GOLD)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Significado Físico del PR")
     pr_phys = (
