@@ -27,11 +27,10 @@ def apply_slide_background(slide):
 def add_title(slide, text):
     title_box = slide.shapes.add_textbox(MARGIN, MARGIN, SLIDE_WIDTH - 2*MARGIN, Inches(0.8))
     tf = title_box.text_frame
+    add_formatted_paragraph(tf, text, font_size=28, default_color=ACCENT_GOLD, is_first=True)
     p = tf.paragraphs[0]
-    p.text = text
-    p.font.bold = True
-    p.font.size = Pt(28)
-    p.font.color.rgb = ACCENT_GOLD
+    for run in p.runs:
+        run.font.bold = True
     return title_box
 
 def add_footer(slide, page_num, total_pages=20):
@@ -51,12 +50,12 @@ def add_panel(slide, left, top, width, height, title=""):
     rect.line.width = Pt(1.0)
     
     if title:
-        box = slide.shapes.add_textbox(left + Inches(0.1), top + Inches(0.1), width - Inches(0.2), Inches(0.4))
-        p = box.text_frame.paragraphs[0]
-        p.text = title
-        p.font.bold = True
-        p.font.size = Pt(18)  # Aumentado de 14 a 18 para mejor legibilidad
-        p.font.color.rgb = ACCENT_GOLD
+        box = slide.shapes.add_textbox(left + Inches(0.1), top + Inches(0.1), width - Inches(0.2), Inches(0.45))
+        tf = box.text_frame
+        add_formatted_paragraph(tf, title, font_size=18, default_color=ACCENT_GOLD, is_first=True)
+        p = tf.paragraphs[0]
+        for run in p.runs:
+            run.font.bold = True
     
     return rect
 
