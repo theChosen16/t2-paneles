@@ -580,7 +580,7 @@ def create_presentation():
     add_panel(slide, MARGIN, Inches(1.2), SLIDE_WIDTH - 2*MARGIN, Inches(2.2), title="Ecuación Matemática del PR")
     add_text(slide, MARGIN + Inches(0.2), Inches(1.65), SLIDE_WIDTH - 2*MARGIN - Inches(0.4), Inches(0.35),
              "El Performance Ratio (_PR_) evalúa la eficiencia neta del sistema fotovoltaico frente a condiciones de referencia STC:", size=15)
-    add_latex_equation(slide, r"PR = \frac{\sum_{t=1}^{N} V_{mp,t}(G_t, T_{c,t}) \cdot I_{mp,t}(G_t, T_{c,t})}{\sum_{t=1}^{N} \left[ P_{STC} \cdot \left(\frac{G_{poa,t}}{G_{ref}}\right) \right]}", MARGIN + Inches(1.5), Inches(2.05), Inches(0.85), max_width=Inches(8.73))
+    add_latex_equation(slide, r"PR = \left[ \sum_{t=1}^{N} V_{mp,t}(G_t, T_{c,t}) \cdot I_{mp,t}(G_t, T_{c,t}) \right] ~ / ~ \left[ \sum_{t=1}^{N} P_{STC} \cdot \left(\frac{G_{poa,t}}{G_{ref}}\right) \right]", MARGIN + Inches(0.5), Inches(2.10), Inches(0.75), max_width=Inches(10.73))
     
     # Segmento Inferior: Dos Paneles
     # Panel Izquierdo: Glosario
