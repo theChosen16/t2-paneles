@@ -336,14 +336,14 @@ def create_presentation():
         r"$\quad + \frac{G}{G_{ref}} \cdot \rho \cdot K_{\tau\alpha,g} \cdot \left(\frac{1 - \cos(\beta)}{2}\right)$"
     )
     add_latex_equation(slide, eq_multiline, 
-                       MARGIN + Inches(5.5) + GAP + Inches(0.2), Inches(2.10), Inches(0.95), max_width=Inches(5.8))
+                       MARGIN + Inches(5.5) + GAP + Inches(0.2), Inches(2.05), Inches(1.40), max_width=Inches(5.8))
     abs_glossary = (
         "Donde:\n"
         "• _S_ / _S_[_ref_]: Irradiancia efectiva y de referencia (1000 W/m²).\n"
         "• _K_[_τα,b_] / _K_[_τα,d_] / _K_[_τα,g_]: Modificadores por IAM para directa, difusa y albedo.\n"
         "• Incorpora las pérdidas ópticas por ángulo de incidencia^[2]^."
     )
-    add_text(slide, MARGIN + Inches(5.5) + GAP + Inches(0.2), Inches(3.20), Inches(5.8), Inches(3.0), abs_glossary, size=15)
+    add_text(slide, MARGIN + Inches(5.5) + GAP + Inches(0.2), Inches(3.65), Inches(5.8), Inches(2.6), abs_glossary, size=16)
     add_footer(slide, 5, TOTAL_SLIDES)
 
     # --- SLIDE 6: Modificadores IAM y Air Mass (LaTeX) ---
