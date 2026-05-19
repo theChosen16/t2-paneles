@@ -93,7 +93,7 @@ def gen_extra_results():
     dia_ejemplo = df_msi[(df_msi['time'].dt.month == 2) & (df_msi['time'].dt.day == 15)].copy()
     
     if not dia_ejemplo.empty:
-        fig, ax1 = plt.subplots(figsize=(10, 6))
+        fig, ax1 = plt.subplots(figsize=(14, 6.7))
         ax2 = ax1.twinx()
         
         ax1.plot(dia_ejemplo['time'], dia_ejemplo['poa_global'], color='#E8A838', label='Irradiancia POA', linewidth=2.5)
@@ -126,7 +126,7 @@ def gen_extra_results():
     pr_msi = df_msi_time['pmp_teorica'].resample('ME').sum() / df_msi_time['p_ideal_stc'].resample('ME').sum()
     pr_hit = df_hit_time['pmp_teorica'].resample('ME').sum() / df_hit_time['p_ideal_stc'].resample('ME').sum()
     
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(14, 6.7))
     plt.plot(range(1, 13), pr_msi.values, marker='o', label='PR m-Si', linewidth=3, color='#007ACC', markersize=8)
     plt.plot(range(1, 13), pr_hit.values, marker='o', label='PR HIT', linewidth=3, color='#E8A838', markersize=8)
     plt.title('Performance Ratio Mensual en Atacama (Simulación 2026)', fontsize=14, fontweight='bold', pad=15)

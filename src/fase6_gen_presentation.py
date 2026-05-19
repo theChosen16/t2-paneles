@@ -381,7 +381,7 @@ def create_presentation():
     apply_slide_background(slide)
     add_title(slide, "Dinámica Horaria: Irradiancia en Día Despejado")
     add_panel(slide, MARGIN, Inches(1.2), SLIDE_WIDTH - 2*MARGIN, Inches(5.8))
-    add_image(slide, 'output/Extra_Resultados/perfil_dia_tipico.png', Inches(2.41), Inches(1.4), width=Inches(8.5))
+    add_image(slide, 'output/Extra_Resultados/perfil_dia_tipico.png', Inches(1.0), Inches(1.35), width=Inches(11.33), height=Inches(5.4))
     add_footer(slide, 7, TOTAL_SLIDES)
 
     # --- SLIDE 8: Modelamiento Térmico (LaTeX) ---
@@ -602,7 +602,7 @@ def create_presentation():
     apply_slide_background(slide)
     add_title(slide, "Resultados: Performance Ratio Mensual")
     add_panel(slide, MARGIN, Inches(1.2), SLIDE_WIDTH - 2*MARGIN, Inches(5.8))
-    add_image(slide, 'output/Extra_Resultados/pr_mensual_comparativo.png', Inches(2.41), Inches(1.4), width=Inches(8.5))
+    add_image(slide, 'output/Extra_Resultados/pr_mensual_comparativo.png', Inches(1.0), Inches(1.35), width=Inches(11.33), height=Inches(5.4))
     add_footer(slide, 16, TOTAL_SLIDES)
 
     # --- SLIDE 17: Sensibilidad Térmica ---
