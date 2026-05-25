@@ -34,7 +34,7 @@ def add_title(slide, text):
         run.font.bold = True
     return title_box
 
-def add_footer(slide, page_num, total_pages=24):
+def add_footer(slide, page_num, total_pages=25):
     footer_text = f"ELI556 | Grupo Alta Tensión | Lámina {page_num}/{total_pages}"
     footer_box = slide.shapes.add_textbox(MARGIN, SLIDE_HEIGHT - Inches(0.4), SLIDE_WIDTH - 2*MARGIN, Inches(0.3))
     p = footer_box.text_frame.paragraphs[0]
@@ -183,7 +183,7 @@ def create_presentation():
     prs = Presentation()
     prs.slide_width = SLIDE_WIDTH
     prs.slide_height = SLIDE_HEIGHT
-    TOTAL_SLIDES = 24
+    TOTAL_SLIDES = 25
 
     # ==========================================
     # CUERPO PRINCIPAL DE LA PRESENTACIÓN
@@ -301,22 +301,53 @@ def create_presentation():
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "c) Marco referencial y revisión de literatura pertinente: Modelos Teóricos")
-    add_panel(slide, MARGIN, Inches(1.2), SLIDE_WIDTH - 2*MARGIN, Inches(5.5), title="Literatura Académica y Modelos Utilizados para la Consultoría")
     
+    # Columna 1: Explicación de Modelos (Asimétrica y Detallada)
+    add_panel(slide, MARGIN, Inches(1.2), Inches(6.2), Inches(5.5), title="Literatura Académica y Modelos Utilizados")
     referencias_cuerpo = (
         "• **Modelo de un Diodo Simple (SDM):**\n"
-        "  El comportamiento eléctrico se modela matemáticamente a través de una ecuación implícita trascendental. Describe las pérdidas resistivas (serie, _R_[_s_]) y las fugas de corriente (shunt, _R_[_sh_]) asociadas a la celda fotovoltaica. *(Ecuación en Anexo IV)*\n\n"
+        "  Estructura circuital clásica que describe eléctricamente la celda. Incorpora las pérdidas óhmicas resistivas en serie (_R_[_s_]) y las corrientes de fuga shunt (_R_[_sh_]) en el semiconductor.\n\n"
         "• **Modelo Térmico de Sandia (SAPM):**\n"
-        "  Desarrollado por el Sandia National Laboratories (King et al., 2004). Estima dinámicamente la temperatura interna de la celda fotovoltaica (_T_[_c_]) en función de la irradiancia incidente en el plano del panel y la velocidad de viento circundante. *(Ecuación en Anexo III)*\n\n"
+        "  Estima dinámicamente la temperatura interna de la celda (_T_[_c_]) a partir de la irradiancia incidente y la velocidad del viento, considerando los coeficientes empíricos del encapsulado.\n\n"
         "• **Modelo de Transposición de Perez (1990):**\n"
-        "  Modelo de cielo anisotrópico ampliamente aceptado por su alta precisión. Divide el recurso solar difuso en componentes circunsolar, de horizonte y difuso de fondo, permitiendo proyectar con exactitud la irradiancia en paneles inclinados. *(Ecuación en Anexo I)*\n\n"
-        "• **Algoritmo de Extracción Paramétrica de De Soto (2006):**\n"
-        "  Metodología para encontrar los 5 parámetros en STC resolviendo un sistema de ecuaciones analíticas y su posterior traslado a condiciones operacionales reales basándose en el bandgap del semiconductor. *(Ecuaciones en Anexos V y VI)*"
+        "  Traducción geométrica de irradiancia sobre plano inclinado, modelando componentes de cielo difuso anisotrópico.\n\n"
+        "• **Algoritmo de Parámetros de De Soto (2006):**\n"
+        "  Fórmulas para trasladar los parámetros desde STC a condiciones operacionales basándose en la energía de bandgap del silicio."
     )
-    add_text(slide, MARGIN + Inches(0.5), Inches(1.8), SLIDE_WIDTH - 2*MARGIN - Inches(1.0), Inches(4.5), referencias_cuerpo, size=15)
+    add_text(slide, MARGIN + Inches(0.2), Inches(1.7), Inches(5.8), Inches(4.8), referencias_cuerpo, size=14)
+
+    # Columna 2: Circuito Equivalente SDM (Imagen Explicativa)
+    add_panel(slide, MARGIN + Inches(6.2) + GAP, Inches(1.2), Inches(5.733), Inches(5.5), title="Circuito Equivalente de un Diodo (SDM)")
+    add_image(slide, 'output/Extra_Resultados/circuito_equivalente_sdm.png', MARGIN + Inches(6.2) + GAP + Inches(0.1), Inches(1.75), width=Inches(5.533), height=Inches(4.8))
     add_footer(slide, 4, TOTAL_SLIDES)
 
-    # --- SLIDE 5: Procedimiento: Tratamiento de la Base de Datos y Carga de Big Data ---
+    # --- SLIDE 5: Procedimiento: Metodología y Pipeline de Simulación ---
+    slide = prs.slides.add_slide(prs.slide_layouts[6])
+    apply_slide_background(slide)
+    add_title(slide, "Procedimiento: Metodología y Pipeline de Simulación")
+    
+    # Columna 1: Texto Explicativo del Pipeline
+    add_panel(slide, MARGIN, Inches(1.2), Inches(6.2), Inches(5.5), title="Flujo de Procesamiento y Simulación")
+    method_text = (
+        "• **Etapa 1: Ingesta de Datos (NREL Cocoa):**\n"
+        "  Extracción selectiva de variables de recurso solar y métricas eléctricas minutales a partir del dataset experimental.\n\n"
+        "• **Etapa 2: Filtro de Emulación Geográfica:**\n"
+        "  Traslación espacial, proyección al año calendarizado 2026 y desfase estacional estricto de +6 meses.\n\n"
+        "• **Etapa 3: Modelamiento Físico y Ajuste Numérico:**\n"
+        "  Cálculo térmico (Sandia) y ajuste por mínimos cuadrados acotados para obtener los 5 parámetros De Soto en STC.\n\n"
+        "• **Etapa 4: Simulación Minutal de Operación:**\n"
+        "  Escalamiento dinámico de parámetros y resolución implícita del circuito fotovoltaico minutal para calcular energía.\n\n"
+        "• **Etapa 5: Evaluación de Indicadores (Performance Ratio):**\n"
+        "  Integración anual y mensual del _PR_ para recomendación final."
+    )
+    add_text(slide, MARGIN + Inches(0.2), Inches(1.7), Inches(5.8), Inches(4.8), method_text, size=13)
+
+    # Columna 2: Pipeline de Simulación (Imagen Explicativa)
+    add_panel(slide, MARGIN + Inches(6.2) + GAP, Inches(1.2), Inches(5.733), Inches(5.5), title="Pipeline de Simulación")
+    add_image(slide, 'output/Extra_Resultados/simulation_pipeline_infographic.png', MARGIN + Inches(6.2) + GAP + Inches(0.1), Inches(1.75), width=Inches(5.533), height=Inches(4.8))
+    add_footer(slide, 5, TOTAL_SLIDES)
+
+    # --- SLIDE 6: Procedimiento: Tratamiento de la Base de Datos y Carga de Big Data ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Procedimiento: Tratamiento de la Base de Datos y Carga de Big Data")
@@ -332,27 +363,33 @@ def create_presentation():
              "• **Lector en Streaming:** Implementación de un analizador de archivos línea por línea mediante el módulo `csv` nativo de Python.\n\n"
              "• **Extracción Selectiva:** Se ignoraron las series de curvas I-V masivas en la carga inicial y se extrajeron únicamente los metadatos y puntos clave de operación (_I_[_sc_], _V_[_oc_], _I_[_mp_], _V_[_mp_], _P_[_mp_], irradiancias).\n\n"
              "• **Limpieza Automática:** Se descartaron registros nocturnos ($G < 10$ W/m²) o con datos incompletos, acelerando la simulación anual un 95%.", size=17)
-    add_footer(slide, 5, TOTAL_SLIDES)
+    add_footer(slide, 6, TOTAL_SLIDES)
 
-    # --- SLIDE 6: Procedimiento: Filtro de Emulación Geográfica (Florida → Atacama 2026) ---
+    # --- SLIDE 7: Procedimiento: Filtro de Emulación Geográfica (Florida → Atacama 2026) ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Procedimiento: Filtro de Emulación Geográfica")
     
-    add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Inconsistencia Hemisférica y Temporal")
-    add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4), 
-             "• **El Problema:** La irradiancia Cocoa es medida en el Hemisferio Norte (Florida) durante 2011-2012.\n\n"
-             "• **Desfase Estacional:** Si se simula Atacama directamente, el mes de alta radiación (Julio) coincidiría con el invierno del Hemisferio Sur, lo que produce una inconsistencia termodinámica insalvable.\n\n"
-             "• **Calendario:** Proyección al año futuro **2026** para análisis predictivo.", size=17)
-    
-    add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Implementación del Filtro de Emulación")
-    add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4), 
-             "• **Desfase Temporal (+6 Meses):** Se aplicó un desplazamiento de 182 días a los registros meteorológicos. De esta forma, el verano de Florida se alinea con el verano astronómico del Hemisferio Sur.\n\n"
-             "• **Traducción Espacial:** Modificación del archivo de cabecera a coordenadas de Atacama (Latitud −22.91° S, Longitud −68.20° W, Elevación 2400 m).\n\n"
-             "• **Alineación Solar:** Se fijó la inclinación del panel (Tilt) a **22.91°** (óptimo anual) y orientación (Azimut) a **0° Norte**.", size=17)
-    add_footer(slide, 6, TOTAL_SLIDES)
+    # Columna 1: Infografía de Emulación Geográfica (Imagen)
+    add_panel(slide, MARGIN, Inches(1.2), Inches(5.5), Inches(5.5), title="Mapa de Emulación Hemisférica")
+    add_image(slide, 'output/Extra_Resultados/geo_emulation_map.png', MARGIN + Inches(0.1), Inches(1.75), width=Inches(5.3), height=Inches(4.5))
 
-    # --- SLIDE 7: Procedimiento: Simulación del Perfil Térmico y Pérdidas Ópticas ---
+    # Columna 2: Texto Explicativo Combinado
+    add_panel(slide, MARGIN + Inches(5.5) + GAP, Inches(1.2), Inches(6.733), Inches(5.5), title="Implementación del Filtro de Emulación")
+    emulation_combined = (
+        "• **Inconsistencia Estacional (Florida → Atacama):**\n"
+        "  Los datos crudos de NREL Cocoa son medidos en Florida (Hemisferio Norte). Si se simulan directamente en Atacama (Hemisferio Sur), el verano solar coincidiría con el invierno térmico real, lo que es físicamente incorrecto.\n\n"
+        "• **Desfase Temporal (+6 Meses):**\n"
+        "  Se aplicó un desplazamiento estacional de +6 meses (+182 días). De esta forma, el verano térmico medido en Florida se alinea correctamente con el verano astronómico del Hemisferio Sur.\n\n"
+        "• **Traducción Espacial y Proyección 2026:**\n"
+        "  Todos los timestamps se remapearon al año 2026. Se modificaron las coordenadas a San Pedro de Atacama (Latitud −22.91° S, Longitud −68.20° W, Altitud 2400 m).\n\n"
+        "• **Alineación Solar Óptima:**\n"
+        "  Inclinación del módulo (Tilt) fijada a **22.91°** (óptimo anual) y orientación (Azimut) a **0° Norte**."
+    )
+    add_text(slide, MARGIN + Inches(5.5) + GAP + Inches(0.2), Inches(1.8), Inches(6.333), Inches(4.5), emulation_combined, size=14)
+    add_footer(slide, 7, TOTAL_SLIDES)
+
+    # --- SLIDE 8: Procedimiento: Simulación del Perfil Térmico y Pérdidas Ópticas ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Procedimiento: Simulación del Perfil Térmico y Pérdidas Ópticas")
@@ -369,9 +406,9 @@ def create_presentation():
              "• **Asunciones Justificadas en Atacama:**\n"
              "  1. **Velocidad del Viento:** Asumida constante en **1 m/s** (valor conservador para desierto que minimiza pérdidas por convección artificial).\n"
              "  2. **Reflectancia del Suelo (Albedo):** Fijada en **0.20** (suelo arenoso/árido del desierto de Atacama).", size=17)
-    add_footer(slide, 7, TOTAL_SLIDES)
+    add_footer(slide, 8, TOTAL_SLIDES)
 
-    # --- SLIDE 8: Procedimiento: Metodología de Extracción de Parámetros en STC ---
+    # --- SLIDE 9: Procedimiento: Metodología de Extracción de Parámetros en STC ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Procedimiento: Metodología de Extracción de Parámetros en STC")
@@ -388,9 +425,9 @@ def create_presentation():
              "  Se calcularon directamente de las mediciones aplicando regresiones lineales en condiciones de alta radiación ($G > 800$ W/m²).\n\n"
              "• **Normalización por Irradiancia:**\n"
              "  Para la corriente de cortocircuito, se normalizó el valor frente a la irradiancia instantánea para desacoplar el efecto solar y aislar la ganancia térmica pura.", size=17)
-    add_footer(slide, 8, TOTAL_SLIDES)
+    add_footer(slide, 9, TOTAL_SLIDES)
 
-    # --- SLIDE 9: Procedimiento: Ajuste Numérico de Parámetros de Referencia ---
+    # --- SLIDE 10: Procedimiento: Ajuste Numérico de Parámetros de Referencia ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Procedimiento: Ajuste Numérico de Parámetros de Referencia")
@@ -408,9 +445,9 @@ def create_presentation():
              "• **Heterounión (HIT):**\n"
              "  $I_{L,ref}$ = 5.607 A  |  $I_{0,ref}$ = $4.68 \times 10^{-10}$ A  |  $R_{s,ref}$ = 0.412 $\Omega$  |  $R_{sh,ref}$ = 612.8 $\Omega$\n\n"
              "• **Coherencia Física:** La corriente de saturación inversa de HIT es un orden de magnitud menor, demostrando su superioridad frente a la recombinación térmica.", size=16)
-    add_footer(slide, 9, TOTAL_SLIDES)
+    add_footer(slide, 10, TOTAL_SLIDES)
 
-    # --- SLIDE 10: Procedimiento: Traslado Paramétrico y Simulación Minutal ---
+    # --- SLIDE 11: Procedimiento: Traslado Paramétrico y Simulación Minutal ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Procedimiento: Traslado Paramétrico y Simulación Minutal")
@@ -426,9 +463,9 @@ def create_presentation():
              "• **Resolución Trascendental:** Dado que la corriente ($I$) depende implícitamente del voltaje y de sí misma, se empleó un algoritmo de resolución numérica robusto (`calcparams_desoto` de pvlib).\n\n"
              "• **Búsqueda del MPP Minutal:** Se resolvió numéricamente la curva para encontrar el Punto de Máxima Potencia ($P_{mp,SDM}$) para cada registro del año.\n\n"
              "• **Cómputo de Generación:** Integración de la potencia generada minutalmente para obtener la energía total anual producida por cada tecnología.", size=17)
-    add_footer(slide, 10, TOTAL_SLIDES)
+    add_footer(slide, 11, TOTAL_SLIDES)
 
-    # --- SLIDE 11: d) Desarrollo, análisis crítico y discusión: Recurso Solar y Perfil Térmico ---
+    # --- SLIDE 12: d) Desarrollo, análisis crítico y discusión: Recurso Solar y Perfil Térmico ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "d) Desarrollo y discusión: Recurso Solar y Perfil Térmico")
@@ -440,9 +477,9 @@ def create_presentation():
              "• **Estrés Térmico Evidenciado:** El histograma térmico revela que la mayor parte de las horas de sol el panel opera entre 38°C y 50°C, con picos extremos de 65°C a 70°C.\n\n"
              "• **Impacto del Viento Bajo (1 m/s):** La baja velocidad del viento en la modelación reduce el enfriamiento convectivo natural, maximizando el calentamiento térmico de la celda.\n\n"
              "• **Consecuencia Física:** Las altas temperaturas aumentan la corriente de saturación inversa ($I_0$), degradando severamente el voltaje en circuito abierto ($V_{oc}$).", size=17)
-    add_footer(slide, 11, TOTAL_SLIDES)
+    add_footer(slide, 12, TOTAL_SLIDES)
 
-    # --- SLIDE 12: d) Desarrollo, análisis crítico y discusión: Validación del Modelo Eléctrico ---
+    # --- SLIDE 13: d) Desarrollo, análisis crítico y discusión: Validación del Modelo Eléctrico ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "d) Desarrollo y discusión: Validación del Modelo Eléctrico")
@@ -455,14 +492,14 @@ def create_presentation():
              "• **RMSE Reducido:** Error cuadrático medio de la potencia ($RMSE$) inferior a 5W bajo condiciones nominales.\n\n"
              "• **Puntos de Desviación:** El error máximo se concentra en la zona del codo de la curva característica I-V a irradiancias muy bajas.\n\n"
              "• **Fidelidad Térmica:** Valida la capacidad de las ecuaciones físicas de trasladar el voltaje y potencia a condiciones reales.", size=17)
-    add_footer(slide, 12, TOTAL_SLIDES)
+    add_footer(slide, 13, TOTAL_SLIDES)
 
-    # --- SLIDE 13: d) Desarrollo, análisis crítico y discusión: Puntos Conflictuales y Acoplamiento Rs - n ---
+    # --- SLIDE 14: d) Desarrollo, análisis crítico y discusión: Puntos Conflictuales y Acoplamiento Rs - n ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "d) Desarrollo y discusión: Puntos Conflictuales y Acoplamiento Rs - n")
     
-    add_panel(slide, MARGIN, Inches(1.2), Inches(5.5), Inches(5.5), title="Acoplamiento de Pérdidas: Rs - n")
+    add_panel(slide, MARGIN, Inches(1.2), Inches(5.5), Inches(5.5), title="Acoplamiento Rs - factor de idealidad (n)")
     acoplamiento_text = (
         "• **Alta Correlación Paramétrica:**\n"
         "  Tanto la resistencia serie (_R_[_s_]) como el factor de idealidad del diodo (_n_) controlan la curvatura de la curva _I_-_V_ en la región cercana al Punto de Máxima Potencia (MPP).\n\n"
@@ -489,9 +526,9 @@ def create_presentation():
         "  *Impacto:* El error inducido es menor al 1% en el rango operacional (0°C a 70°C)."
     )
     add_text(slide, MARGIN + Inches(5.5) + GAP + Inches(0.2), Inches(1.8), Inches(6.333), Inches(4.5), limitaciones_text, size=14, color=TEXT_WHITE)
-    add_footer(slide, 13, TOTAL_SLIDES)
+    add_footer(slide, 14, TOTAL_SLIDES)
 
-    # --- SLIDE 14: d) Desarrollo, análisis crítico y discusión: Pérdidas Térmicas y Performance Ratio ---
+    # --- SLIDE 15: d) Desarrollo, análisis crítico y discusión: Pérdidas Térmicas y Performance Ratio ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "d) Desarrollo y discusión: Pérdidas Térmicas y Performance Ratio")
@@ -503,9 +540,9 @@ def create_presentation():
              "• **Heterounión (HIT - Naranja):** Pendiente suave y controlada. Su bajo coeficiente térmico de potencia (-0.26 %/°C) mantiene una alta eficiencia de conversión incluso a temperaturas de 65°C.\n\n"
              "• **Silicio Monocristalino (m-Si - Azul):** Caída térmica severa. Su alto coeficiente térmico (-0.40 %/°C) penaliza drásticamente el voltaje durante las horas pico de irradiancia desértica.\n\n"
              "• **Impacto en PR:** Esta diferencia de comportamiento explica la brecha mensual y anual de rendimiento entre ambas tecnologías.", size=17)
-    add_footer(slide, 14, TOTAL_SLIDES)
+    add_footer(slide, 15, TOTAL_SLIDES)
 
-    # --- SLIDE 15: d) Desarrollo, análisis crítico y discusión: Veredicto Técnico y Económico ---
+    # --- SLIDE 16: d) Desarrollo, análisis crítico y discusión: Veredicto Técnico y Económico ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "d) Desarrollo y discusión: Veredicto Técnico y Económico")
@@ -527,9 +564,9 @@ def create_presentation():
         "• **Recomendación de Compra:** Se justifica económicamente la inversión en HIT si el costo extra del panel (capex) es inferior a la tasa de amortización de estos ingresos extra en 25 años."
     )
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), impact_text, size=16)
-    add_footer(slide, 15, TOTAL_SLIDES)
+    add_footer(slide, 16, TOTAL_SLIDES)
 
-    # --- SLIDE 16: e) Conclusiones y propuestas de trabajos futuros ---
+    # --- SLIDE 17: e) Conclusiones y propuestas de trabajos futuros ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "e) Conclusiones y propuestas de trabajos futuros")
@@ -551,9 +588,9 @@ def create_presentation():
         "• **Análisis de Doble Diodo:** Capturar los efectos de recombinación no ideal a baja irradiancia."
     )
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4.5), futur, size=16)
-    add_footer(slide, 16, TOTAL_SLIDES)
+    add_footer(slide, 17, TOTAL_SLIDES)
 
-    # --- SLIDE 17: Referencias ---
+    # --- SLIDE 18: Referencias ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Referencias")
@@ -564,14 +601,14 @@ def create_presentation():
             "5. Marion, B. et al. (2014). \"Cocoa, Florida Data Set for Validating PV Models.\" NREL Technical Report.\n\n"
             "Agradecimientos al Departamento de Electrotecnia de la UTFSM.")
     add_text(slide, MARGIN, Inches(2), SLIDE_WIDTH - 2*MARGIN, Inches(4), refs, size=18)
-    add_footer(slide, 17, TOTAL_SLIDES)
+    add_footer(slide, 18, TOTAL_SLIDES)
 
 
     # ==========================================
     # SECCIÓN DE ANEXOS (ECUACIONES Y MATEMÁTICA)
     # ==========================================
 
-    # --- SLIDE 18: Anexo I: Ecuaciones de Transposición y Absorción Solar ---
+    # --- SLIDE 19: Anexo I: Ecuaciones de Transposición y Absorción Solar ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Anexo I: Ecuaciones de Transposición y Absorción Solar")
@@ -607,9 +644,9 @@ def create_presentation():
         "• Modela las pérdidas ópticas reflectivas por ángulo de incidencia."
     )
     add_text(slide, MARGIN + Inches(5.5) + GAP + Inches(0.2), Inches(3.65), Inches(6.333), Inches(2.6), abs_glossary, size=16)
-    add_footer(slide, 18, TOTAL_SLIDES)
+    add_footer(slide, 19, TOTAL_SLIDES)
 
-    # --- SLIDE 19: Anexo II: Ecuaciones de Modificadores Ópticos (IAM y Masa de Aire) ---
+    # --- SLIDE 20: Anexo II: Ecuaciones de Modificadores Ópticos (IAM y Masa de Aire) ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Anexo II: Ecuaciones de Modificadores Ópticos (IAM y Masa de Aire)")
@@ -641,9 +678,9 @@ def create_presentation():
         "• _M_[_ref_]: Transmitancia espectral a condiciones de referencia (AM 1.5g)."
     )
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(4.10), COLUMN_WIDTH - Inches(0.4), Inches(2.5), am_details, size=15)
-    add_footer(slide, 19, TOTAL_SLIDES)
+    add_footer(slide, 20, TOTAL_SLIDES)
 
-    # --- SLIDE 20: Anexo III: Ecuaciones del Perfil Térmico (Modelo Sandia SAPM) ---
+    # --- SLIDE 21: Anexo III: Ecuaciones del Perfil Térmico (Modelo Sandia SAPM) ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Anexo III: Ecuaciones del Perfil Térmico (Modelo Sandia SAPM)")
@@ -673,9 +710,9 @@ def create_presentation():
         "Estos coeficientes están validados empíricamente por el Sandia National Laboratories."
     )
     add_text(slide, MARGIN + Inches(5.0) + GAP + Inches(0.2), Inches(4.10), Inches(6.833), Inches(2.3), thermal_coef, size=14)
-    add_footer(slide, 20, TOTAL_SLIDES)
+    add_footer(slide, 21, TOTAL_SLIDES)
 
-    # --- SLIDE 21: Anexo IV: Ecuaciones del Modelo Eléctrico de un Diodo (SDM) ---
+    # --- SLIDE 22: Anexo IV: Ecuaciones del Modelo Eléctrico de un Diodo (SDM) ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Anexo IV: Ecuaciones del Modelo Eléctrico de un Diodo (SDM)")
@@ -705,9 +742,9 @@ def create_presentation():
         "• _k_ / _q_ / _T_[_c_]: Constante de Boltzmann, carga elemental y temperatura de celda (K)."
     )
     add_text(slide, Inches(6.3), Inches(4.0), Inches(6.433), Inches(2.3), sdm_glossary, size=14)
-    add_footer(slide, 21, TOTAL_SLIDES)
+    add_footer(slide, 22, TOTAL_SLIDES)
 
-    # --- SLIDE 22: Anexo V: Ecuaciones de Extracción en STC y Derivada Analítica ---
+    # --- SLIDE 23: Anexo V: Ecuaciones de Extracción en STC y Derivada Analítica ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Anexo V: Ecuaciones de Extracción en STC y Derivada Analítica")
@@ -734,9 +771,9 @@ def create_presentation():
              "Donde los coeficientes internos del diodo se definen como:", size=15)
     add_latex_equation(slide, r"A = \frac{I_0}{a} \cdot e^{\frac{V_{mp} + I_{mp} \cdot R_s}{a}}", Inches(5.9), Inches(3.70), Inches(0.55), max_width=Inches(6.833))
     add_latex_equation(slide, r"B = \frac{1}{R_{sh}}", Inches(5.9), Inches(4.35), Inches(0.45), max_width=Inches(6.833))
-    add_footer(slide, 22, TOTAL_SLIDES)
+    add_footer(slide, 23, TOTAL_SLIDES)
 
-    # --- SLIDE 23: Anexo VI: Ecuaciones de Escalamiento a Condiciones de Operación ---
+    # --- SLIDE 24: Anexo VI: Ecuaciones de Escalamiento a Condiciones de Operación ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Anexo VI: Ecuaciones de Escalamiento a Condiciones de Operación")
@@ -751,7 +788,7 @@ def create_presentation():
     
     add_text(slide, MARGIN + Inches(0.2), Inches(3.85), COLUMN_WIDTH - Inches(0.4), Inches(0.3), "3. Factor de Idealidad térmico (_a_):", size=15)
     add_latex_equation(slide, r"\frac{a}{a_{ref}} = \frac{T_c}{T_{ref}}", MARGIN + Inches(0.3), Inches(4.20), Inches(0.55))
-    add_footer(slide, 23, TOTAL_SLIDES)
+    add_footer(slide, 24, TOTAL_SLIDES)
     
     # Derecha
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Resistencias y Energía de Bandgap")
@@ -768,9 +805,9 @@ def create_presentation():
         "• _E_[_g,ref_] = 1.121 eV para el Silicio a 25°C."
     )
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(3.85), COLUMN_WIDTH - Inches(0.4), Inches(2.70), scale_just, size=15)
-    add_footer(slide, 23, TOTAL_SLIDES)
+    add_footer(slide, 24, TOTAL_SLIDES)
 
-    # --- SLIDE 24: Anexo VII: Ecuaciones para el Cálculo del Performance Ratio ---
+    # --- SLIDE 25: Anexo VII: Ecuaciones para el Cálculo del Performance Ratio ---
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_slide_background(slide)
     add_title(slide, "Anexo VII: Ecuaciones para el Cálculo del Performance Ratio")
@@ -799,7 +836,7 @@ def create_presentation():
         "• **Pérdidas Óhmicas:** Pérdidas resistivas en la resistencia serie _R_[_s_]."
     )
     add_text(slide, Inches(6.1), Inches(4.10), Inches(6.633), Inches(2.3), pr_phys, size=15)
-    add_footer(slide, 24, TOTAL_SLIDES)
+    add_footer(slide, 25, TOTAL_SLIDES)
 
     # --- Guardar con manejo robusto de bloqueos de PowerPoint ---
     output_path = "output/Presentacion_Final_ELI556_Atacama.pptx"
