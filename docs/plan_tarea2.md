@@ -5,7 +5,7 @@
 > **Ubicación:** Desierto de Atacama (Caracterización eléctrica mediante DB Cocoa)  
 > **Base de datos:** Cocoa  
 > **Método SDM:** De Soto et al. (2006)  
-> **Fecha presentación:** Jueves 4 de junio de 2026  
+> **Fecha presentación:** Jueves, 11 de junio de 2026  
 > **Duración:** 20 min exposición + 5-10 min preguntas
 
 ---

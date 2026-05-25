@@ -1,0 +1,96 @@
+--- PAGE 1 ---
+DIE UTFSM SJ Tarea 2 ELI556 2026-1
+Evaluaci´on de Tecnolog´ıas Fotovoltaicas
+1. Criterios de evaluaci ´on
+La actividad ser´a calificada en una escala de 0 a 100 puntos, bajo los siguientes lineamientos:
+1.Formato y Duraci ´on:La evaluaci ´on consiste en una defensa oral con una duraci´on m´axi-
+ma de20 minutos. El cumplimiento del tiempo es estricto; aquellas presentaciones que
+excedan este l´ımite ser´an penalizadas con un descuento de10 puntossobre la nota final.
+2.Defensa y Discusi ´on:Tras la exposici ´on, se llevar´a a cabo una ronda de preguntas y dis-
+cusi´on t´ecnica de 5 a 10 minutos.
+3.Criterios de Evaluaci ´on:Se ponderar ´a la profundidad y consistencia del marco investiga-
+tivo, as´ı como la capacidad de s´ıntesis y transferencia de conocimiento hacia una audiencia
+no experta (divulgaci´on cient´ıfica).
+4.Estructura Sugerida:Para asegurar una comunicaci ´on efectiva, la presentaci ´on debe in-
+cluir obligatoriamente:
+a) Introducci ´on al problema y contextualizaci´on.
+b) Justificaci ´on e impacto (relevancia del tema).
+c) Marco referencial y revisi ´on de literatura pertinente.
+d) Desarrollo, an ´alisis cr´ıtico y discusi´on de resultados.
+e) Conclusiones y propuestas de trabajos futuros.
+5.Elementos de forma:La presentaci ´on debe poseer elementos m ´ınimos para una buena
+evaluaci´on (penalizaci´on de5 puntospor cada punto no satisfactorio):
+a) Portada del trabajo: t ´ıtulo, integrantes, nombre del curso.
+b) Numeraci ´on de l´aminas presentadas.
+c) Referencias.
+6.Fecha de presentaci ´on:Jueves, 11 de junio de 2026.
+C. C´ardenas-Bravo P ´agina 1 de 3
+--- PAGE 2 ---
+DIE UTFSM SJ Tarea 2 ELI556 2026-1
+Contenidos
+1. Contexto y Objetivo
+El objetivo de esta actividad es determinar la mejor tecnolog ´ıa fotovoltaica sobre una ubi-
+caci´on geogr´afica espec´ıfica mediante el modelamiento avanzado de su desempe˜no anual. Usted
+actuar´a como consultor t ´ecnico, utilizando bases de datos de mediciones reales para proyectar
+el comportamiento de diferentes m ´odulos durante el a ˜no calendario 2026. Utilice como base lo
+indicado en la tabla adjunta.
+2. Lineamientos T´ecnicos
+1.Caracterizaci ´on del Recurso Solar y Perfil T´ermico
+Deber´a procesar los datos meteorol ´ogicos de la ubicaci ´on asignada utilizando la librer ´ıa
+PVlib(o similar). El an ´alisis debe incluir la transposici ´on de la irradiancia al plano del
+arreglo (𝐺poa). Para la estimaci´on de la temperatura de operaci´on de la celda (𝑇c), sesugiere
+el uso delSandia Module Temperature Model, cuya formulaci ´on es:
+𝑇𝑐 =𝐺 𝑝𝑜𝑎 ·𝑒 𝑎+𝑏·𝑣𝑤 +𝑇 𝑎 +
+𝐺𝑝𝑜𝑎
+𝐺0
+
+𝛥𝑇(1)
+Donde𝑎y𝑏son par ´ametros emp´ıricos del modelo de Sandia,𝑣 𝑤 es la velocidad del viento
+y𝑇 𝑎 es la temperatura ambiente.
+2.Modelamiento El ´ectrico (Single Diode Model - SDM)
+Determine los cinco par´ametros fundamentales (𝐼𝑝ℎ, 𝐼0, 𝑛, 𝑅𝑠, 𝑅𝑠ℎ) de la tecnolog´ıa asignada
+bas´andose en la estructura matem´atica del modelo de un diodo:
+𝐼=𝐼 𝑝ℎ −𝐼 0
+
+exp
+𝑉+𝐼𝑅 𝑠
+𝑛𝑁𝑠𝑉𝑡
+
+−1
+
+− 𝑉+𝐼𝑅 𝑠
+𝑅𝑠ℎ
+(2)
+Se requiere una discusi ´on sobre puntos de inter ´es conflictuales en la identificaci ´on de los
+par´ametros, tales como el acoplamiento entre la resistencia serie (𝑅𝑠) y el factor de idealidad
+(𝑛) durante el proceso de ajuste (fitting).
+3.Evaluaci ´on de Indicadores de Desempe ˜no (Performance Ratio)
+Basado en el recurso solar estimado y el modelo SDM, eval ´ue elPerformance Ratio(𝑃𝑅)
+anual para el periodo 2026:
+𝑃𝑅 2026 =
+Í8760
+𝑡=1 𝑃mp,SDM(𝐺, 𝑇𝑐)
+Í8760
+𝑡=1
+
+𝑃STC · 𝐺𝑝𝑜𝑎
+1000
+ (3)
+Donde𝑃 mp,SDM es la potencia m ´axima calculada mediante el modelo para cada paso de
+tiempo𝑡.
+C. C´ardenas-Bravo P ´agina 2 de 3
+--- PAGE 3 ---
+DIE UTFSM SJ Tarea 2 ELI556 2026-1
+3. Entregables
+Se espera una presentaci´on t´ecnica que contenga: caracterizaci´on clara del recurso solar/perfil
+t´ermico, metodolog´ıa de extracci´on de par´ametros, y una justificaci´on t´ecnica de la tecnolog´ıa su-
+gerida basada en el𝑃𝑅obtenido.Proponga y justifique todas las suposiciones que considere
+necesarias,e.g., posici ´on del m´odulo solar (azimuth, inclinaci´on, velocidad viento).
+4. Condiciones de desarrollo
+Grupo AT Grupo AE
+Ubicaci´on geogr´afica de inter´es Desierto de atacama Desiero del sahara
+Base de datos Cocoa Golden
+M´etodo de estimaci´on SDM DeSotoet al.Villalbaet al.
+Enlace para consultar base de datos:https://drive.google.com/drive/folders/
+1PbO-FAvIkmKmIeyZTRMkiCe2lS0WnbbV?usp=sharing
+C. C´ardenas-Bravo P ´agina 3 de 3

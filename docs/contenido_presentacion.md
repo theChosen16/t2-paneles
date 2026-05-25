@@ -1,6 +1,6 @@
 # Contenido Textual: Presentación Tarea 2 — ELI556
 # Evaluación de Tecnologías PV en el Desierto de Atacama
-# Grupo: Alta Tensión | Fecha: 4 de junio de 2026
+# Grupo: Alta Tensión | Fecha: 11 de junio de 2026
 
 ---
 
@@ -15,7 +15,7 @@ Modelamiento Eléctrico mediante el Modelo de 5 Parámetros de De Soto
 **Metadata:**
 - Curso: ELI556 — Modelamiento y Análisis de Sistemas PV
 - Grupo: Alta Tensión (AT)
-- Fecha: 4 de junio de 2026
+- Fecha: 11 de junio de 2026
 - Lámina: 1/15
 
 ---
