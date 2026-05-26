@@ -86,7 +86,7 @@ def add_formatted_paragraph(tf, text, font_size=14, default_color=TEXT_WHITE, is
     p.font.color.rgb = default_color
     
     import re
-    tokens = re.split(r'(\*\*[^*]+\*\*|\_[^_]+\_|\[[^\]]+\]|\^[^^]+\^)', text)
+    tokens = re.split(r'(\*\*[^*]+\*\*|\_[^_]+\_|\[_[^_]+_\]|\^[^^]+\^)', text)
     
     for token in tokens:
         if not token:
@@ -103,14 +103,12 @@ def add_formatted_paragraph(tf, text, font_size=14, default_color=TEXT_WHITE, is
             inner = token[1:-1]
             run.text = inner
             run.font.italic = True
-        elif token.startswith('[') and token.endswith(']'):
-            inner = token[1:-1]
-            if inner.startswith('_') and inner.endswith('_'):
-                run.text = inner[1:-1]
-                run.font.italic = True
-            else:
-                run.text = inner
+        elif token.startswith('[_') and token.endswith('_]'):
+            inner = token[2:-2]  # strip [_ and _]
+            run.text = inner
+            run.font.italic = True
             run.font.subscript = True
+            run.font.size = Pt(max(8, font_size - 4))
         elif token.startswith('^') and token.endswith('^'):
             inner = token[1:-1]
             if inner.startswith('_') and inner.endswith('_'):
@@ -119,6 +117,7 @@ def add_formatted_paragraph(tf, text, font_size=14, default_color=TEXT_WHITE, is
             else:
                 run.text = inner
             run.font.superscript = True
+            run.font.size = Pt(max(8, font_size - 4))
         else:
             run.text = token
 
@@ -399,7 +398,7 @@ def create_presentation():
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4), 
              "• **Lector en Streaming:** Implementación de un analizador de archivos línea por línea mediante el módulo `csv` nativo de Python.\n\n"
              "• **Extracción Selectiva [Marion et al., 2014]:** Se ignoraron las series de curvas I-V completas en la carga inicial y se extrajeron únicamente los metadatos y puntos clave de operación (_I_[_sc_], _V_[_oc_], _I_[_mp_], _V_[_mp_], _P_[_mp_], irradiancias).\n\n"
-             "• **Limpieza Automática:** Se descartaron registros nocturnos ($G < 10$ W/m²) o incompletos, acelerando la simulación anual del recurso solar un 95%.", size=17)
+             "• **Limpieza Automática:** Se descartaron registros nocturnos (_G_ < 10 W/m²) o incompletos, acelerando la simulación anual del recurso solar un 95%.", size=17)
     add_footer(slide, 6, TOTAL_SLIDES)
 
     # --- SLIDE 7: Procedimiento: Filtro de Emulación Geográfica (Florida → Atacama 2026) ---
@@ -433,7 +432,7 @@ def create_presentation():
     
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Transposición de Recurso y Modificadores", accent_color=ACCENT_BLUE)
     add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4), 
-             "• **Modelo de Perez:** Ejecución del algoritmo [Perez et al., 1990] en pvlib para calcular la irradiancia total en el Plano del Arreglo ($G_{poa}$). *(Ecuación en Anexo I, Lámina 19)*\n\n"
+             "• **Modelo de Perez:** Ejecución del algoritmo [Perez et al., 1990] en pvlib para calcular la irradiancia total en el Plano del Arreglo (_G_[_poa_]). *(Ecuación en Anexo I, Lámina 19)*\n\n"
              "• **Modificador IAM:** Pérdidas por reflexión en el cristal basadas en la Ley de Snell y Bouguer [King et al., 2004] (espesor 2mm, índice refracción 1.526). *(Fórmulas en Anexo II, Lámina 20)*\n\n"
              "• **Modificador Espectral (AM):** Corrección empírica de masa de aire de cuarto orden [King et al., 2004] según la elevación del sol. *(Fórmula en Anexo II, Lámina 20)*", size=16)
     
@@ -454,12 +453,12 @@ def create_presentation():
     add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4), 
              "• **El Problema:** La base experimental Cocoa usa códigos internos del NREL (`mSi0166`, `HIT05667`) que no figuran directamente en datasheets comerciales estándar.\n\n"
              "• **Solución: Extracción en STC:** Se diseñó un algoritmo para caracterizar las propiedades nominales directamente desde la base de datos experimental minutal [De Soto et al., 2006].\n\n"
-             "• **Condiciones de Referencia (SRC):** Se filtraron mediciones instantáneas bajo condiciones estándar ($G \\approx 1000$ W/m² y temperatura de celda $T_c \\approx 25^\\circ\\text{C}$).", size=17)
+             "• **Condiciones de Referencia (SRC):** Se filtraron mediciones instantáneas bajo condiciones estándar (_G_ ≈ 1000 W/m² y temperatura de celda _T_[_c_] ≈ 25°C).", size=17)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Cálculo Experimental de Coeficientes Térmicos", accent_color=ACCENT_BLUE)
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4), 
-             "• **Coeficientes Térmicos ($\alpha_{Isc}$ y $\beta_{Voc}$):**\n"
-             "  Calculados directamente de los datos usando regresiones lineales en periodos estables y de alta radiación ($G > 800$ W/m²).\n\n"
+             "• **Coeficientes Térmicos** (_α_[_Isc_] y _β_[_Voc_]):\n"
+             "  Calculados directamente de los datos usando regresiones lineales en periodos estables y de alta radiación (_G_ > 800 W/m²).\n\n"
              "• **Normalización y Consistencia [De Soto et al., 2006]:**\n"
              "  La corriente de cortocircuito se normalizó por irradiancia efectiva para aislar el coeficiente de ganancia térmica pura y asegurar consistencia paramétrica.", size=16)
     add_footer(slide, 9, TOTAL_SLIDES)
@@ -471,17 +470,17 @@ def create_presentation():
     
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="El Sistema de Ajuste Trascendental", accent_color=ACCENT_BLUE)
     add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4), 
-             "• **Formulación Matemática:** Ecuaciones del modelo SDM de 5 parámetros planteadas en STC para cortocircuito, circuito abierto y máxima potencia [De Soto et al., 2006]. *(Ecuación en Anexo V, Lámina 23)*\n\n"
+             "• **Formulación Matemática:** Ecuaciones del modelo SDM de 5 parámetros planteadas en STC para cortocircuito, circuito abierto y máxima potencia [De Soto et al., 2006]. *(Ecuación en Anexo IV, Lámina 22)*\n\n"
              "• **Optimización de Mínimos Cuadrados:** Resolución simultánea del sistema no lineal trascendental mediante scipy en Python para obtener los valores óptimos nominales.\n\n"
-             "• **Consistencia Física (Bounds):** Restricciones explícitas de resistencia serie mayor a cero ($R_{s,ref} > 0$) y factor de idealidad $n_I \\in [1, 2]$ para garantizar sentido físico.", size=16)
+             "• **Consistencia Física (Bounds):** Restricciones explícitas de resistencia serie mayor a cero (_R_[_s,ref_] > 0) y factor de idealidad _n_[_I_] ∈ [1, 2] para garantizar sentido físico.", size=16)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Resultados de Parámetros en STC Extraídos", accent_color=ACCENT_GOLD)
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4), 
              "• **m-Si (Silicio Monocristalino) [De Soto et al., 2006]:**\n"
-             "  $I_{L,ref}$ = 2.768 A  |  $I_{0,ref}$ = $4.13 \\times 10^{-9}$ A  |  $R_{s,ref}$ = 0.542 $\\Omega$  |  $R_{sh,ref}$ = 352.4 $\\Omega$\n\n"
+             "  _I_[_L,ref_] = 2.768 A  |  _I_[_0,ref_] = 4.13 × 10⁻⁹ A  |  _R_[_s,ref_] = 0.542 Ω  |  _R_[_sh,ref_] = 352.4 Ω\n\n"
              "• **HIT (Heterounión) [De Soto et al., 2006]:**\n"
-             "  $I_{L,ref}$ = 5.607 A  |  $I_{0,ref}$ = $4.68 \\times 10^{-10}$ A  |  $R_{s,ref}$ = 0.412 $\\Omega$  |  $R_{sh,ref}$ = 612.8 $\\Omega$\n\n"
-             "• **Coherencia Física:** La corriente de saturación inversa ($I_0$) de HIT es un orden de magnitud inferior, demostrando su menor recombinación intrínseca por temperatura.", size=16)
+             "  _I_[_L,ref_] = 5.607 A  |  _I_[_0,ref_] = 4.68 × 10⁻¹⁰ A  |  _R_[_s,ref_] = 0.412 Ω  |  _R_[_sh,ref_] = 612.8 Ω\n\n"
+             "• **Coherencia Física:** La corriente de saturación inversa (_I_[_0_]) de HIT es un orden de magnitud inferior, demostrando su menor recombinación intrínseca por temperatura.", size=16)
     add_footer(slide, 10, TOTAL_SLIDES)
 
     # --- SLIDE 11: Procedimiento: Traslado Paramétrico y Simulación Minutal ---
@@ -491,14 +490,14 @@ def create_presentation():
     
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Escalamiento Dinámico a Condiciones Reales", accent_color=ACCENT_BLUE)
     add_text(slide, MARGIN + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4), 
-             "• **Traslado de De Soto:** Para cada intervalo de la simulación anual 2026, los 5 parámetros se escalaron a la irradiancia efectiva ($S$) y temperatura de celda (_T_[_c_]) locales [De Soto et al., 2006]. *(Ecuaciones en Anexo VI, Lámina 24)*\n\n"
+             "• **Traslado de De Soto:** Para cada intervalo de la simulación anual 2026, los 5 parámetros se escalaron a la irradiancia efectiva (_S_) y temperatura de celda (_T_[_c_]) locales [De Soto et al., 2006]. *(Ecuaciones en Anexo VI, Lámina 24)*\n\n"
              "• **Dependencia del Bandgap:** Variación térmica no lineal del bandgap de silicio (_E_[_g_]) y factor de idealidad térmico (_a_).\n\n"
              "• **Resistencias Shunt y Serie:** Resistencia paralelo inversamente proporcional a la irradiancia. Resistencia serie asumida constante según validaciones NIST [De Soto et al., 2006].", size=16)
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Resolución Implícita del Circuito (MPP)", accent_color=ACCENT_GOLD)
     add_text(slide, MARGIN + COLUMN_WIDTH + GAP + Inches(0.2), Inches(1.8), COLUMN_WIDTH - Inches(0.4), Inches(4), 
              "• **Resolución Numérica:** Empleo del algoritmo implícito `calcparams_desoto` de pvlib [Holmgren et al., 2018] para obtener los parámetros en cada minuto.\n\n"
-             "• **Búsqueda del MPP:** Se resolvió la ecuación trascendental del diodo simple utilizando la función W de Lambert para ubicar el Punto de Máxima Potencia ($P_{mp,SDM}$).\n\n"
+             "• **Búsqueda del MPP:** Se resolvió la ecuación trascendental del diodo simple utilizando la función W de Lambert para ubicar el Punto de Máxima Potencia (_P_[_mp,SDM_]).\n\n"
              "• **Cómputo de Energía:** Integración temporal de la potencia útil minutal para consolidar la energía anual generada por cada panel.", size=16)
     add_footer(slide, 11, TOTAL_SLIDES)
 
@@ -521,7 +520,7 @@ def create_presentation():
     add_text(slide, Inches(7.8), Inches(3.50), Inches(4.933), Inches(3.0), 
              "• **Estrés Térmico Evidenciado:** La simulación térmica minutal revela temperaturas de celda operativas recurrentes muy por encima de STC.\n\n"
              "• **Enfriamiento Convectivo Limitado:** Al asumir velocidad de viento conservadora de 1 m/s en SAPM [King et al., 2004], se modela el escenario de mayor estrés físico.\n\n"
-             "• **Consecuencia en Voltaje [De Soto et al., 2006]:** El calentamiento incrementa la corriente de saturación inversa ($I_0$), deprimiendo la tensión de circuito abierto ($V_{oc}$).", size=13)
+             "• **Consecuencia en Voltaje [De Soto et al., 2006]:** El calentamiento incrementa la corriente de saturación inversa (_I_[_0_]), deprimiendo la tensión de circuito abierto (_V_[_oc_]).", size=13)
     add_footer(slide, 12, TOTAL_SLIDES)
 
     # --- SLIDE 13: d) Desarrollo, análisis crítico y discusión: Validación del Modelo Eléctrico ---
@@ -541,8 +540,8 @@ def create_presentation():
     # Columna Derecha: Tarjeta de Análisis Inferior
     add_panel(slide, Inches(7.3), Inches(3.0), Inches(5.633), Inches(3.7), title="Métricas de Ajuste y Rigor", accent_color=ACCENT_GOLD)
     add_text(slide, Inches(7.5), Inches(3.50), Inches(5.233), Inches(3.0), 
-             "• **Fidelidad del Ajuste [De Soto et al., 2006]:** Coeficiente de determinación $R^2 > 0.99$ en validación cruzada frente a datos medidos, confirmando la precisión del modelo en todo el espectro.\n\n"
-             "• **Desviación Minutal (RMSE):** Error cuadrático medio ($RMSE$) extremadamente bajo en periodos estables diurnos.\n\n"
+             "• **Fidelidad del Ajuste [De Soto et al., 2006]:** Coeficiente de determinación _R_² > 0.99 en validación cruzada frente a datos medidos, confirmando la precisión del modelo en todo el espectro.\n\n"
+             "• **Desviación Minutal (RMSE):** Error cuadrático medio (_RMSE_) extremadamente bajo en periodos estables diurnos.\n\n"
              "• **Zonas de Discrepancia:** Leve dispersión en irradiancias bajas por la idealización empírica de la resistencia shunt.", size=13)
     add_footer(slide, 13, TOTAL_SLIDES)
 
@@ -567,10 +566,10 @@ def create_presentation():
     # Columna 2: Limitaciones y Suposiciones
     add_panel(slide, MARGIN + Inches(5.5) + GAP, Inches(1.2), Inches(6.733), Inches(5.5), title="Limitaciones y Suposiciones del Modelo", accent_color=ACCENT_GOLD)
     limitaciones_text = (
-        "• **Resistencia Shunt (R_sh) e Irradiancia (G):**\n"
+        "• **Resistencia Shunt (_R_[_sh_]) e Irradiancia (_G_):**\n"
         "  La relación _R_[_sh_] = _R_[_sh,ref_] · (_S_[_ref_]/_S_) es empírica. A muy baja irradiancia (amanecer/ocaso), puede sobreestimar la resistencia shunt.\n"
         "  *Impacto:* Despreciable en el PR anual, ya que esas horas representan una fracción mínima de la energía total.\n\n"
-        "• **Rs Constante con la Temperatura:**\n"
+        "• **_R_[_s_] Constante con la Temperatura:**\n"
         "  Ignora el cambio de la resistividad del semiconductor con _T_[_c_].\n"
         "  *Justificación:* De Soto (2006) validó que mantener _R_[_s_] constante produce errores de potencia < 2% frente a datos experimentales NIST.\n\n"
         "• **Bandgap lineal con la Temperatura:**\n"
@@ -590,7 +589,7 @@ def create_presentation():
     add_image(slide, 'output/Extra_Resultados/degradacion_termica_scatter.png', Inches(0.8), Inches(1.8), width=Inches(6.8))
     
     # Columna Derecha: Tarjeta Callout Superior
-    add_panel(slide, Inches(8.3), Inches(1.2), Inches(4.633), Inches(1.6), title="Coeficientes de Temperatura (Pmp)", accent_color=ACCENT_ORANGE)
+    add_panel(slide, Inches(8.3), Inches(1.2), Inches(4.633), Inches(1.6), title="Coeficientes de Temperatura (_P_[_mp_])", accent_color=ACCENT_ORANGE)
     add_text(slide, Inches(8.5), Inches(1.70), Inches(4.233), Inches(1.0), 
              "**m-Si:** −0.40 %/°C (Pérdidas severas)\n**HIT:** −0.26 %/°C (Alta tolerancia)", size=15, color=ACCENT_ORANGE, bold=True)
              
@@ -616,7 +615,7 @@ def create_presentation():
     add_panel(slide, MARGIN, Inches(3.2), COLUMN_WIDTH, Inches(3.5), title="Conclusión Técnica de Diseño", accent_color=ACCENT_BLUE)
     verdict = (
         "• **Superioridad Física [De Soto et al., 2006]:**\n"
-        "  HIT demuestra superioridad física indiscutible en Atacama. Su celda híbrida intrínsecamente resiste el calor amortiguando la caída de la tensión en circuito abierto ($V_{oc}$).\n\n"
+        "  HIT demuestra superioridad física indiscutible en Atacama. Su celda híbrida intrínsecamente resiste el calor amortiguando la caída de la tensión en circuito abierto (_V_[_oc_]).\n\n"
         "• **Estructura Híbrida:** Capas delgadas que atenúan recombinación de portadores debida a excitación térmica."
     )
     add_text(slide, MARGIN + Inches(0.2), Inches(3.70), COLUMN_WIDTH - Inches(0.4), Inches(2.8), verdict, size=14)
@@ -643,7 +642,7 @@ def create_presentation():
     add_panel(slide, MARGIN, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Conclusiones del Estudio", accent_color=ACCENT_GOLD)
     concl = (
         "1. **Fidelidad Metodológica:** La emulación geográfica y estacional por traslación temporal fue coherente, permitiendo simular Atacama con data de Cocoa.\n\n"
-        "2. **Ajuste Robusto:** El modelo De Soto de 5 parámetros reprodujo con alta precisión ($R^2 > 0.99$) el comportamiento del circuito.\n\n"
+        "2. **Ajuste Robusto:** El modelo De Soto de 5 parámetros reprodujo con alta precisión (_R_² > 0.99) el comportamiento del circuito.\n\n"
         "3. **HIT Vencedor:** HIT superó en 2.39% de PR a m-Si por su bajo coeficiente de temperatura de potencia.\n\n"
         "4. **Recomendación:** HIT es técnicamente superior para plantas desérticas de alta irradiancia y alta temperatura."
     )
@@ -651,7 +650,7 @@ def create_presentation():
     
     add_panel(slide, MARGIN + COLUMN_WIDTH + GAP, Inches(1.2), COLUMN_WIDTH, Inches(5.5), title="Propuestas de Trabajos Futuros", accent_color=ACCENT_BLUE)
     futur = (
-        "• **Integración de Bifacialidad:** Incorporar el aporte de la irradiancia reflejada (albedo desértico, $\rho > 0.25$) en la cara posterior del módulo.\n\n"
+        "• **Integración de Bifacialidad:** Incorporar el aporte de la irradiancia reflejada (albedo desértico, _ρ_ > 0.25) en la cara posterior del módulo.\n\n"
         "• **Pérdidas por Soiling:** Modelar la acumulación de polvo desértico en la superficie del cristal, factor de pérdida de rendimiento crítico en Atacama.\n\n"
         "• **Estudio Espectral Avanzado:** Evaluar el efecto de la masa de aire sobre la eficiencia cuántica de la celda de heterounión.\n\n"
         "• **Análisis de Doble Diodo:** Capturar los efectos de recombinación no ideal a baja irradiancia."
