@@ -42,11 +42,11 @@ def export_pptx_to_png(pptx_path, output_dir):
         powerpoint.Quit()
 
 if __name__ == "__main__":
-    pptx_path = "output/Presentacion_Final_ELI556_Atacama.pptx"
-    alternative_path = "output/Presentacion_Final_ELI556_Atacama_v2.pptx"
+    pptx_path = "output/Presentacion_Final_ELI556_Atacama_POA_Tarea2_revisado.pptx"
+    alternative_path = "output/Presentacion_Final_ELI556_Atacama.pptx"
     if os.path.exists(alternative_path) and (not os.path.exists(pptx_path) or os.path.getmtime(alternative_path) > os.path.getmtime(pptx_path)):
         print(f"Usando version mas reciente: {alternative_path}")
         pptx_path = alternative_path
         
-    output_dir = "output/slide_preview"
+    output_dir = "output/slide_preview_final"
     export_pptx_to_png(pptx_path, output_dir)
