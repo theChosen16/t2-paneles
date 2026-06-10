@@ -9,21 +9,22 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Large Datasets and Generated CSV Files
-*.csv
-data/**/*.csv
-output/**/*.csv
+# Base de datos original (archivos de referencia)
+Base datos original/
 
-# Temporary Files and Cache
-temp/
+# Large CSV files (>100MB, exceed GitHub limit)
+data/**/*.csv
+
+# Caché de Tiempo de Ejecución (regenerables automáticamente)
+output/temp_latex/
+
+# Previsualizaciones de Slides (regenerables con fase7_export_slides.py)
+output/slide_preview_final/
+
+# Directorios de desarrollo
 .idea/
 .vscode/
 
-# System Files
+# Sistema Operativo
 .DS_Store
 Thumbs.db
-
-# Temporary Outputs and Cache
-output/temp_latex/
-output/test/
-
