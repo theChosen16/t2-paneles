@@ -64,7 +64,7 @@ IMG = {
 ORDER = [
     'portada', 'intro', 'justificacion', 'marco',
     'pipeline', 'basedatos', 'basedatos_vars', 'estructura', 'ingesta', 'embudo',
-    'emu_concepto', 'emu_comparacion', 'emu_flujo', 'poa_medida',
+    'emu_concepto', 'emu_comparacion', 'emu_flujo', 'poa_medida', 'poa_notas',
     'f2_flujo', 'f3_flujo', 'f3_result', 'f4_flujo',
     'res_termico', 'validacion', 'rs_n', 'perdidas_pr', 'veredicto', 'economia',
     'limitaciones', 'conclusiones', 'referencias',
@@ -78,7 +78,8 @@ SECTION = {  # (etiqueta kicker, color de sección)
     'estructura': ('DATOS', ACCENT_GOLD), 'ingesta': ('DATOS', ACCENT_GOLD),
     'embudo': ('DATOS', ACCENT_GOLD), 'emu_concepto': ('EMULACIÓN', ACCENT_ORANGE),
     'emu_comparacion': ('EMULACIÓN', ACCENT_ORANGE), 'emu_flujo': ('EMULACIÓN', ACCENT_ORANGE),
-    'poa_medida': ('EMULACIÓN', ACCENT_ORANGE), 'f2_flujo': ('MODELADO', ACCENT_GOLD),
+    'poa_medida': ('EMULACIÓN', ACCENT_ORANGE), 'poa_notas': ('EMULACIÓN', ACCENT_ORANGE),
+    'f2_flujo': ('MODELADO', ACCENT_GOLD),
     'f3_flujo': ('MODELADO', ACCENT_GOLD), 'f3_result': ('MODELADO', ACCENT_GOLD),
     'f4_flujo': ('MODELADO', ACCENT_GOLD), 'res_termico': ('RESULTADOS', ACCENT_GREEN),
     'validacion': ('RESULTADOS', ACCENT_GREEN), 'rs_n': ('RESULTADOS', ACCENT_GREEN),
@@ -458,7 +459,13 @@ def s_marco(slide, n):
 
 def s_pipeline(slide, n):
     add_title(slide, "Procedimiento: Arquitectura del Pipeline de Simulación (Fases 0–7)")
-    full_width_image(slide, IMG['pipeline'], max_w=11.5, top_in=1.32, max_bottom=6.95)
+    full_width_image(slide, IMG['pipeline'], max_w=11.5, top_in=1.30, max_bottom=5.70)
+    add_caption(slide,
+        "**Flujo lógico de la simulación:** El proceso inicia con la exploración y emulación "
+        "estacional de los datos (Fases 0-1) para adaptarlos al hemisferio sur. Luego, se limpia y calcula "
+        "el recurso solar efectivo (Fase 2) y se extraen los parámetros físicos de los módulos (Fase 3). "
+        "Finalmente, se realiza la simulación horaria (Fase 4) para graficar, documentar y exportar los resultados (Fases 5-7).",
+        top_in=5.85, h_in=1.15, accent=ACCENT_GOLD)
 
 
 def s_basedatos(slide, n):
@@ -519,7 +526,13 @@ def s_basedatos_vars(slide, n):
 
 def s_estructura(slide, n):
     add_title(slide, "Procedimiento: Anatomía del Archivo CSV y Decisiones de Ingesta")
-    full_width_image(slide, IMG['estructura'], max_w=11.3, top_in=1.32, max_bottom=6.98)
+    full_width_image(slide, IMG['estructura'], max_w=12.5, top_in=1.30, max_bottom=5.70)
+    add_caption(slide,
+        "**Estructura y lectura de datos:** Los archivos originales del NREL contienen una cabecera de metadatos "
+        "y registros cada 5 minutos. Dado que cada fila incluye las curvas eléctricas crudas completas, su tamaño "
+        "es variable y pesado (~110 MB). Para optimizar la memoria, el código lee el archivo en flujo (streaming) "
+        "e indexa únicamente las 11 variables meteorológicas y eléctricas necesarias, descartando el resto al vuelo.",
+        top_in=5.85, h_in=1.15, accent=ACCENT_BLUE)
 
 
 def s_ingesta(slide, n):
@@ -592,56 +605,80 @@ def s_emu_comparacion(slide, n):
 
 def s_emu_flujo(slide, n):
     add_title(slide, "Procedimiento: Filtro de Emulación — Implementación (Fase 1)")
-    full_width_image(slide, IMG['f1'], max_w=12.5, top_in=1.40, max_bottom=5.95)
+    full_width_image(slide, IMG['f1'], max_w=12.5, top_in=1.35, max_bottom=5.65)
     add_caption(slide,
-        "**Advertencias controladas:** (1) 29-feb se reasigna al 28-feb-2026; (2) al proyectar 13.5 meses "
-        "sobre un solo año, **julio–septiembre 2026 promedian datos de dos veranos** (ene–mar 2011 y 2012); "
-        "(3) las mediciones físicas no se alteran — solo cambia el eje temporal y la metadata de sitio.",
-        top_in=6.08, h_in=0.92, accent=ACCENT_ORANGE)
+        "**Proceso de emulación temporal:** Para trasladar las estaciones de Florida (hemisferio norte) "
+        "a San Pedro de Atacama (hemisferio sur), el código modifica la latitud y altura en los metadatos y aplica "
+        "un desfase de 6 meses en las fechas. De esta manera, el verano e invierno coinciden con la realidad del sitio "
+        "simulado sin alterar los valores físicos medidos. Los solapamientos de fechas se promedian y el año se proyecta a 2026.",
+        top_in=5.80, h_in=1.20, accent=ACCENT_ORANGE)
 
 
 def s_poa_medida(slide, n):
-    add_title(slide, "Procedimiento: Verificación del Recurso Medido — POA CMP22")
-    add_panel(slide, MARGIN, CONTENT_Y, Inches(7.9), Inches(5.5),
-              "Irradiancia POA CMP22 — 11 módulos Cocoa (2011–2012)", accent=ACCENT_BLUE)
-    add_image(slide, IMG['poa_cmp22'], MARGIN + Inches(0.25), CONTENT_Y + Inches(0.68),
-              width=Inches(7.4), height=Inches(4.16))
-    X2 = MARGIN + Inches(8.1)
-    W2 = SLIDE_W - X2 - MARGIN
-    panel_with_body(slide, X2, CONTENT_Y, W2, Inches(5.5),
-        "Notas Metodológicas",
-        "• **Sensor:** piranómetro CMP22 (clase A) — referencia de alta precisión "
-        "en el plano del arreglo.\n\n"
-        "• **Registros:** 421,664 válidos sumando los 11 archivos Cocoa "
-        "(2011-01-21 a 2012-03-04).\n\n"
-        "• **Curvas:** mediana diaria suavizada 7 días por archivo; las 11 series "
-        "se superponen porque comparten sitio y sensor.\n\n"
-        "• **POA máx. medida:** ~1,443 W/m².\n\n"
-        "• **Propósito:** verificar la consistencia del recurso medido **antes** "
-        "de aplicar el filtro de emulación geográfica.",
+    # Imagen a pantalla completa (16:9) sin título duplicado de slide
+    slide.shapes.add_picture(IMG['poa_cmp22'], 0, 0, width=SLIDE_W, height=SLIDE_H)
+
+
+def s_poa_notas(slide, n):
+    add_title(slide, "Procedimiento: Verificación del Recurso — Notas Metodológicas")
+    
+    # Tarjetas de Cifras Destacadas (Stat Tiles)
+    TW = Inches(3.85)
+    gap = Inches(0.49)
+    stat_tile(slide, MARGIN, CONTENT_Y, TW, Inches(1.50),
+              "421,664", "Registros de irradiancia válidos\n(11 archivos Cocoa)", accent=ACCENT_BLUE)
+    stat_tile(slide, MARGIN + TW + gap, CONTENT_Y, TW, Inches(1.50),
+              "1,443 W/m²", "Irradiancia POA máxima medida\nen el plano del arreglo", accent=ACCENT_GOLD)
+    stat_tile(slide, MARGIN + 2 * (TW + gap), CONTENT_Y, TW, Inches(1.50),
+              "CMP22", "Piranómetro de referencia\nclase A (alta precisión)", accent=ACCENT_ORANGE)
+    
+    # Paneles de Notas
+    Y2 = CONTENT_Y + Inches(1.75)
+    H2 = Inches(3.65)
+    panel_with_body(slide, MARGIN, Y2, COL_W, H2,
+        "Análisis de Consistencia de Datos",
+        "• **Superposición de mediciones:** Las curvas de irradiancia diaria de "
+        "los 11 archivos se superponen con exactitud, confirmando la consistencia "
+        "del instrumental experimental.\n\n"
+        "• **Rango temporal:** Campaña desde el **21 de enero de 2011** hasta el "
+        "**4 de marzo de 2012**.\n\n"
+        "• **Tratamiento:** Se calcula la mediana diaria suavizada con una ventana "
+        "de 7 días por cada archivo para aislar ruidos y nubes transitorias.",
+        accent=ACCENT_BLUE, body_size=13.5)
+    
+    panel_with_body(slide, MARGIN + COL_W + GAP, Y2, COL_W, H2,
+        "Propósito del Control de Calidad",
+        "• **Validación previa:** El objetivo es validar la homogeneidad física "
+        "de la radiación medida **antes** de procesar la emulación geográfica y "
+        "el modelado de celdas.\n\n"
+        "• **Evidencia de soiling y mantenimiento:** La perfecta coincidencia de "
+        "las curvas demuestra que no hay desviaciones locales significativas en "
+        "los sensores de referencia.\n\n"
+        "• **Alineación de sensores:** Se asegura que la irradiancia incidente en "
+        "los 11 planos de módulo sea idéntica para una comparación tecnológica justa.",
         accent=ACCENT_GOLD, body_size=13.5)
 
 
 def s_f2_flujo(slide, n):
     add_title(slide, "Procedimiento: Recurso Solar Sintético y Perfil Térmico (Fase 2)")
-    full_width_image(slide, IMG['f2'], max_w=12.3, top_in=1.38, max_bottom=6.05)
+    full_width_image(slide, IMG['f2'], max_w=12.3, top_in=1.35, max_bottom=5.65)
     add_caption(slide,
-        "**Supuestos declarados:** viento fijo 1 m/s (escenario conservador de enfriamiento); albedo 0.25 "
-        "(default de `pvlib.get_total_irradiance`); **sin** modificadores IAM ni corrección espectral AM — "
-        "la POA de Perez se usa directamente como irradiancia efectiva " + A('anexo2') +
-        ". Coeficientes SAPM " + A('anexo3') + ".",
-        top_in=6.15, h_in=0.85, accent=ACCENT_ORANGE)
+        "**Estimación de la radiación y temperatura:** Tras filtrar y limpiar los registros nulos, "
+        "el código utiliza el modelo difuso de Perez para transponer las irradiancias al plano inclinado (POA). "
+        "Luego, con el modelo de Sandia (SAPM) y asumiendo una velocidad de viento fija de 1 m/s (peor caso de ventilación), "
+        "se estima la temperatura interna de operación de las celdas para cada tecnología (m-Si y HIT).",
+        top_in=5.80, h_in=1.20, accent=ACCENT_ORANGE)
 
 
 def s_f3_flujo(slide, n):
     add_title(slide, "Procedimiento: Extracción de Parámetros De Soto (Fase 3)")
-    full_width_image(slide, IMG['f3'], max_w=12.1, top_in=1.36, max_bottom=6.05)
+    full_width_image(slide, IMG['f3'], max_w=12.1, top_in=1.35, max_bottom=5.65)
     add_caption(slide,
-        "**Hallazgo metodológico:** la regresión experimental de α[_Isc_] resultó **negativa** en ambos módulos "
-        "(confundida por efectos espectrales/estacionales) → el código aplica el resguardo físico "
-        "α[_Isc_] = +0.05 %/°C (valor típico de literatura). β[_Voc_] sí es experimental: −0.30 %/°C (m-Si) y "
-        "−0.21 %/°C (HIT). Detalle del sistema de ecuaciones en " + A('anexo5') + ".",
-        top_in=6.15, h_in=0.92, accent=ACCENT_GOLD)
+        "**Caracterización física de los módulos:** Para modelar el comportamiento eléctrico, se estiman los coeficientes "
+        "térmicos de corriente y voltaje. Dado que la corriente arrojó coeficientes negativos debido a la estacionalidad, "
+        "se aplicó un valor estándar de resguardo de +0.05 %/°C. Luego, los datos se trasladan a condiciones nominales (STC) "
+        "y un optimizador no lineal ajusta los 5 parámetros de De Soto (corrientes, resistencias y factor de idealidad).",
+        top_in=5.80, h_in=1.20, accent=ACCENT_GOLD)
 
 
 def s_f3_result(slide, n):
@@ -680,12 +717,13 @@ def s_f3_result(slide, n):
 
 def s_f4_flujo(slide, n):
     add_title(slide, "Procedimiento: Simulación Anual y Performance Ratio (Fase 4)")
-    full_width_image(slide, IMG['f4'], max_w=12.1, top_in=1.36, max_bottom=6.05)
+    full_width_image(slide, IMG['f4'], max_w=12.1, top_in=1.35, max_bottom=5.65)
     add_caption(slide,
-        "**Energía DC anual por panel:** m-Si 57.8 kWh · HIT 292.6 kWh → yield específico **1,152 vs 1,236 "
-        "kWh/kWp (+7.3 %)**. Ecuaciones de escalamiento en " + A('anexo6') +
-        " y del PR en " + A('anexo7') + ".",
-        top_in=6.15, h_in=0.85, accent=ACCENT_GOLD)
+        "**Cálculo de la producción eléctrica anual:** Con los parámetros calibrados, se evalúa el modelo "
+        "para cada uno de los registros del año 2026. A partir de la irradiancia y temperatura de celda de cada instante, "
+        "se escala el circuito de un diodo y se resuelve analíticamente la potencia útil máxima (Pmp). Finalmente, "
+        "la energía anual integrada se compara con el rendimiento ideal para obtener el Performance Ratio (PR).",
+        top_in=5.80, h_in=1.20, accent=ACCENT_GOLD)
 
 
 def s_res_termico(slide, n):
@@ -1197,7 +1235,7 @@ BUILDERS = {
     'ingesta': s_ingesta, 'embudo': s_embudo,
     'emu_concepto': s_emu_concepto, 'emu_comparacion': s_emu_comparacion,
     'emu_flujo': s_emu_flujo,
-    'poa_medida': s_poa_medida, 'f2_flujo': s_f2_flujo, 'f3_flujo': s_f3_flujo,
+    'poa_medida': s_poa_medida, 'poa_notas': s_poa_notas, 'f2_flujo': s_f2_flujo, 'f3_flujo': s_f3_flujo,
     'f3_result': s_f3_result, 'f4_flujo': s_f4_flujo,
     'res_termico': s_res_termico, 'validacion': s_validacion, 'rs_n': s_rs_n,
     'perdidas_pr': s_perdidas_pr, 'veredicto': s_veredicto, 'economia': s_economia,

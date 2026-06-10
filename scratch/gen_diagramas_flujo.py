@@ -41,7 +41,7 @@ def arrow(ax, x1, y1, x2, y2, color=C_GOLD, lw=2.4, ms=17):
 def new_fig(w=12.8, h=5.6):
     fig = plt.figure(figsize=(w, h), facecolor='none')
     ax = fig.add_axes([0, 0, 1, 1])
-    ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.axis('off')
+    ax.set_xlim(-0.015, 1.015); ax.set_ylim(-0.015, 1.015); ax.axis('off')
     return fig, ax
 
 
@@ -91,13 +91,13 @@ for x, y, t in art:
 save(fig, 'pipeline_general.png')
 
 # ---------- 2) ESTRUCTURA DEL CSV ----------
-fig, ax = new_fig(12.8, 6.4)
-box(ax, 0.012, 0.06, 0.315, 0.88, "Cocoa_mSi0166.csv  (~102 MB)", [],
+fig, ax = new_fig(18.2, 6.4)
+box(ax, 0.012, 0.012, 0.315, 0.928, "Cocoa_mSi0166.csv  (~102 MB)", [],
     edge=C_CYAN, fs_title=14)
 rows = [
-    ("Líneas 1-2 · METADATOS", "módulo, ciudad, TZ, lat,\nlon, altitud, tilt, azimut", C_GOLD),
-    ("Línea 3 · ENCABEZADO", "43 columnas fijas, con\nnombre y unidad", C_GOLD),
-    ("Líneas 4+ · REGISTROS", "1 fila = 1 curva I-V cada 5 min\n(solo de día) · 36,765 filas", C_ORANGE),
+    ("Líneas 1-2 · METADATOS", "módulo, ciudad, TZ, lat, lon, altitud, tilt, azimut", C_GOLD),
+    ("Línea 3 · ENCABEZADO", "43 columnas fijas con nombre y unidad", C_GOLD),
+    ("Líneas 4+ · REGISTROS", "1 fila = 1 curva I-V cada 5 min (solo de día)\nTotal registros: 36,765 filas", C_ORANGE),
     ("Cola variable de fila", "n pares (I,V) crudos (≈180–380)\n→ ancho de fila VARIABLE", C_ORANGE),
 ]
 yy = 0.755
@@ -106,19 +106,19 @@ for t, b, e in rows:
         fc=C_PANEL2, fs_title=12, fs_body=10.8, lw=1.6)
     yy -= 0.20
 grupos = [
-    ("Eléctricas (usadas)", ["Isc, Pmp, Imp, Vmp, Voc", "+ FF e incertidumbres"], C_GREEN, 0.755),
-    ("Meteorológicas (usadas)", ["GHI, DNI, DHI, T bulbo", "seco, presión"], C_GREEN, 0.525),
-    ("POA CMP22 (verificación)", ["Piranómetro clase A en", "el plano del arreglo"], C_CYAN, 0.295),
-    ("No usadas", ["T dorso, humedad, lluvia,", "soiling, QA, mantenimiento"], C_GREY, 0.065),
+    ("Eléctricas (usadas)", ["Isc, Pmp, Imp, Vmp, Voc, FF e incertidumbres"], C_GREEN, 0.755),
+    ("Meteorológicas (usadas)", ["GHI, DNI, DHI, T bulbo seco y presión"], C_GREEN, 0.525),
+    ("POA CMP22 (verificación)", ["Piranómetro clase A en el plano del arreglo"], C_CYAN, 0.295),
+    ("No usadas", ["T dorso, humedad, lluvia, soiling, QA, mantención"], C_GREY, 0.065),
 ]
 for t, b, e, y in grupos:
     box(ax, 0.40, y, 0.27, 0.18, t, b, edge=e, fs_title=12.5, fs_body=11.5)
     arrow(ax, 0.33, 0.42, 0.397, y+0.09, color=C_GREY, lw=1.5, ms=12)
 box(ax, 0.74, 0.525, 0.248, 0.41, "Decisión de ingesta",
-    ["Lector streaming (csv):", "indexa SOLO 11 columnas", "por posición fija y descarta", "la cola I-V al vuelo."],
+    ["Lector streaming (csv) que indexa", "solo 11 columnas por posición fija", "y descarta la cola I-V al vuelo."],
     edge=C_GOLD, fs_title=13.5, fs_body=11.8)
 box(ax, 0.74, 0.065, 0.248, 0.41, "Limpieza aplicada",
-    ["-9999 → NaN · dropna", "clip(≥0) en irradiancias", "Válidos: 97.0 % (m-Si)", "y 97.2 % (HIT)"],
+    ["Reemplazo de -9999 → NaN,", "dropna, clip(≥0) en irradiancias.", "Válidos: 97.0% (m-Si) y 97.2% (HIT)."],
     edge=C_ORANGE, fs_title=13.5, fs_body=11.8)
 arrow(ax, 0.672, 0.62, 0.737, 0.70, color=C_GOLD, lw=2, ms=14)
 arrow(ax, 0.672, 0.38, 0.737, 0.29, color=C_ORANGE, lw=2, ms=14)
