@@ -222,4 +222,30 @@ for i, (t, sub, frac, col) in enumerate(etapas):
     y -= 0.138
 save(fig, 'embudo_datos.png')
 
+# ---------- 8) INGESTA Y LIMPIEZA ----------
+fig, ax = new_fig(18.2, 6.4)
+BW, BH, Y = 0.22, 0.75, 0.125
+xs = [0.015, 0.265, 0.515, 0.765]
+
+box(ax, xs[0], Y, BW, BH, "1 · Dataset Crudo NREL",
+    ["Archivo Cocoa: ~110 MB", "43 col fijas + cola I-V", "Longitud de fila variable", "Sentinelas con -9999"],
+    edge=C_CYAN, fs_title=16.0, fs_body=13.5)
+
+box(ax, xs[1], Y, BW, BH, "2 · Ingesta por Streaming",
+    ["Módulo csv nativo", "Lectura línea a línea", "Descarta cola I-V al vuelo", "Uso de memoria < 1 MB"],
+    edge=C_GOLD, fs_title=16.0, fs_body=13.5)
+
+box(ax, xs[2], Y, BW, BH, "3 · Limpieza y QA",
+    ["Reemplazo -9999 → NaN", "dropna() sobre variables", "clave (GHI, DNI, DHI, T)", "clip(≥0) en irradiancias"],
+    edge=C_ORANGE, fs_title=16.0, fs_body=13.5)
+
+box(ax, xs[3], Y, BW, BH, "4 · Dataset Final",
+    ["Registros válidos:", "m-Si: 97.0% (35,669/36,765)", "HIT: 97.2% (37,313/38,377)", "No requiere filtro nocturno"],
+    edge=C_GREEN, fs_title=16.0, fs_body=13.5)
+
+for i in range(3):
+    arrow(ax, xs[i]+BW+0.005, Y+BH/2, xs[i+1]-0.007, Y+BH/2, color=C_GOLD, lw=2.4, ms=14)
+
+save(fig, 'ingesta_limpieza.png')
+
 print('Diagramas v2 generados en', OUT)

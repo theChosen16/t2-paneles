@@ -43,6 +43,7 @@ IMG = {
     'pipeline':   'output/Extra_Resultados/diagramas/pipeline_general.png',
     'estructura': 'output/Extra_Resultados/diagramas/estructura_csv.png',
     'embudo':     'output/Extra_Resultados/diagramas/embudo_datos.png',
+    'ingesta_limpieza': 'output/Extra_Resultados/diagramas/ingesta_limpieza.png',
     'f1':         'output/Extra_Resultados/diagramas/flujo_fase1.png',
     'f2':         'output/Extra_Resultados/diagramas/flujo_fase2.png',
     'f3':         'output/Extra_Resultados/diagramas/flujo_fase3.png',
@@ -547,30 +548,14 @@ def s_estructura(slide, n):
 
 def s_ingesta(slide, n):
     add_title(slide, "Procedimiento: Ingesta y Limpieza de la Base de Datos")
-    H = Inches(5.45)
-    panel_with_body(slide, MARGIN, CONTENT_Y, COL_W, H,
-        "El Desafío: archivos irregulares de ~110 MB",
-        "• **Naturaleza de los datos:** cada fila contiene 43 columnas fijas + "
-        "**n pares (I, V) crudos** de la curva trazada (n ≈ 180–380) → filas de "
-        "longitud variable.\n\n"
-        "• **Falla del método estándar:** `pandas.read_csv` no tolera el ancho "
-        "variable (infiere mal el esquema) y carga ~110 MB por módulo a memoria "
-        "innecesariamente.\n\n"
-        "• **Datos centinela:** los faltantes vienen codificados como **−9999**, "
-        "que contaminan promedios y regresiones si no se neutralizan.",
-        accent=ACCENT_ORANGE, body_size=17)
-    panel_with_body(slide, MARGIN + COL_W + GAP, CONTENT_Y, COL_W, H,
-        "La Solución: lector en streaming (Fase 2)",
-        "• **Lectura línea a línea** con el módulo `csv` nativo: se indexan solo "
-        "las **11 columnas clave por posición fija** y se descarta la cola I-V al "
-        "vuelo.\n\n"
-        "• **Limpieza:** `-9999 → NaN`, `dropna` sobre GHI/DNI/DHI/T_air y "
-        "`clip(≥0)` en irradiancias.\n\n"
-        "• **Resultado:** m-Si 35,669/36,765 filas válidas (97.0 %) · HIT "
-        "37,313/38,377 (97.2 %).\n\n"
-        "• Los registros nocturnos no existen en la base (solo se midió de día); "
-        "no se requirió filtro nocturno adicional.",
-        accent=ACCENT_BLUE, body_size=17)
+    full_width_image(slide, IMG['ingesta_limpieza'], max_w=12.5, top_in=1.20, max_bottom=5.60)
+    add_caption(slide,
+        "**Proceso de ingesta y depuración:** El gran volumen de datos (~110 MB por archivo) y el ancho de fila "
+        "variable debido a la cola de curvas I-V impiden el uso de métodos convencionales como `pandas.read_csv`. "
+        "El pipeline implementa un lector en flujo (streaming) nativo que indexa selectivamente solo las 11 variables útiles. "
+        "Posteriormente, se reemplazan los valores centinela `-9999` por `NaN`, se descartan filas nulas y se recortan "
+        "irradiancias negativas, logrando un 97.0 % (m-Si) y 97.2 % (HIT) de registros útiles para el modelado.",
+        top_in=5.70, h_in=1.35, accent=ACCENT_GOLD)
 
 
 def s_embudo(slide, n):
