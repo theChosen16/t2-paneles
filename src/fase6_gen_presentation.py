@@ -464,7 +464,7 @@ def s_marco(slide, n):
     add_panel(slide, MARGIN + COL_W + GAP, CONTENT_Y, COL_W, H,
               "Circuito Equivalente de un Diodo (SDM)", accent=ACCENT_GOLD)
     add_image(slide, IMG['circuito'],
-              MARGIN + COL_W + GAP + Inches(1.05), CONTENT_Y + Inches(0.75),
+              MARGIN + COL_W + GAP + Inches(0.91), CONTENT_Y + Inches(0.75),
               width=Inches(4.3), height=Inches(4.3))
 
 
