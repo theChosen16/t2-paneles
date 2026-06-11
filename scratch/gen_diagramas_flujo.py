@@ -14,23 +14,23 @@ plt.rcParams['font.family'] = 'DejaVu Sans'
 
 
 def box(ax, x, y, w, h, title, lines, edge=C_CYAN, fc=C_PANEL,
-        fs_title=14.5, fs_body=12, lw=2.0):
+        fs_title=14.5, fs_body=12, lw=2.0, linespacing=1.65):
     ax.add_patch(FancyBboxPatch((x, y), w, h,
                  boxstyle="round,pad=0.012,rounding_size=0.018",
                  linewidth=lw, edgecolor=edge, facecolor=fc, zorder=2))
     ax.text(x+w/2, y+h-0.045, title, ha='center', va='top', fontsize=fs_title,
             color=C_GOLD, fontweight='bold', zorder=3)
     if lines:
-        ax.text(x+w/2, y+(h-0.13)/2.0, '\n'.join(lines), ha='center', va='center',
-                fontsize=fs_body, color=C_WHITE, zorder=3, linespacing=1.4)
+        ax.text(x+w/2, y+(h-0.10)/2.0, '\n'.join(lines), ha='center', va='center',
+                fontsize=fs_body, color=C_WHITE, zorder=3, linespacing=linespacing)
 
 
-def filebox(ax, x, y, w, h, label, edge=C_ORANGE, fs=11.5):
+def filebox(ax, x, y, w, h, label, edge=C_ORANGE, fs=13.0):
     ax.add_patch(FancyBboxPatch((x, y), w, h,
                  boxstyle="round,pad=0.010,rounding_size=0.012", linewidth=1.8,
                  edgecolor=edge, facecolor='#161B22', linestyle=(0, (4, 2)), zorder=2))
     ax.text(x+w/2, y+h/2, label, ha='center', va='center', fontsize=fs,
-            color=edge, zorder=3, linespacing=1.35, family='monospace')
+            color=edge, zorder=3, linespacing=1.45, family='monospace')
 
 
 def arrow(ax, x1, y1, x2, y2, color=C_GOLD, lw=2.4, ms=17):
@@ -93,7 +93,7 @@ save(fig, 'pipeline_general.png')
 # ---------- 2) ESTRUCTURA DEL CSV ----------
 fig, ax = new_fig(18.2, 6.4)
 box(ax, 0.012, 0.012, 0.315, 0.928, "Cocoa_mSi0166.csv  (~102 MB)", [],
-    edge=C_CYAN, fs_title=18.5)
+    edge=C_CYAN, fs_title=20.0)
 rows = [
     ("Líneas 1-2 · METADATOS", "módulo, ciudad, TZ, lat, lon, altitud, tilt, azimut", C_GOLD),
     ("Línea 3 · ENCABEZADO", "43 columnas fijas con nombre y unidad", C_GOLD),
@@ -103,7 +103,7 @@ rows = [
 yy = 0.755
 for t, b, e in rows:
     box(ax, 0.028, yy-0.125, 0.283, 0.175, t, b.split('\n'), edge=e,
-        fc=C_PANEL2, fs_title=15.5, fs_body=13.5, lw=1.6)
+        fc=C_PANEL2, fs_title=17.5, fs_body=15.0, lw=1.6)
     yy -= 0.20
 grupos = [
     ("Eléctricas (usadas)", ["Isc, Pmp, Imp, Vmp, Voc, FF e incertidumbres"], C_GREEN, 0.755),
@@ -112,14 +112,14 @@ grupos = [
     ("No usadas", ["T dorso, humedad, lluvia, soiling, QA, mantención"], C_GREY, 0.065),
 ]
 for t, b, e, y in grupos:
-    box(ax, 0.40, y, 0.27, 0.18, t, b, edge=e, fs_title=16.0, fs_body=14.5)
+    box(ax, 0.40, y, 0.27, 0.18, t, b, edge=e, fs_title=18.0, fs_body=16.0)
     arrow(ax, 0.33, 0.42, 0.397, y+0.09, color=C_GREY, lw=1.5, ms=12)
 box(ax, 0.74, 0.525, 0.248, 0.41, "Decisión de ingesta",
     ["Lector streaming (csv) que indexa", "solo 11 columnas por posición fija", "y descarta la cola I-V al vuelo."],
-    edge=C_GOLD, fs_title=17.0, fs_body=14.5)
+    edge=C_GOLD, fs_title=18.5, fs_body=16.0)
 box(ax, 0.74, 0.065, 0.248, 0.41, "Limpieza aplicada",
     ["Reemplazo de -9999 → NaN,", "dropna, clip(≥0) en irradiancias.", "Válidos: 97.0% (m-Si) y 97.2% (HIT)."],
-    edge=C_ORANGE, fs_title=17.0, fs_body=14.5)
+    edge=C_ORANGE, fs_title=18.5, fs_body=16.0)
 arrow(ax, 0.672, 0.62, 0.737, 0.70, color=C_GOLD, lw=2, ms=14)
 arrow(ax, 0.672, 0.38, 0.737, 0.29, color=C_ORANGE, lw=2, ms=14)
 save(fig, 'estructura_csv.png')
@@ -224,24 +224,24 @@ save(fig, 'embudo_datos.png')
 
 # ---------- 8) INGESTA Y LIMPIEZA ----------
 fig, ax = new_fig(18.2, 6.4)
-BW, BH, Y = 0.22, 0.75, 0.125
+BW, BH, Y = 0.228, 0.75, 0.125
 xs = [0.015, 0.265, 0.515, 0.765]
 
 box(ax, xs[0], Y, BW, BH, "1 · Dataset Crudo NREL",
     ["Archivo Cocoa: ~110 MB", "43 col fijas + cola I-V", "Longitud de fila variable", "Sentinelas con -9999"],
-    edge=C_CYAN, fs_title=16.0, fs_body=13.5)
+    edge=C_CYAN, fs_title=24.5, fs_body=20.0, linespacing=1.85)
 
 box(ax, xs[1], Y, BW, BH, "2 · Ingesta por Streaming",
     ["Módulo csv nativo", "Lectura línea a línea", "Descarta cola I-V al vuelo", "Uso de memoria < 1 MB"],
-    edge=C_GOLD, fs_title=16.0, fs_body=13.5)
+    edge=C_GOLD, fs_title=24.5, fs_body=20.0, linespacing=1.85)
 
 box(ax, xs[2], Y, BW, BH, "3 · Limpieza y QA",
     ["Reemplazo -9999 → NaN", "dropna() sobre variables", "clave (GHI, DNI, DHI, T)", "clip(≥0) en irradiancias"],
-    edge=C_ORANGE, fs_title=16.0, fs_body=13.5)
+    edge=C_ORANGE, fs_title=24.5, fs_body=20.0, linespacing=1.85)
 
 box(ax, xs[3], Y, BW, BH, "4 · Dataset Final",
     ["Registros válidos:", "m-Si: 97.0% (35,669/36,765)", "HIT: 97.2% (37,313/38,377)", "No requiere filtro nocturno"],
-    edge=C_GREEN, fs_title=16.0, fs_body=13.5)
+    edge=C_GREEN, fs_title=24.5, fs_body=20.0, linespacing=1.85)
 
 for i in range(3):
     arrow(ax, xs[i]+BW+0.005, Y+BH/2, xs[i+1]-0.007, Y+BH/2, color=C_GOLD, lw=2.4, ms=14)
