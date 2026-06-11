@@ -284,8 +284,18 @@ def add_caption(slide, text, top_in, h_in=0.85, accent=ACCENT_GOLD, size=17.5):
     rect = slide.shapes.add_shape(1, left, Inches(top_in), w, Inches(h_in))
     rect.fill.solid(); rect.fill.fore_color.rgb = PANEL_BG
     rect.line.color.rgb = accent; rect.line.width = Pt(1.0)
-    add_text(slide, left + Inches(0.2), Inches(top_in + 0.08),
-             w - Inches(0.4), Inches(h_in - 0.16), text, size=size, line_space=1.08)
+    # Use zero margin text frame to prevent text overflow at the bottom
+    box = slide.shapes.add_textbox(left + Inches(0.2), Inches(top_in + 0.04),
+                                   w - Inches(0.4), Inches(h_in - 0.08))
+    tf = box.text_frame
+    tf.word_wrap = True
+    tf.margin_left = Inches(0.0)
+    tf.margin_right = Inches(0.0)
+    tf.margin_top = Inches(0.0)
+    tf.margin_bottom = Inches(0.0)
+    for i, line in enumerate(text.split('\n')):
+        p = add_par(tf, line, size=size, color=TEXT_WHITE, first=(i == 0))
+        p.line_spacing = 1.08
 
 
 def add_table(slide, left, top, width, height, headers, rows, col_ratios=None,
@@ -465,7 +475,7 @@ def s_pipeline(slide, n):
         "estacional de los datos (Fases 0-1) para adaptarlos al hemisferio sur. Luego, se limpia y calcula "
         "el recurso solar efectivo (Fase 2) y se extraen los parámetros físicos de los módulos (Fase 3). "
         "Finalmente, se realiza la simulación horaria (Fase 4) para graficar, documentar y exportar los resultados (Fases 5-7).",
-        top_in=5.85, h_in=1.15, accent=ACCENT_GOLD)
+        top_in=5.75, h_in=1.30, accent=ACCENT_GOLD)
 
 
 def s_basedatos(slide, n):
@@ -532,7 +542,7 @@ def s_estructura(slide, n):
         "y registros cada 5 minutos. Dado que cada fila incluye las curvas eléctricas crudas completas, su tamaño "
         "es variable y pesado (~110 MB). Para optimizar la memoria, el código lee el archivo en flujo (streaming) "
         "e indexa únicamente las 11 variables meteorológicas y eléctricas necesarias, descartando el resto al vuelo.",
-        top_in=5.85, h_in=1.15, accent=ACCENT_BLUE)
+        top_in=5.75, h_in=1.30, accent=ACCENT_BLUE)
 
 
 def s_ingesta(slide, n):
@@ -600,7 +610,7 @@ def s_emu_comparacion(slide, n):
         "**Límite explícito del método:** el filtro alinea estaciones, geometría solar e "
         "inclinación óptima (tilt = latitud, azimut 0° N); las **magnitudes medidas** de "
         "irradiancia y clima siguen siendo las de Florida (ver Limitaciones, Lám. %d)." % REF['limitaciones'],
-        top_in=5.85, h_in=1.0, accent=ACCENT_ORANGE)
+        top_in=5.75, h_in=1.20, accent=ACCENT_ORANGE)
 
 
 def s_emu_flujo(slide, n):
@@ -611,7 +621,7 @@ def s_emu_flujo(slide, n):
         "a San Pedro de Atacama (hemisferio sur), el código modifica la latitud y altura en los metadatos y aplica "
         "un desfase de 6 meses en las fechas. De esta manera, el verano e invierno coinciden con la realidad del sitio "
         "simulado sin alterar los valores físicos medidos. Los solapamientos de fechas se promedian y el año se proyecta a 2026.",
-        top_in=5.80, h_in=1.20, accent=ACCENT_ORANGE)
+        top_in=5.70, h_in=1.35, accent=ACCENT_ORANGE)
 
 
 def s_poa_medida(slide, n):
@@ -667,7 +677,7 @@ def s_f2_flujo(slide, n):
         "el código utiliza el modelo difuso de Perez para transponer las irradiancias al plano inclinado (POA). "
         "Luego, con el modelo de Sandia (SAPM) y asumiendo una velocidad de viento fija de 1 m/s (peor caso de ventilación), "
         "se estima la temperatura interna de operación de las celdas para cada tecnología (m-Si y HIT).",
-        top_in=5.80, h_in=1.20, accent=ACCENT_ORANGE)
+        top_in=5.70, h_in=1.35, accent=ACCENT_ORANGE)
 
 
 def s_f3_flujo(slide, n):
@@ -678,7 +688,7 @@ def s_f3_flujo(slide, n):
         "térmicos de corriente y voltaje. Dado que la corriente arrojó coeficientes negativos debido a la estacionalidad, "
         "se aplicó un valor estándar de resguardo de +0.05 %/°C. Luego, los datos se trasladan a condiciones nominales (STC) "
         "y un optimizador no lineal ajusta los 5 parámetros de De Soto (corrientes, resistencias y factor de idealidad).",
-        top_in=5.80, h_in=1.20, accent=ACCENT_GOLD)
+        top_in=5.70, h_in=1.35, accent=ACCENT_GOLD)
 
 
 def s_f3_result(slide, n):
@@ -723,7 +733,7 @@ def s_f4_flujo(slide, n):
         "para cada uno de los registros del año 2026. A partir de la irradiancia y temperatura de celda de cada instante, "
         "se escala el circuito de un diodo y se resuelve analíticamente la potencia útil máxima (Pmp). Finalmente, "
         "la energía anual integrada se compara con el rendimiento ideal para obtener el Performance Ratio (PR).",
-        top_in=5.80, h_in=1.20, accent=ACCENT_GOLD)
+        top_in=5.70, h_in=1.35, accent=ACCENT_GOLD)
 
 
 def s_res_termico(slide, n):
@@ -1022,7 +1032,7 @@ def s_anexo2(slide, n):
         "**Estado en este estudio:** ecuaciones revisadas en la literatura pero **no ejecutadas por el "
         "pipeline** (la POA de Perez ingresa directa al SDM). Su incorporación es la primera propuesta de "
         "trabajo futuro — la omisión sobreestima levemente la energía en ángulos de incidencia rasantes.",
-        top_in=6.05, h_in=0.95, accent=ACCENT_ORANGE)
+        top_in=5.95, h_in=1.10, accent=ACCENT_ORANGE)
 
 
 def s_anexo3(slide, n):
