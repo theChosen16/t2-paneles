@@ -93,7 +93,7 @@ save(fig, 'pipeline_general.png')
 # ---------- 2) ESTRUCTURA DEL CSV ----------
 fig, ax = new_fig(18.2, 6.4)
 box(ax, 0.012, 0.012, 0.315, 0.928, "Cocoa_mSi0166.csv  (~102 MB)", [],
-    edge=C_CYAN, fs_title=14)
+    edge=C_CYAN, fs_title=18.5)
 rows = [
     ("Líneas 1-2 · METADATOS", "módulo, ciudad, TZ, lat, lon, altitud, tilt, azimut", C_GOLD),
     ("Línea 3 · ENCABEZADO", "43 columnas fijas con nombre y unidad", C_GOLD),
@@ -103,7 +103,7 @@ rows = [
 yy = 0.755
 for t, b, e in rows:
     box(ax, 0.028, yy-0.125, 0.283, 0.175, t, b.split('\n'), edge=e,
-        fc=C_PANEL2, fs_title=12, fs_body=10.8, lw=1.6)
+        fc=C_PANEL2, fs_title=15.5, fs_body=13.5, lw=1.6)
     yy -= 0.20
 grupos = [
     ("Eléctricas (usadas)", ["Isc, Pmp, Imp, Vmp, Voc, FF e incertidumbres"], C_GREEN, 0.755),
@@ -112,14 +112,14 @@ grupos = [
     ("No usadas", ["T dorso, humedad, lluvia, soiling, QA, mantención"], C_GREY, 0.065),
 ]
 for t, b, e, y in grupos:
-    box(ax, 0.40, y, 0.27, 0.18, t, b, edge=e, fs_title=12.5, fs_body=11.5)
+    box(ax, 0.40, y, 0.27, 0.18, t, b, edge=e, fs_title=16.0, fs_body=14.5)
     arrow(ax, 0.33, 0.42, 0.397, y+0.09, color=C_GREY, lw=1.5, ms=12)
 box(ax, 0.74, 0.525, 0.248, 0.41, "Decisión de ingesta",
     ["Lector streaming (csv) que indexa", "solo 11 columnas por posición fija", "y descarta la cola I-V al vuelo."],
-    edge=C_GOLD, fs_title=13.5, fs_body=11.8)
+    edge=C_GOLD, fs_title=17.0, fs_body=14.5)
 box(ax, 0.74, 0.065, 0.248, 0.41, "Limpieza aplicada",
     ["Reemplazo de -9999 → NaN,", "dropna, clip(≥0) en irradiancias.", "Válidos: 97.0% (m-Si) y 97.2% (HIT)."],
-    edge=C_ORANGE, fs_title=13.5, fs_body=11.8)
+    edge=C_ORANGE, fs_title=17.0, fs_body=14.5)
 arrow(ax, 0.672, 0.62, 0.737, 0.70, color=C_GOLD, lw=2, ms=14)
 arrow(ax, 0.672, 0.38, 0.737, 0.29, color=C_ORANGE, lw=2, ms=14)
 save(fig, 'estructura_csv.png')

@@ -536,13 +536,13 @@ def s_basedatos_vars(slide, n):
 
 def s_estructura(slide, n):
     add_title(slide, "Procedimiento: Anatomía del Archivo CSV y Decisiones de Ingesta")
-    full_width_image(slide, IMG['estructura'], max_w=12.5, top_in=1.30, max_bottom=5.70)
+    full_width_image(slide, IMG['estructura'], max_w=12.5, top_in=1.20, max_bottom=5.60)
     add_caption(slide,
         "**Estructura y lectura de datos:** Los archivos originales del NREL contienen una cabecera de metadatos "
         "y registros cada 5 minutos. Dado que cada fila incluye las curvas eléctricas crudas completas, su tamaño "
         "es variable y pesado (~110 MB). Para optimizar la memoria, el código lee el archivo en flujo (streaming) "
         "e indexa únicamente las 11 variables meteorológicas y eléctricas necesarias, descartando el resto al vuelo.",
-        top_in=5.75, h_in=1.30, accent=ACCENT_BLUE)
+        top_in=5.70, h_in=1.35, accent=ACCENT_BLUE)
 
 
 def s_ingesta(slide, n):
