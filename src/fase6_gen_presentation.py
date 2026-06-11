@@ -312,6 +312,10 @@ def add_table(slide, left, top, width, height, headers, rows, col_ratios=None,
         cell = table.cell(0, j)
         cell.fill.solid(); cell.fill.fore_color.rgb = PANEL_BG2
         tf = cell.text_frame; tf.word_wrap = True
+        tf.margin_left = Inches(0.06)
+        tf.margin_right = Inches(0.06)
+        tf.margin_top = Inches(0.04)
+        tf.margin_bottom = Inches(0.04)
         p = tf.paragraphs[0]; p.alignment = PP_ALIGN.CENTER
         fmt_runs(p, htxt, fs_head, ACCENT_GOLD)
         for run in p.runs:
@@ -322,6 +326,10 @@ def add_table(slide, left, top, width, height, headers, rows, col_ratios=None,
             cell = table.cell(i + 1, j)
             cell.fill.solid(); cell.fill.fore_color.rgb = PANEL_BG if i % 2 == 0 else RGBColor(0x1A, 0x22, 0x2C)
             tf = cell.text_frame; tf.word_wrap = True
+            tf.margin_left = Inches(0.06)
+            tf.margin_right = Inches(0.06)
+            tf.margin_top = Inches(0.04)
+            tf.margin_bottom = Inches(0.04)
             p = tf.paragraphs[0]
             p.alignment = PP_ALIGN.CENTER if j > 0 else PP_ALIGN.LEFT
             fmt_runs(p, str(val), fs_body, TEXT_WHITE)
@@ -417,7 +425,7 @@ def s_intro(slide, n):
 
 def s_justificacion(slide, n):
     add_title(slide, "b) Justificación e impacto: Selección de Tecnologías")
-    add_panel(slide, MARGIN, CONTENT_Y, SLIDE_W - 2 * MARGIN, Inches(5.5),
+    add_panel(slide, MARGIN, CONTENT_Y, SLIDE_W - 2 * MARGIN, Inches(5.7),
               "Familias disponibles en el Dataset Cocoa (NREL) y criterio de selección",
               accent=ACCENT_GOLD)
     headers = ["Tecnología", "Eficiencia", "Coef. Temp. (Pmp)", "Comportamiento en Desierto", "Decisión / Rol"]
@@ -433,14 +441,14 @@ def s_justificacion(slide, n):
         ["a-Si\n(Silicio Amorfo)", "6% - 10%", "−0.20 %/°C (Excelente)",
          "Muy baja eficiencia base y alta degradación inicial.", "DESCARTADO (Inviable comercial)"],
     ]
-    add_table(slide, MARGIN + Inches(0.25), CONTENT_Y + Inches(0.62),
-              SLIDE_W - 2 * MARGIN - Inches(0.5), Inches(4.25),
-              headers, rows, col_ratios=[2.2, 1.0, 1.4, 2.6, 1.9], fs_head=18, fs_body=16.5)
-    add_text(slide, MARGIN + Inches(0.25), CONTENT_Y + Inches(4.98),
+    add_table(slide, MARGIN + Inches(0.25), CONTENT_Y + Inches(0.55),
+              SLIDE_W - 2 * MARGIN - Inches(0.5), Inches(3.3),
+              headers, rows, col_ratios=[2.2, 1.0, 1.4, 2.6, 1.9], fs_head=17, fs_body=15.0)
+    add_text(slide, MARGIN + Inches(0.25), CONTENT_Y + Inches(4.55),
              SLIDE_W - 2 * MARGIN - Inches(0.5), Inches(0.5),
              "Criterio: máximo contraste térmico entre tecnologías comerciales viables, con datos "
              "experimentales completos en el dataset (`mSi0166` y `HIT05667`).",
-             size=17.0, color=TEXT_GREY)
+             size=15.5, color=TEXT_GREY)
 
 
 def s_marco(slide, n):
