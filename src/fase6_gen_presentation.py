@@ -231,10 +231,10 @@ def add_text(slide, left, top, width, height, text, size=14, color=TEXT_WHITE,
 
 
 def panel_with_body(slide, left, top, width, height, title, body, accent=None,
-                    body_size=14, line_space=1.08):
+                    body_size=17, line_space=1.10):
     add_panel(slide, left, top, width, height, title, accent)
-    add_text(slide, left + Inches(0.22), top + Inches(0.64),
-             width - Inches(0.44), height - Inches(0.82),
+    add_text(slide, left + Inches(0.22), top + Inches(0.70),
+             width - Inches(0.44), height - Inches(0.88),
              body, size=body_size, line_space=line_space)
 
 
@@ -243,11 +243,11 @@ def stat_tile(slide, left, top, width, height, value, label, accent=ACCENT_GOLD)
     rect = slide.shapes.add_shape(1, left, top, width, height)
     rect.fill.solid(); rect.fill.fore_color.rgb = PANEL_BG2
     rect.line.color.rgb = accent; rect.line.width = Pt(1.2)
-    add_text(slide, left, top + Inches(0.12), width, Inches(0.62),
-             "**" + value + "**", size=28, color=accent, align=PP_ALIGN.CENTER)
-    add_text(slide, left + Inches(0.06), top + height - Inches(0.62),
-             width - Inches(0.12), Inches(0.55),
-             label, size=12.5, color=TEXT_GREY, align=PP_ALIGN.CENTER)
+    add_text(slide, left, top + Inches(0.10), width, Inches(0.72),
+             "**" + value + "**", size=38, color=accent, align=PP_ALIGN.CENTER)
+    add_text(slide, left + Inches(0.06), top + height - Inches(0.70),
+             width - Inches(0.12), Inches(0.62),
+             label, size=15.5, color=TEXT_GREY, align=PP_ALIGN.CENTER)
 
 
 def add_image(slide, path, left, top, width=None, height=None):
@@ -278,14 +278,14 @@ def full_width_image(slide, path, max_w=12.5, top_in=1.35, max_bottom=6.95):
                                     width=Inches(w), height=Inches(h))
 
 
-def add_caption(slide, text, top_in, h_in=0.85, accent=ACCENT_GOLD, size=14):
+def add_caption(slide, text, top_in, h_in=0.85, accent=ACCENT_GOLD, size=17.5):
     left = MARGIN
     w = SLIDE_W - 2 * MARGIN
     rect = slide.shapes.add_shape(1, left, Inches(top_in), w, Inches(h_in))
     rect.fill.solid(); rect.fill.fore_color.rgb = PANEL_BG
     rect.line.color.rgb = accent; rect.line.width = Pt(1.0)
     add_text(slide, left + Inches(0.2), Inches(top_in + 0.08),
-             w - Inches(0.4), Inches(h_in - 0.16), text, size=size, line_space=1.05)
+             w - Inches(0.4), Inches(h_in - 0.16), text, size=size, line_space=1.08)
 
 
 def add_table(slide, left, top, width, height, headers, rows, col_ratios=None,
@@ -424,12 +424,12 @@ def s_justificacion(slide, n):
     ]
     add_table(slide, MARGIN + Inches(0.25), CONTENT_Y + Inches(0.62),
               SLIDE_W - 2 * MARGIN - Inches(0.5), Inches(4.1),
-              headers, rows, col_ratios=[2.2, 1.0, 1.4, 2.6, 1.9])
+              headers, rows, col_ratios=[2.2, 1.0, 1.4, 2.6, 1.9], fs_head=17, fs_body=15.5)
     add_text(slide, MARGIN + Inches(0.25), CONTENT_Y + Inches(4.85),
              SLIDE_W - 2 * MARGIN - Inches(0.5), Inches(0.5),
              "Criterio: máximo contraste térmico entre tecnologías comerciales viables, con datos "
              "experimentales completos en el dataset (`mSi0166` y `HIT05667`).",
-             size=12, color=TEXT_GREY)
+             size=15.5, color=TEXT_GREY)
 
 
 def s_marco(slide, n):
@@ -449,7 +449,7 @@ def s_marco(slide, n):
         "• **Marco revisado NO aplicado:** modificadores ópticos IAM y espectral "
         f"AM [King et al., 2004] — se documentan en {A('anexo2')} y quedan como "
         "trabajo futuro.",
-        accent=ACCENT_BLUE, body_size=13.5)
+        accent=ACCENT_BLUE, body_size=16.5)
     add_panel(slide, MARGIN + COL_W + GAP, CONTENT_Y, COL_W, H,
               "Circuito Equivalente de un Diodo (SDM)", accent=ACCENT_GOLD)
     add_image(slide, IMG['circuito'],
@@ -548,7 +548,7 @@ def s_ingesta(slide, n):
         "innecesariamente.\n\n"
         "• **Datos centinela:** los faltantes vienen codificados como **−9999**, "
         "que contaminan promedios y regresiones si no se neutralizan.",
-        accent=ACCENT_ORANGE, body_size=14)
+        accent=ACCENT_ORANGE, body_size=17)
     panel_with_body(slide, MARGIN + COL_W + GAP, CONTENT_Y, COL_W, H,
         "La Solución: lector en streaming (Fase 2)",
         "• **Lectura línea a línea** con el módulo `csv` nativo: se indexan solo "
@@ -560,7 +560,7 @@ def s_ingesta(slide, n):
         "37,313/38,377 (97.2 %).\n\n"
         "• Los registros nocturnos no existen en la base (solo se midió de día); "
         "no se requirió filtro nocturno adicional.",
-        accent=ACCENT_BLUE, body_size=14)
+        accent=ACCENT_BLUE, body_size=17)
 
 
 def s_embudo(slide, n):
@@ -890,7 +890,7 @@ def s_limitaciones(slide, n):
         "• **α[_Isc_] de literatura:** la regresión experimental falló (espectro/"
         "estacionalidad) y se usó +0.05 %/°C — impacto menor: la corriente domina "
         "por G, no por T.",
-        accent=ACCENT_ORANGE, body_size=13.5)
+        accent=ACCENT_ORANGE, body_size=16.5)
     panel_with_body(slide, MARGIN + COL_W + GAP, CONTENT_Y, COL_W, H,
         "Limitaciones del modelo",
         "• **Sin pérdidas ópticas/espectrales:** IAM y corrección AM revisados "
@@ -903,7 +903,7 @@ def s_limitaciones(slide, n):
         "criterio consistente entre ambas tecnologías.\n\n"
         "• **Sin soiling ni mismatch:** pérdidas de planta real no modeladas — el "
         "PR aquí es un PR de módulo, no de planta.",
-        accent=ACCENT_BLUE, body_size=13.5)
+        accent=ACCENT_BLUE, body_size=16.5)
 
 
 def s_conclusiones(slide, n):
@@ -921,7 +921,7 @@ def s_conclusiones(slide, n):
         "4. **HIT vencedor:** +2.39 puntos de PR anual (86.92 % vs 84.53 %) por "
         "su menor coeficiente térmico — técnicamente superior para plantas "
         "desérticas de alta irradiancia y temperatura.",
-        accent=ACCENT_GOLD, body_size=13.5)
+        accent=ACCENT_GOLD, body_size=16.5)
     panel_with_body(slide, MARGIN + COL_W + GAP, CONTENT_Y, COL_W, H,
         "Propuestas de Trabajos Futuros",
         "• **Aplicar IAM y corrección espectral AM** ya documentados %s, "
@@ -934,7 +934,7 @@ def s_conclusiones(slide, n):
         "pérdida en Atacama.\n\n"
         "• **Modelo de doble diodo:** capturar recombinación no ideal a baja "
         "irradiancia." % A('anexo2'),
-        accent=ACCENT_BLUE, body_size=13.5)
+        accent=ACCENT_BLUE, body_size=16.5)
 
 
 def s_referencias(slide, n):
@@ -955,7 +955,7 @@ def s_referencias(slide, n):
         'a python package for modeling solar energy systems." JOSS 3(29), 884.\n\n'
         '6. IEC 61724-1 — Photovoltaic system performance, Part 1: Monitoring.\n\n'
         'Agradecimientos al Departamento de Electrotecnia de la UTFSM.',
-        accent=ACCENT_ORANGE, body_size=14.5)
+        accent=ACCENT_ORANGE, body_size=17.5)
 
 
 def s_anexo1(slide, n):
@@ -964,7 +964,7 @@ def s_anexo1(slide, n):
     add_panel(slide, MARGIN, CONTENT_Y, COL_W, H,
               "Forma general de transposición POA", accent=ACCENT_BLUE)
     add_text(slide, MARGIN + Inches(0.22), CONTENT_Y + Inches(0.62), COL_W - Inches(0.44), Inches(0.5),
-             "Irradiancia incidente total en el plano inclinado del panel:", size=13)
+             "Irradiancia incidente total en el plano inclinado del panel:", size=16)
     add_eq(slide,
            r"G_{poa}=G_b\,R_{beam}+G_{d,perez}+G\,\rho\,\left(\frac{1-\cos(\beta)}{2}\right)",
            MARGIN + Inches(0.35), CONTENT_Y + Inches(1.25), Inches(0.62), max_width=Inches(5.7))
@@ -976,7 +976,7 @@ def s_anexo1(slide, n):
              "• R[_beam_]: factor geométrico de transposición directa.\n"
              "• G[_d,perez_]: difusa anisotrópica de Perez (circumsolar +\n"
              "  brillo de horizonte), evaluada por `pvlib.get_total_irradiance`.",
-             size=13.5, color=ACCENT_GOLD, line_space=1.15)
+             size=16.5, color=ACCENT_GOLD, line_space=1.15)
     X2 = MARGIN + COL_W + GAP
     panel_with_body(slide, X2, CONTENT_Y, COL_W, H,
         "Implementación en el código (Fase 2)",
@@ -988,7 +988,7 @@ def s_anexo1(slide, n):
         "model='perez')` → componente directa + difusa Perez + reflejada.\n\n"
         "• Salida: `poa_global` con `clip(≥0)`, usada como irradiancia efectiva "
         "del SDM (sin modificadores ópticos — ver Anexo II).",
-        accent=ACCENT_GOLD, body_size=13.5)
+        accent=ACCENT_GOLD, body_size=16.5)
 
 
 def s_anexo2(slide, n):
@@ -1004,7 +1004,7 @@ def s_anexo2(slide, n):
     add_text(slide, MARGIN + Inches(0.22), CONTENT_Y + Inches(2.7), COL_W - Inches(0.44), Inches(1.7),
              "Ley de Snell y Bouguer [King et al., 2004]: θ[_r_] = arcsin(sin θ / n), con "
              "n = 1.526 (vidrio), K = 4 m⁻¹, L = 2 mm.",
-             size=13.5, color=ACCENT_GOLD, line_space=1.15)
+             size=16.5, color=ACCENT_GOLD, line_space=1.15)
     X2 = MARGIN + COL_W + GAP
     add_panel(slide, X2, CONTENT_Y, COL_W, H,
               "Modificador Espectral por Masa de Aire (AM)", accent=ACCENT_GOLD)
@@ -1017,7 +1017,7 @@ def s_anexo2(slide, n):
     add_text(slide, X2 + Inches(0.22), CONTENT_Y + Inches(2.7), COL_W - Inches(0.44), Inches(1.7),
              "Corrige el desajuste espectral según la atmósfera atravesada; a[_0_]…a[_4_] son "
              "coeficientes empíricos de cada celda [King et al., 2004].",
-             size=13.5, color=ACCENT_GOLD, line_space=1.15)
+             size=16.5, color=ACCENT_GOLD, line_space=1.15)
     add_caption(slide,
         "**Estado en este estudio:** ecuaciones revisadas en la literatura pero **no ejecutadas por el "
         "pipeline** (la POA de Perez ingresa directa al SDM). Su incorporación es la primera propuesta de "
@@ -1031,7 +1031,7 @@ def s_anexo3(slide, n):
               "Ecuación de Sandia para Temperatura de Celda", accent=ACCENT_BLUE)
     add_text(slide, MARGIN + Inches(0.22), CONTENT_Y + Inches(0.58),
              SLIDE_W - 2 * MARGIN - Inches(0.5), Inches(0.4),
-             "La temperatura de la celda se modela a partir del equilibrio térmico dinámico:", size=13)
+             "La temperatura de la celda se modela a partir del equilibrio térmico dinámico:", size=16)
     add_eq(slide,
            r"T_c = G_{poa}\cdot e^{a+b\,v_w} + T_a + \left(\frac{G_{poa}}{1000}\right)\Delta T",
            Inches(4.0), CONTENT_Y + Inches(1.05), Inches(0.7), max_width=Inches(6.0))
@@ -1043,37 +1043,37 @@ def s_anexo3(slide, n):
         "• G[_poa_]: irradiancia total en el plano del panel (W/m²).\n"
         "• v[_w_]: velocidad de viento (fijada en 1 m/s).\n"
         "• a, b, ΔT: parámetros empíricos del encapsulado/montaje.",
-        accent=ACCENT_BLUE, body_size=13.5)
+        accent=ACCENT_BLUE, body_size=16.5)
     panel_with_body(slide, MARGIN + COL_W + GAP, Y2, COL_W, H2,
         "Coeficientes Empíricos Utilizados",
         "• m-Si — `open_rack_glass_polymer`: a = −3.56 · b = −0.075 · ΔT = 3.0 °C\n\n"
         "• HIT — `open_rack_glass_glass`: a = −3.47 · b = −0.059 · ΔT = 3.0 °C\n\n"
         "**Fuente:** `pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS['sapm']` — "
         "base interna validada por Sandia NL [King et al., 2004].",
-        accent=ACCENT_GOLD, body_size=13.5)
+        accent=ACCENT_GOLD, body_size=16.5)
 
 
 def s_anexo4(slide, n):
     add_title(slide, "Anexo IV: Ecuaciones del Modelo Eléctrico de un Diodo (SDM)")
     add_panel(slide, MARGIN, CONTENT_Y, SLIDE_W - 2 * MARGIN, Inches(1.95),
-              "Ecuación Trascendental del Circuito Equivalente", accent=ACCENT_BLUE)
+               "Ecuación Trascendental del Circuito Equivalente", accent=ACCENT_BLUE)
     add_text(slide, MARGIN + Inches(0.22), CONTENT_Y + Inches(0.58),
-             SLIDE_W - 2 * MARGIN - Inches(0.5), Inches(0.4),
-             "Corriente implícita del modelo de diodo simple con resistencias parásitas "
-             "(resuelta con la función W de Lambert en `pvlib.singlediode`):", size=13)
+              SLIDE_W - 2 * MARGIN - Inches(0.5), Inches(0.4),
+              "Corriente implícita del modelo de diodo simple con resistencias parásitas "
+              "(resuelta con la función W de Lambert en `pvlib.singlediode`):", size=16)
     add_eq(slide,
-           r"I = I_L - I_0\left[\exp\left(\frac{V+I R_s}{a}\right)-1\right]-\frac{V+I R_s}{R_{sh}}",
-           Inches(3.8), CONTENT_Y + Inches(1.1), Inches(0.62), max_width=Inches(6.2))
+            r"I = I_L - I_0\left[\exp\left(\frac{V+I R_s}{a}\right)-1\right]-\frac{V+I R_s}{R_{sh}}",
+            Inches(3.8), CONTENT_Y + Inches(1.1), Inches(0.62), max_width=Inches(6.2))
     Y2 = CONTENT_Y + Inches(2.15)
     H2 = Inches(3.3)
     add_panel(slide, MARGIN, Y2, COL_W, H2,
-              "Factor de Idealidad Térmico (a)", accent=ACCENT_GOLD)
+               "Factor de Idealidad Térmico (a)", accent=ACCENT_GOLD)
     add_eq(slide, r"a=\frac{N_s\,n_I\,k\,T_c}{q}",
-           MARGIN + Inches(0.45), Y2 + Inches(0.75), Inches(0.62), max_width=Inches(3.2))
+            MARGIN + Inches(0.45), Y2 + Inches(0.75), Inches(0.62), max_width=Inches(3.2))
     add_text(slide, MARGIN + Inches(0.22), Y2 + Inches(1.7), COL_W - Inches(0.44), Inches(1.4),
-             "• N[_s_]: celdas en serie (m-Si: 36, HIT: 72).\n"
-             "• n[_I_]: factor de idealidad del diodo, acotado a [1, 2].",
-             size=13.5, color=ACCENT_GOLD, line_space=1.15)
+              "• N[_s_]: celdas en serie (m-Si: 36, HIT: 72).\n"
+              "• n[_I_]: factor de idealidad del diodo, acotado a [1, 2].",
+              size=16.5, color=ACCENT_GOLD, line_space=1.15)
     panel_with_body(slide, MARGIN + COL_W + GAP, Y2, COL_W, H2,
         "Glosario de Parámetros Físicos",
         "• I / V: corriente y voltaje de salida (A, V).\n"
@@ -1082,7 +1082,7 @@ def s_anexo4(slide, n):
         "• R[_s_] / R[_sh_]: resistencias parásitas serie y shunt (Ω).\n"
         "• k / q / T[_c_]: constante de Boltzmann, carga elemental y "
         "temperatura de celda (K).",
-        accent=ACCENT_BLUE, body_size=13.5)
+        accent=ACCENT_BLUE, body_size=16.5)
 
 
 def s_anexo5(slide, n):
@@ -1092,24 +1092,24 @@ def s_anexo5(slide, n):
               "Normalización de mediciones a SRC", accent=ACCENT_BLUE)
     add_text(slide, MARGIN + Inches(0.22), CONTENT_Y + Inches(0.6), COL_W - Inches(0.44), Inches(0.7),
              "Cada punto en la ventana 900–1100 W/m² se traslada a 1000 W/m² y 25 °C:",
-             size=12.5)
+             size=15.5)
     add_eq(slide, r"I_{sc}^{SRC}=I_{sc}\,\frac{1000}{G}+\alpha_{Isc}\,(25-T_c)",
            MARGIN + Inches(0.4), CONTENT_Y + Inches(1.3), Inches(0.55), max_width=Inches(5.4))
     add_eq(slide, r"V_{oc}^{SRC}=V_{oc}+\beta_{Voc}\,(25-T_c)",
            MARGIN + Inches(0.4), CONTENT_Y + Inches(2.05), Inches(0.55), max_width=Inches(5.4))
     add_text(slide, MARGIN + Inches(0.22), CONTENT_Y + Inches(2.85), COL_W - Inches(0.44), Inches(2.3),
-             "• β[_Voc_]: regresión lineal V[_oc_] vs T[_c_] (ventana 800–1200 W/m²).\n"
-             "• α[_Isc_]: la regresión resultó negativa → resguardo físico "
+             "• β[_Voc_] (medido): regresión lineal V[_oc_] vs T[_c_] (ventana 800–1200 W/m²).\n"
+             "• α[_Isc_] (literatura): la regresión resultó negativa → resguardo físico "
              "+0.05 %/°C de literatura.\n"
              "• Promedios de la ventana → I[_sc,ref_], V[_oc,ref_], I[_mp,ref_], "
              "V[_mp,ref_].",
-             size=13.5, color=ACCENT_GOLD, line_space=1.2)
+             size=15.5, color=ACCENT_GOLD, line_space=1.2)
     X2 = MARGIN + COL_W + GAP
     add_panel(slide, X2, CONTENT_Y, COL_W, H,
               "Ajuste de los 5 parámetros (lo que ejecuta el código)", accent=ACCENT_GOLD)
     add_text(slide, X2 + Inches(0.22), CONTENT_Y + Inches(0.6), COL_W - Inches(0.44), Inches(0.65),
              "`scipy.optimize.minimize` sobre el residuo cuadrático de las 3 condiciones "
-             "del SDM en SRC:", size=12.5)
+             "del SDM en SRC:", size=15.5)
     add_eq(slide, r"\min_{I_L,I_0,a,R_s,R_{sh}}\;e_{V_{oc}}^2+e_{I_{sc}}^2+e_{MPP}^2",
            X2 + Inches(0.45), CONTENT_Y + Inches(1.35), Inches(0.6), max_width=Inches(5.2))
     add_text(slide, X2 + Inches(0.22), CONTENT_Y + Inches(2.25), COL_W - Inches(0.44), Inches(2.9),
@@ -1123,7 +1123,7 @@ def s_anexo5(slide, n):
              "I[_0,0_] = I[_sc_]·exp(−V[_oc_]/a₀).\n"
              "Sistema de 3 ecuaciones y 5 incógnitas: la unicidad la aportan los "
              "bounds + inicialización, no una derivada analítica.",
-             size=12, color=ACCENT_GOLD, line_space=1.18)
+             size=15, color=ACCENT_GOLD, line_space=1.18)
 
 
 def s_anexo6(slide, n):
@@ -1131,51 +1131,51 @@ def s_anexo6(slide, n):
     H = Inches(5.45)
     add_panel(slide, MARGIN, CONTENT_Y, COL_W, H,
               "Corrientes y Factor de Idealidad", accent=ACCENT_BLUE)
-    add_text(slide, MARGIN + Inches(0.22), CONTENT_Y + Inches(0.58), COL_W - Inches(0.44), Inches(0.35),
-             "1. Corriente fotogenerada (I[_L_]):", size=12.5)
+    add_text(slide, MARGIN + Inches(0.22), CONTENT_Y + Inches(0.72), COL_W - Inches(0.44), Inches(0.35),
+             "1. Corriente fotogenerada (I[_L_]):", size=15.5)
     add_eq(slide, r"I_L=\frac{S}{S_{ref}}\left[I_{L,ref}+\alpha_{Isc}(T_c-T_{ref})\right]",
-           MARGIN + Inches(0.4), CONTENT_Y + Inches(1.0), Inches(0.55), max_width=Inches(5.3))
-    add_text(slide, MARGIN + Inches(0.22), CONTENT_Y + Inches(1.75), COL_W - Inches(0.44), Inches(0.35),
-             "2. Corriente de saturación inversa (I[_0_]):", size=12.5)
+           MARGIN + Inches(0.4), CONTENT_Y + Inches(1.10), Inches(0.55), max_width=Inches(5.3))
+    add_text(slide, MARGIN + Inches(0.22), CONTENT_Y + Inches(1.85), COL_W - Inches(0.44), Inches(0.35),
+             "2. Corriente de saturación inversa (I[_0_]):", size=15.5)
     add_eq(slide,
            r"\frac{I_0}{I_{0,ref}}=\left(\frac{T_c}{T_{ref}}\right)^3\exp\left[\frac{E_{g,ref}}{k\,T_{ref}}-\frac{E_g}{k\,T_c}\right]",
-           MARGIN + Inches(0.4), CONTENT_Y + Inches(2.18), Inches(0.65), max_width=Inches(5.3))
-    add_text(slide, MARGIN + Inches(0.22), CONTENT_Y + Inches(3.05), COL_W - Inches(0.44), Inches(0.35),
-             "3. Factor de idealidad térmico (a):", size=12.5)
+           MARGIN + Inches(0.4), CONTENT_Y + Inches(2.28), Inches(0.65), max_width=Inches(5.3))
+    add_text(slide, MARGIN + Inches(0.22), CONTENT_Y + Inches(3.15), COL_W - Inches(0.44), Inches(0.35),
+             "3. Factor de idealidad térmico (a):", size=15.5)
     add_eq(slide, r"\frac{a}{a_{ref}}=\frac{T_c}{T_{ref}}",
-           MARGIN + Inches(0.4), CONTENT_Y + Inches(3.5), Inches(0.55), max_width=Inches(3.0))
+           MARGIN + Inches(0.4), CONTENT_Y + Inches(3.60), Inches(0.55), max_width=Inches(3.0))
     X2 = MARGIN + COL_W + GAP
     add_panel(slide, X2, CONTENT_Y, COL_W, H,
               "Resistencias y Energía de Bandgap", accent=ACCENT_GOLD)
-    add_text(slide, X2 + Inches(0.22), CONTENT_Y + Inches(0.58), COL_W - Inches(0.44), Inches(0.35),
-             "4. Resistencia shunt (R[_sh_]):", size=12.5)
+    add_text(slide, X2 + Inches(0.22), CONTENT_Y + Inches(0.72), COL_W - Inches(0.44), Inches(0.35),
+             "4. Resistencia shunt (R[_sh_]):", size=15.5)
     add_eq(slide, r"R_{sh}=R_{sh,ref}\left(\frac{S_{ref}}{S}\right)",
-           X2 + Inches(0.4), CONTENT_Y + Inches(1.0), Inches(0.6), max_width=Inches(4.0))
-    add_text(slide, X2 + Inches(0.22), CONTENT_Y + Inches(1.8), COL_W - Inches(0.44), Inches(0.35),
-             "5. Energía de bandgap del Silicio (E[_g_]):", size=12.5)
+           X2 + Inches(0.4), CONTENT_Y + Inches(1.10), Inches(0.6), max_width=Inches(4.0))
+    add_text(slide, X2 + Inches(0.22), CONTENT_Y + Inches(1.90), COL_W - Inches(0.44), Inches(0.35),
+             "5. Energía de bandgap del Silicio (E[_g_]):", size=15.5)
     add_eq(slide, r"\frac{E_g}{E_{g,ref}}=1-0.0002677\,(T_c-T_{ref})",
-           X2 + Inches(0.4), CONTENT_Y + Inches(2.2), Inches(0.55), max_width=Inches(4.8))
-    add_text(slide, X2 + Inches(0.22), CONTENT_Y + Inches(3.05), COL_W - Inches(0.44), Inches(2.2),
+           X2 + Inches(0.4), CONTENT_Y + Inches(2.30), Inches(0.55), max_width=Inches(4.8))
+    add_text(slide, X2 + Inches(0.22), CONTENT_Y + Inches(3.15), COL_W - Inches(0.44), Inches(2.2),
              "Suposiciones físicas justificadas:\n"
              "• R[_s_] constante: R[_s_] = R[_s,ref_] (validación NIST < 2 %).\n"
              "• R[_sh_] ∝ 1/S: empírica, dominante a baja irradiancia.\n"
              "• E[_g,ref_] = 1.121 eV para Silicio a 25 °C.\n"
              "• S = G[_poa_] (sin corrección espectral — Anexo II).\n"
              "Implementado por `pvlib.pvsystem.calcparams_desoto`.",
-             size=13.5, color=ACCENT_GOLD, line_space=1.2)
+             size=15.5, color=ACCENT_GOLD, line_space=1.2)
 
 
 def s_anexo7(slide, n):
     add_title(slide, "Anexo VII: Ecuaciones para el Cálculo del Performance Ratio")
     add_panel(slide, MARGIN, CONTENT_Y, SLIDE_W - 2 * MARGIN, Inches(1.95),
               "Ecuación de Rendimiento Global del PR (IEC 61724-1)", accent=ACCENT_BLUE)
-    add_text(slide, MARGIN + Inches(0.22), CONTENT_Y + Inches(0.58),
+    add_text(slide, MARGIN + Inches(0.22), CONTENT_Y + Inches(0.72),
              SLIDE_W - 2 * MARGIN - Inches(0.5), Inches(0.4),
              "Eficiencia neta del sistema frente a su comportamiento ideal en condiciones estándar:",
-             size=13)
+             size=16)
     add_eq(slide,
            r"PR=\sum_{t=1}^{N} P_{mp,t}(G_t,T_{c,t})\;/\;\sum_{t=1}^{N} P_{STC}\cdot\frac{G_{poa,t}}{G_{ref}}",
-           Inches(3.9), CONTENT_Y + Inches(1.02), Inches(0.78), max_width=Inches(6.0))
+           Inches(3.9), CONTENT_Y + Inches(1.05), Inches(0.78), max_width=Inches(6.0))
     Y2 = CONTENT_Y + Inches(2.15)
     H2 = Inches(3.3)
     panel_with_body(slide, MARGIN, Y2, COL_W, H2,
@@ -1185,7 +1185,7 @@ def s_anexo7(slide, n):
         "25 °C — m-Si: 50.17 W · HIT: 236.72 W (criterio consistente).\n"
         "• G[_poa,t_]: irradiancia instantánea en el plano del panel (W/m²).\n"
         "• G[_ref_]: irradiancia de referencia STC (1000 W/m²).",
-        accent=ACCENT_GOLD, body_size=13.5)
+        accent=ACCENT_GOLD, body_size=16.5)
     panel_with_body(slide, MARGIN + COL_W + GAP, Y2, COL_W, H2,
         "Pérdidas penalizadas por el PR",
         "• **Térmicas:** caídas por elevada T[_c_] — dominantes en Atacama.\n"
@@ -1193,7 +1193,7 @@ def s_anexo7(slide, n):
         "• **De bajo G:** comportamiento no lineal a baja irradiancia (R[_sh_]).\n"
         "• NO penaliza pérdidas ópticas/espectrales (no modeladas) ni de "
         "planta (cableado, inversor, soiling).",
-        accent=ACCENT_BLUE, body_size=13.5)
+        accent=ACCENT_BLUE, body_size=16.5)
 
 
 def s_anexo8(slide, n):
@@ -1204,13 +1204,13 @@ def s_anexo8(slide, n):
         "• `Time Stamp` (hora local estándar, paso 5 min) — col. 0.\n"
         "• Metadatos (líneas 1–2): módulo, ciudad, estado, zona horaria, "
         "latitud, longitud, altitud, tilt, azimut.",
-        accent=ACCENT_BLUE, body_size=13)
+        accent=ACCENT_BLUE, body_size=16.5)
     panel_with_body(slide, MARGIN, CONTENT_Y + H1 + Inches(0.25), COL_W, H1,
         "Eléctricas (usadas → índices fijos)",
         "• `Isc` (5), `Pmp` (7), `Imp` (9), `Vmp` (11), `Voc` (13) — cada una "
         "con su columna de incertidumbre (%).\n"
         "• `FF` (15) y cola de n pares (I, V) crudos — descartadas en la ingesta.",
-        accent=ACCENT_GREEN, body_size=13)
+        accent=ACCENT_GREEN, body_size=16.5)
     X2 = MARGIN + COL_W + GAP
     panel_with_body(slide, X2, CONTENT_Y, COL_W, H1,
         "Meteorológicas (usadas → índices fijos)",
@@ -1218,14 +1218,14 @@ def s_anexo8(slide, n):
         "• `DNI` (27), `GHI` (30), `DHI` (33) — c/u con incertidumbre y "
         "desviación estándar de muestras de 1 s.\n"
         "• `POA CMP22` (1): referencia para verificación del recurso.",
-        accent=ACCENT_GREEN, body_size=13)
+        accent=ACCENT_GREEN, body_size=16.5)
     panel_with_body(slide, X2, CONTENT_Y + H1 + Inches(0.25), COL_W, H1,
         "Calidad y operación (no usadas)",
         "• `Solar QA residual`: cierre Direct·cos(z) + Difusa − Global.\n"
         "• `PV module soiling derate`, lluvia acumulada, humedad relativa, "
         "T dorso del módulo, T gabinete MT5, horarios de mantenimiento "
         "(`99:99` = sin mantención) y n.º de pares I-V.",
-        accent=ACCENT_ORANGE, body_size=13)
+        accent=ACCENT_ORANGE, body_size=16.5)
 
 
 BUILDERS = {
