@@ -494,14 +494,14 @@ def s_marco(slide, n):
 
 
 def s_pipeline(slide, n):
-    add_title(slide, "Procedimiento: Arquitectura del Pipeline de Simulación (Fases 0–7)")
-    full_width_image(slide, IMG['pipeline'], max_w=11.5, top_in=1.30, max_bottom=5.20)
+    add_title(slide, "Procedimiento: Arquitectura del Pipeline de Simulación (Fases 0–4)")
+    full_width_image(slide, IMG['pipeline'], max_w=12.5, top_in=1.30, max_bottom=5.50)
     add_caption(slide,
-        "**Flujo lógico de la simulación:** El proceso inicia con la exploración y emulación "
+        "**Flujo lógico de la simulación (Fases 0-4):** El proceso inicia con la exploración y emulación "
         "estacional de los datos (Fases 0-1) para adaptarlos al hemisferio sur. Luego, se limpia y calcula "
         "el recurso solar efectivo (Fase 2) y se extraen los parámetros físicos de los módulos (Fase 3). "
-        "Finalmente, se realiza la simulación horaria (Fase 4) para graficar, documentar y exportar los resultados (Fases 5-7).",
-        top_in=5.30, h_in=1.70, accent=ACCENT_GOLD)
+        "Finalmente, se realiza la simulación horaria dinámica (Fase 4) para obtener las series temporales de potencia y PR.",
+        top_in=5.60, h_in=1.30, accent=ACCENT_GOLD)
 
 
 def s_basedatos(slide, n):
@@ -562,25 +562,25 @@ def s_basedatos_vars(slide, n):
 
 def s_estructura(slide, n):
     add_title(slide, "Procedimiento: Anatomía del Archivo CSV y Decisiones de Ingesta")
-    full_width_image(slide, IMG['estructura'], max_w=11.5, top_in=1.20, max_bottom=5.20)
+    full_width_image(slide, IMG['estructura'], max_w=12.5, top_in=1.25, max_bottom=5.50)
     add_caption(slide,
         "**Estructura y lectura de datos:** Los archivos originales del NREL contienen una cabecera de metadatos "
         "y registros cada 5 minutos. Dado que cada fila incluye las curvas eléctricas crudas completas, su tamaño "
         "es variable y pesado (~110 MB). Para optimizar la memoria, el código lee el archivo en flujo (streaming) "
         "e indexa únicamente las 11 variables meteorológicas y eléctricas necesarias, descartando el resto al vuelo.",
-        top_in=5.30, h_in=1.70, accent=ACCENT_BLUE)
+        top_in=5.60, h_in=1.30, accent=ACCENT_BLUE)
 
 
 def s_ingesta(slide, n):
     add_title(slide, "Procedimiento: Ingesta y Limpieza de la Base de Datos")
-    full_width_image(slide, IMG['ingesta_limpieza'], max_w=11.5, top_in=1.20, max_bottom=5.20)
+    full_width_image(slide, IMG['ingesta_limpieza'], max_w=12.5, top_in=1.20, max_bottom=5.20)
     add_caption(slide,
         "**Proceso de ingesta y depuración:** El gran volumen de datos (~110 MB por archivo) y el ancho de fila "
         "variable debido a la cola de curvas I-V impiden el uso de métodos convencionales como `pandas.read_csv`. "
         "El pipeline implementa un lector en flujo (streaming) nativo que indexa selectivamente solo las 11 variables útiles. "
         "Posteriormente, se reemplazan los valores centinela `-9999` por `NaN`, se descartan filas nulas y se recortan "
         "irradiancias negativas, logrando un 97.0 % (m-Si) y 97.2 % (HIT) de registros útiles para el modelado.",
-        top_in=5.30, h_in=1.75, accent=ACCENT_GOLD, size=17.0)
+        top_in=5.30, h_in=1.60, accent=ACCENT_GOLD, size=17.0)
 
 
 def s_embudo(slide, n):
@@ -653,30 +653,27 @@ def s_poa_notas(slide, n):
               "CMP22", "Piranómetro de referencia\nclase A (alta precisión)", accent=ACCENT_ORANGE)
     
     # Paneles de Notas
-    Y2 = CONTENT_Y + Inches(1.75)
-    H2 = Inches(3.65)
+    Y2 = CONTENT_Y + Inches(1.68)
+    H2 = Inches(3.92)
     panel_with_body(slide, MARGIN, Y2, COL_W, H2,
         "Análisis de Consistencia de Datos",
-        "• **Superposición de mediciones:** Las curvas de irradiancia diaria de "
-        "los 11 archivos se superponen con exactitud, confirmando la consistencia "
-        "del instrumental experimental.\n\n"
-        "• **Rango temporal:** Campaña desde el **21 de enero de 2011** hasta el "
+        "• **Superposición de mediciones:** Las curvas de irradiancia diaria se "
+        "superponen con exactitud, confirmando la consistencia instrumental.\n\n"
+        "• **Rango temporal:** Campaña desde el **21 de enero de 2011** al "
         "**4 de marzo de 2012**.\n\n"
-        "• **Tratamiento:** Se calcula la mediana diaria suavizada con una ventana "
-        "de 7 días por cada archivo para aislar ruidos y nubes transitorias.",
-        accent=ACCENT_BLUE, body_size=17.5, line_space=1.12)
+        "• **Tratamiento:** Mediana diaria suavizada (ventana 7 días) por archivo "
+        "para aislar ruidos y nubes transitorias.",
+        accent=ACCENT_BLUE, body_size=15.0, line_space=1.12)
     
     panel_with_body(slide, MARGIN + COL_W + GAP, Y2, COL_W, H2,
         "Propósito del Control de Calidad",
-        "• **Validación previa:** El objetivo es validar la homogeneidad física "
-        "de la radiación medida **antes** de procesar la emulación geográfica y "
-        "el modelado de celdas.\n\n"
-        "• **Evidencia de soiling y mantenimiento:** La perfecta coincidencia de "
-        "las curvas demuestra que no hay desviaciones locales significativas en "
-        "los sensores de referencia.\n\n"
-        "• **Alineación de sensores:** Se asegura que la irradiancia incidente en "
-        "los 11 planos de módulo sea idéntica para una comparación tecnológica justa.",
-        accent=ACCENT_GOLD, body_size=17.5, line_space=1.12)
+        "• **Validación previa:** Confirmar la homogeneidad física de la radiación "
+        "**antes** de la emulación geográfica y el modelado.\n\n"
+        "• **Soiling y mantenimiento:** La coincidencia de curvas demuestra que "
+        "no hay desviaciones locales significativas en los sensores de referencia.\n\n"
+        "• **Alineación de sensores:** Garantizar que la irradiancia incidente en "
+        "los 11 planos sea idéntica para una comparación justa.",
+        accent=ACCENT_GOLD, body_size=15.0, line_space=1.12)
 
 
 def s_f2_flujo(slide, n):
