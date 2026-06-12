@@ -17,6 +17,8 @@ data/**/*.csv
 
 # Caché de Tiempo de Ejecución (regenerables automáticamente)
 output/temp_latex/
+temp/
+output/Fase1_Resultados/Datos_Fase2_*.csv
 
 # Previsualizaciones de Slides (regenerables con fase7_export_slides.py)
 output/slide_preview_final/

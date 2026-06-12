@@ -98,11 +98,11 @@ def simular_desempeno(module_name, params, df):
     # Comparación P_medida vs P_teorica (Scatter)
     plt.figure(figsize=(10, 7.5))
     scatter_color = '#E8A838' if module_name == 'HIT' else '#007ACC'
-    plt.scatter(df['pmp'], df['pmp_teorica'], alpha=0.08, s=3, color=scatter_color, label='Datos Minutales')
+    plt.scatter(df['pmp'], df['pmp_teorica'], alpha=0.08, s=3, color=scatter_color, label='Registros 5-min')
     plt.plot([0, df['pmp'].max()], [0, df['pmp'].max()], 'r--', linewidth=2, label='1:1 Relación')
-    # plt.title(f'Validación Potencia: Medida vs Simulada - {module_name}', fontsize=12, fontweight='bold', pad=15)
-    plt.xlabel('Pmp Medida (Florida) [W]', fontsize=16, labelpad=10)
-    plt.ylabel('Pmp Simulada (Atacama) [W]', fontsize=16, labelpad=10)
+    # Misma meteorología en ambos ejes: valida el modelo eléctrico, no compara sitios.
+    plt.xlabel('Pmp medida por trazador NREL [W]', fontsize=16, labelpad=10)
+    plt.ylabel('Pmp simulada SDM ajustado [W]', fontsize=16, labelpad=10)
     plt.xticks(fontsize=13)
     plt.yticks(fontsize=13)
     plt.grid(True, linestyle=':', alpha=0.5)

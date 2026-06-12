@@ -133,6 +133,7 @@ if __name__ == "__main__":
             df = pd.read_csv(path)
             res[mod] = extraer_parametros_src(df, mod)
             
+    os.makedirs('temp', exist_ok=True)
     with open('temp/parametros_desoto.json', 'w') as f:
         json.dump(res, f, indent=4)
     print("\nParámetros guardados en temp/parametros_desoto.json")

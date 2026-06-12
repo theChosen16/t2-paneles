@@ -91,3 +91,17 @@
 - **Archivos de salida:** `output/Presentacion_Final_ELI556_Atacama.pptx`
 - **Trazabilidad:** Todo el proceso, desde el filtrado de datos crudos hasta la exportación de la presentación, está documentado y automatizado.
 - **Veredicto:** El proyecto demuestra con rigor numérico que la tecnología **HIT** es la opción óptima para el despliegue fotovoltaico en el Desierto de Atacama en 2026.
+
+---
+
+## Fase 6 (revisión final): Reestructura del deck para la defensa de 20 minutos
+
+### Decisiones - Reestructura
+
+1. **24 láminas presentadas + 13 anexos** (antes 28+8): fusiones basedatos+variables, estructura→ingesta (caption), emulación impl.+límite, POA medida+notas, veredicto+economía; las láminas desplazadas pasaron a Anexos IX–XIII. Guion total: **19.4 min**.
+2. **Láminas nuevas:** "Un día despejado de verano" (28-ene-2026, puente divulgativo dato→física) y "Mapa de cumplimiento Tarea 2" (requisito → método → lámina de evidencia → resultado).
+3. **Corrección de coherencia código↔deck:** la tabla de parámetros ahora muestra los valores reales de `temp/parametros_desoto.json` (Rs ≈ 0.01 Ω y Rsh ≈ 1000 Ω anclados a la inicialización, nI = 1.20 en ambas tecnologías) y se usa como evidencia del mal condicionamiento Rs–n.
+4. **Gráficos regenerados:** scatter de validación sin ejes "Florida vs Atacama" (fase4), perfil de día típico con hora local correcta (bug tz-aware de matplotlib en fase5: dibujaba en UTC, +4 h) y día despejado 28-ene, y POA CMP22 en español con leyenda por familia (`scratch/gen_poa_cmp22.py`).
+5. **Notas del expositor embebidas** en el PPTX con presupuesto de tiempo acumulado por lámina + `docs/guion_presentacion.md` con guion, mapa de anexos y respuestas preparadas.
+6. **Guard anti-desbordes** en `fase6` (`_check_overflow`): estima la altura del texto y avisa con `[OVERFLOW]` al generar; deck actual con cero avisos y verificación visual de las 37 láminas exportadas.
+7. **Bug corregido (A15):** `fase3` crea `temp/` antes de escribir el JSON.

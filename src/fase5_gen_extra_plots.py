@@ -86,11 +86,15 @@ def gen_extra_results():
     plt.close()
     
     # --- GRÁFICO 2: Perfil de un Día Despejado ---
-    df_msi['time'] = pd.to_datetime(df_msi['time'])
+    df_msi['time'] = pd.to_datetime(df_msi['time'], utc=True)
+    # Volver a hora local de Atacama (UTC-4) y quitar tz: matplotlib grafica
+    # los timestamps tz-aware en UTC, corriendo el mediodía solar +4 h.
+    df_msi['time'] = df_msi['time'].dt.tz_convert('Etc/GMT+4').dt.tz_localize(None)
     df_msi = df_msi.sort_values('time')
     
-    # Elegir un día representativo (ej: 15 de Febrero)
-    dia_ejemplo = df_msi[(df_msi['time'].dt.month == 2) & (df_msi['time'].dt.day == 15)].copy()
+    # Día despejado representativo del verano emulado (28 de enero de 2026:
+    # POA ~990 W/m² con la mínima variabilidad nubosa del periodo estival)
+    dia_ejemplo = df_msi[(df_msi['time'].dt.month == 1) & (df_msi['time'].dt.day == 28)].copy()
     
     if not dia_ejemplo.empty:
         fig, ax1 = plt.subplots(figsize=(14, 6.7))
@@ -99,7 +103,7 @@ def gen_extra_results():
         ax1.plot(dia_ejemplo['time'], dia_ejemplo['poa_global'], color='#E8A838', label='Irradiancia POA', linewidth=2.5)
         ax2.plot(dia_ejemplo['time'], dia_ejemplo['temp_cell'], color='#FF4C4C', label='Temp. Celda', linewidth=2.5, alpha=0.8)
         
-        ax1.set_xlabel('Hora del Día (15 Feb 2026)', fontsize=12)
+        ax1.set_xlabel('Hora del Día (28 Ene 2026, hora local Atacama)', fontsize=12)
         ax1.set_ylabel('Irradiancia (W/m2)', color='#E8A838', fontsize=12, fontweight='bold')
         ax2.set_ylabel('Temperatura (°C)', color='#FF4C4C', fontsize=12, fontweight='bold')
         ax1.tick_params(axis='y', labelcolor='#E8A838')
