@@ -62,7 +62,7 @@ filebox(ax, xs[0], Y1, BW, BH, "Base datos original\n11 CSV NREL\n(~1.2 GB)", ed
 box(ax, xs[1], Y1, BW, BH, "FASE 0 · Exploración", ["fase0_setup.py", "Inspección bases pvlib.", "Selección: mSi/HIT"], edge=C_ORANGE, fs_title=18.0, fs_body=14.0, lw=3.2)
 box(ax, xs[2], Y1, BW, BH, "FASE 1 · Emulación", ["fase1_filtro_emulacion.py", "Metadatos + desfase 6m", "y proyección al 2026"], edge=C_ORANGE, fs_title=18.0, fs_body=14.0, lw=3.2)
 filebox(ax, xs[3], Y1, BW, BH, "data/Atacama_2026\n2 CSV emulados", edge=C_ORANGE, fs=14.5)
-box(ax, xs[4], Y1, BW, BH, "FASE 2 · Recurso Solar", ["fase2_recurso_solar.py", "Streaming + limpieza.", "POA (Perez) y Tc (SAPM)"], edge=C_CYAN, fs_title=18.0, fs_body=14.0, lw=2.0)
+box(ax, xs[4], Y1, BW, BH, "FASE 2 · Recurso Solar", ["fase2_recurso_solar.py", "POA Perez + IAM + espectral", "y Tc (SAPM)"], edge=C_CYAN, fs_title=18.0, fs_body=14.0, lw=2.0)
 
 # Row 2: Files and Phases (Right to Left)
 filebox(ax, xs[4], Y2, BW, BH, "Datos_Fase2_{mod}.csv\n(POA + Tc limpios)", edge=C_CYAN, fs=14.5)

@@ -443,7 +443,7 @@ def s_intro(slide, n):
         "• **Calentamiento severo:** las celdas operan sobre 65 °C al mediodía "
         "solar de verano (máx. simulado: 73.3 °C en HIT).\n\n"
         "• **Degradación térmica:** la potencia máxima y el voltaje de circuito "
-        "abierto caen al subir la temperatura de celda (T[_c_], máx. simulado 73.3 °C).\n\n"
+        "abierto caen al subir la temperatura de celda (T[_c_]).\n\n"
         "• **Objetivo:** modelar registro a registro (cadencia 5 min) qué "
         "tecnología — **m-Si** o **HIT** — resiste mejor el estrés térmico "
         "desértico durante 2026, y traducirlo a PR anual.",
@@ -575,7 +575,7 @@ def s_anexo9(slide, n):
 
 def s_ingesta(slide, n):
     add_title(slide, "Procedimiento: Ingesta y Limpieza de la Base de Datos")
-    full_width_image(slide, IMG['ingesta_limpieza'], max_w=12.5, top_in=1.20, max_bottom=5.20)
+    full_width_image(slide, IMG['ingesta_limpieza'], max_w=12.5, top_in=1.70, max_bottom=5.20)
     add_caption(slide,
         "**Proceso de ingesta y depuración:** Cada fila del CSV mezcla 43 columnas fijas con una cola de pares I-V "
         "de largo variable y sentinelas `-9999` — anatomía detallada en %s —, lo que impide `pandas.read_csv` directo. "
@@ -680,8 +680,9 @@ def s_anexo11(slide, n):
         "superponen con exactitud, confirmando la consistencia instrumental.\n\n"
         "• **Rango temporal:** Campaña desde el **21 de enero de 2011** al "
         "**4 de marzo de 2012**.\n\n"
-        "• **Tratamiento:** Mediana diaria suavizada (ventana 7 días) por archivo "
-        "para aislar ruidos y nubes transitorias.",
+        "• **Tratamiento:** Mediana diaria (descartando días parciales con <40 "
+        "registros) suavizada a 7 días por archivo, para aislar ruidos, nubes "
+        "transitorias y caídas del datalogger.",
         accent=ACCENT_BLUE, body_size=15.0, line_space=1.12)
     
     panel_with_body(slide, MARGIN + COL_W + GAP, Y2, COL_W, H2,
@@ -1046,8 +1047,10 @@ def s_referencias(slide, n):
         '5. Holmgren, W.F., Hansen, C.W., Mikofski, M.A. (2018). "pvlib python: '
         'a python package for modeling solar energy systems." JOSS 3(29), 884.\n\n'
         '6. IEC 61724-1 — Photovoltaic system performance, Part 1: Monitoring.\n\n'
+        '7. PVGIS — Photovoltaic Geographical Information System, Joint Research '
+        'Centre (Comisión Europea), base SARAH — recurso TMY de Atacama (Fase 8).\n\n'
         'Agradecimientos al Departamento de Electrotecnia de la UTFSM.',
-        accent=ACCENT_ORANGE, body_size=15.5, line_space=1.08)
+        accent=ACCENT_ORANGE, body_size=14.5, line_space=1.05)
 
 
 def s_anexo_tools(slide, n):
@@ -1292,7 +1295,8 @@ def s_anexo6(slide, n):
              "Suposiciones físicas justificadas:\n"
              "• R[_s_] constante: R[_s_] = R[_s,ref_] (validación NIST < 2 %).\n"
              "• R[_sh_] ∝ 1/S: empírica, dominante a baja irradiancia.\n"
-             "• E[_g,ref_] = 1.121 eV (Si, 25 °C); S = G[_poa_] (Anexo II).\n"
+             "• E[_g,ref_] = 1.121 eV (Si); S = irradiancia efectiva = "
+             "G[_poa_]·IAM·M (Anexo II).\n"
              "Implementado por `pvlib.pvsystem.calcparams_desoto`.",
              size=15.5, color=ACCENT_GOLD, line_space=1.12)
 
@@ -1322,10 +1326,11 @@ def s_anexo7(slide, n):
         "Pérdidas penalizadas por el PR",
         "• **Térmicas:** caídas por elevada T[_c_] — dominantes en Atacama.\n"
         "• **Óhmicas:** pérdidas resistivas en R[_s_].\n"
-        "• **De bajo G:** comportamiento no lineal a baja irradiancia (R[_sh_]).\n"
-        "• NO penaliza pérdidas ópticas/espectrales (no modeladas) ni de "
-        "planta (cableado, inversor, soiling).",
-        accent=ACCENT_BLUE, body_size=18.0)
+        "• **De bajo G:** no linealidad a baja irradiancia (R[_sh_]).\n"
+        "• **Ópticas/espectrales:** ahora penalizadas vía la irradiancia "
+        "efectiva (IAM + factor espectral, ≈3 % en Atacama).\n"
+        "• NO penaliza pérdidas de planta (cableado, inversor, soiling).",
+        accent=ACCENT_BLUE, body_size=16.0)
 
 
 def s_anexo8(slide, n):
@@ -1347,15 +1352,16 @@ def s_anexo8(slide, n):
     X2 = MARGIN + COL_W + GAP
     panel_with_body(slide, X2, CONTENT_Y, COL_W, H1,
         "Meteorológicas (usadas → índices fijos)",
-        "• `Dry bulb temperature` (20), `Atmospheric pressure` (24).\n"
-        "• `DNI` (27), `GHI` (30), `DHI` (33) — c/u con incertidumbre y desv. "
-        "estándar de muestras de 1 s.\n"
-        "• `POA CMP22` (1): referencia para verificar el recurso.",
+        "• `Dry bulb temperature` (20), `Relative humidity` (22), "
+        "`Atmospheric pressure` (24).\n"
+        "• `DNI` (27), `GHI` (30), `DHI` (33) — c/u con incertidumbre.\n"
+        "• `POA CMP22` (1): referencia para verificar el recurso. "
+        "Humedad+T+presión → factor espectral.",
         accent=ACCENT_GREEN, body_size=15.5)
     panel_with_body(slide, X2, CONTENT_Y + H1 + Inches(0.25), COL_W, H1,
         "Calidad y operación (no usadas)",
         "• `Solar QA residual`: cierre Direct·cos(z) + Difusa − Global.\n"
-        "• `PV module soiling derate`, lluvia, humedad relativa, T dorso, "
+        "• `PV module soiling derate`, lluvia, T dorso, "
         "T gabinete MT5, horarios de mantención (`99:99` = sin mantención) y "
         "n.º de pares I-V.",
         accent=ACCENT_ORANGE, body_size=15.5)

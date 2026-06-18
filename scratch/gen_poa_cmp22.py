@@ -72,8 +72,13 @@ def main():
         for nombre in archivos:
             s = leer_poa(os.path.join(BASE, nombre))
             total_validos += len(s)
-            diaria = s.resample('D').median()
-            suave = diaria.rolling(7, center=True, min_periods=1).mean()
+            # Mediana diaria descartando días PARCIALES (logger caído / pocas
+            # muestras): si un día tiene <40 registros, su mediana no representa
+            # el día completo (p. ej. solo amanecer) y produce picos espurios.
+            g = s.resample('D')
+            diaria = g.median().where(g.count() >= 40)
+            # min_periods=2 evita dibujar un único día aislado a través de huecos.
+            suave = diaria.rolling(7, center=True, min_periods=2).mean()
             suaves.append(suave)
             ax.plot(suave.index, suave.values, color=color, linewidth=1.3, alpha=0.75)
             print(f"  {nombre}: {len(s):,} registros válidos")
