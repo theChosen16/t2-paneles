@@ -492,9 +492,10 @@ def s_marco(slide, n):
         f"con cielo difuso anisotrópico. {A('anexo1')}\n\n"
         "• **Escalamiento De Soto (2006):** traslada los 5 parámetros desde STC a "
         f"condiciones operacionales vía bandgap. {A('anexo6')}\n\n"
-        "• **Modificadores ópticos APLICADOS:** IAM físico de Snell-Bouguer y "
-        f"factor espectral por masa de aire [King et al., 2004] — ejecutados en la "
-        f"Fase 2 sobre la POA. {A('anexo2')}",
+        "• **Modificadores ópticos APLICADOS:** descuentan la luz que se "
+        "refleja en el vidrio cuando el sol llega muy inclinado (IAM) y la "
+        "corrigen según el espectro solar; aplicados en la Fase 2 — fórmulas y "
+        f"parámetros en {A('anexo2')}.",
         accent=ACCENT_BLUE, body_size=15.0, line_space=1.05)
     
     left_panel_x = MARGIN + COL_W + GAP
@@ -914,7 +915,7 @@ def s_anexo13(slide, n):
         stat_tile(slide, MARGIN + i * (TW + Inches(0.3)), CONTENT_Y,
                   TW, Inches(1.5), v, l, accent=c)
     Y2 = CONTENT_Y + Inches(1.75)
-    H2 = Inches(3.70)
+    H2 = Inches(3.90)
     panel_with_body(slide, MARGIN, Y2, COL_W, H2,
         "Supuestos explícitos del cálculo",
         "• **Recurso REAL (no escalado):** PVGIS TMY de San Pedro de Atacama, "
@@ -922,7 +923,7 @@ def s_anexo13(slide, n):
         "• ΔPR +1.17 pts (HIT 84.99 %% vs m-Si 83.82 %%) → Δyield 33 kWh/kWp·año.\n\n"
         "• 33 kWh/kWp × 100,000 kWp = **+3,294 MWh/año**.\n\n"
         "• Precio de venta ≈ 45 USD/MWh → **+USD 148k/año**." % REF['recurso_real'],
-        accent=ACCENT_GOLD, body_size=16.5)
+        accent=ACCENT_GOLD, body_size=15.5)
     panel_with_body(slide, MARGIN + COL_W + GAP, Y2, COL_W, H2,
         "Conclusión de diseño",
         "• La prima CAPEX de los módulos HIT se **amortiza** por su mayor yield "
@@ -932,7 +933,7 @@ def s_anexo13(slide, n):
         "térmico que favorece a HIT.\n\n"
         "• Aun así HIT gana en PR, energía y facturación en ambos escenarios de "
         "recurso (emulado y real).",
-        accent=ACCENT_GREEN, body_size=16.5)
+        accent=ACCENT_GREEN, body_size=15.5)
 
 
 def s_cumplimiento(slide, n):
@@ -968,9 +969,9 @@ def s_cumplimiento(slide, n):
          "Declarados + limitaciones"],
     ]
     add_table(slide, MARGIN + Inches(0.25), CONTENT_Y + Inches(0.60),
-              SLIDE_W - 2 * MARGIN - Inches(0.5), Inches(4.85),
+              SLIDE_W - 2 * MARGIN - Inches(0.5), Inches(4.55),
               headers, rows, col_ratios=[2.3, 2.4, 1.5, 1.7],
-              fs_head=15.0, fs_body=13.5)
+              fs_head=14.0, fs_body=12.5)
 
 
 def s_limitaciones(slide, n):
@@ -1055,42 +1056,44 @@ def s_referencias(slide, n):
 
 def s_anexo_tools(slide, n):
     add_title(slide, "Anexo · Librerías y Herramientas de Código Utilizadas")
-    H1 = Inches(2.62)
+    H_top = Inches(2.40)
+    H_bot = Inches(2.98)
     gap_v = Inches(0.22)
+    Y_bot = CONTENT_Y + H_top + gap_v
     X2 = MARGIN + COL_W + GAP
-    panel_with_body(slide, MARGIN, CONTENT_Y, COL_W, H1,
+    panel_with_body(slide, MARGIN, CONTENT_Y, COL_W, H_top,
         "Lenguaje y núcleo científico",
         "• **Python 3.12** en entorno virtual (`venv`).\n"
-        "• **pvlib 0.15** — modelado fotovoltaico (transposición, IAM, espectral, "
-        "térmico, modelo de diodo, lectura PVGIS).\n"
+        "• **pvlib 0.15** — modelado fotovoltaico (transposición, IAM, "
+        "espectral, térmico, diodo, lectura PVGIS).\n"
         "• **NumPy 2.4** — cálculo numérico vectorizado.\n"
         "• **pandas 3.0** — series temporales, `resample`, limpieza.\n"
-        "• **SciPy** — `optimize.minimize`/`fsolve` (ajuste de 5 parámetros).",
-        accent=ACCENT_BLUE, body_size=14.0, line_space=1.06)
-    panel_with_body(slide, MARGIN, CONTENT_Y + H1 + gap_v, COL_W, H1,
+        "• **SciPy** — `optimize.minimize`/`fsolve` (5 parámetros).",
+        accent=ACCENT_BLUE, body_size=13.0, line_space=1.05)
+    panel_with_body(slide, MARGIN, Y_bot, COL_W, H_bot,
         "Funciones pvlib utilizadas (por fase)",
-        "• `irradiance.get_total_irradiance` (Perez), `aoi`, `get_extra_radiation`.\n"
-        "• `iam.physical` + `iam.marion_diffuse` (IAM directo y difuso).\n"
-        "• `spectrum.spectral_factor_firstsolar`, `atmosphere.gueymard94_pw` + airmass.\n"
-        "• `temperature.sapm_cell` (modelo térmico Sandia).\n"
-        "• `pvsystem.calcparams_desoto` · `singlediode` · `i_from_v` (Lambert W).\n"
-        "• `iotools.get_pvgis_tmy` · `location.Location`.",
-        accent=ACCENT_GOLD, body_size=14.0, line_space=1.06)
-    panel_with_body(slide, X2, CONTENT_Y, COL_W, H1,
+        "• `get_total_irradiance` (Perez), `aoi`, `get_extra_radiation`.\n"
+        "• `iam.physical` + `iam.marion_diffuse` (directo y difuso).\n"
+        "• `spectral_factor_firstsolar` + `gueymard94_pw` (espectral).\n"
+        "• `temperature.sapm_cell` (térmico Sandia).\n"
+        "• `calcparams_desoto`, `singlediode`, `i_from_v` (Lambert W).\n"
+        "• `iotools.get_pvgis_tmy`, `location.Location`.",
+        accent=ACCENT_GOLD, body_size=13.0, line_space=1.05)
+    panel_with_body(slide, X2, CONTENT_Y, COL_W, H_top,
         "Visualización y generación de entregables",
         "• **Matplotlib** — gráficos (modo oscuro, `mathtext` para ecuaciones).\n"
         "• **python-pptx** — generación automática del archivo PPTX.\n"
         "• **Pillow (PIL)** — recorte e inserción de imágenes y ecuaciones.\n"
         "• **pywin32** (`win32com`) — exporta cada lámina a PNG vía PowerPoint.",
-        accent=ACCENT_GREEN, body_size=14.0, line_space=1.06)
-    panel_with_body(slide, X2, CONTENT_Y + H1 + gap_v, COL_W, H1,
+        accent=ACCENT_GREEN, body_size=13.0, line_space=1.05)
+    panel_with_body(slide, X2, Y_bot, COL_W, H_bot,
         "Utilidades y datos externos",
         "• **python-dateutil** (`relativedelta`) — desfase estacional de +6 meses.\n"
         "• **stdlib:** `csv`, `json`, `os`, `re`, `datetime`, `hashlib`, `math`.\n"
         "• **Dataset NREL Cocoa** — mediciones experimentales (11 módulos).\n"
         "• **PVGIS TMY** (JRC, Comisión Europea, base SARAH) — recurso real de "
         "Atacama (Fase 8).",
-        accent=ACCENT_ORANGE, body_size=14.0, line_space=1.06)
+        accent=ACCENT_ORANGE, body_size=13.0, line_space=1.05)
 
 
 def s_anexo1(slide, n):
@@ -1368,25 +1371,25 @@ def s_anexo8(slide, n):
 
 
 def s_optica(slide, n):
-    add_title(slide, "Procedimiento: Modificadores Ópticos APLICADOS — IAM y Espectral (Fase 2)")
+    add_title(slide, "Procedimiento: Modificadores Ópticos (IAM y Espectral)")
     full_width_image(slide, IMG['optica'], max_w=12.2, top_in=1.28, max_bottom=5.15)
     add_caption(slide,
-        "**Pérdidas ópticas y espectrales ahora ejecutadas en el pipeline:** sobre la POA de Perez (albedo "
-        "**0.20**) se aplica el **IAM físico** de Snell-Bouguer (`pvlib.iam.physical`, n=1.526, K=4 m⁻¹, L=2 mm) "
-        "a la directa y los factores de Marion a la difusa, y el **factor espectral** First Solar "
-        "(`spectral_factor_firstsolar`, agua precipitable + masa de aire). El resultado es la **irradiancia "
-        "efectiva** que fotogenera I[_L_] en la Fase 4. Efecto en Atacama: pérdida óptica ≈ **3.0 %%** "
-        "(ángulos rasantes) y espectral ≈ **neutra** (cielo seco y limpio) — ecuaciones en %s." % A('anexo2'),
+        "**¿Qué hacen?** Sobre la POA de Perez (albedo **0.20**) se descuentan dos pérdidas reales: el "
+        "**IAM** quita la luz que se refleja en el vidrio cuando el sol llega muy inclinado (ángulos "
+        "rasantes), y el **factor espectral** ajusta según el color de la luz solar. El resultado es la "
+        "**irradiancia efectiva** que realmente genera corriente en la Fase 4. Efecto en Atacama: pérdida "
+        "óptica ≈ **3.0 %%** y espectral ≈ **neutra** (cielo seco y limpio). Ecuaciones, constantes y "
+        "funciones `pvlib` en %s." % A('anexo2'),
         top_in=5.25, h_in=1.75, accent=ACCENT_GOLD, size=15.5)
 
 
 def s_recurso_real(slide, n):
-    add_title(slide, "Resultado: Recurso REAL de Atacama (PVGIS TMY) — Magnitudes Absolutas")
+    add_title(slide, "Resultado: Recurso REAL de Atacama (PVGIS TMY)")
     TW = (COL_W - Inches(0.4)) / 2
     stat_tile(slide, MARGIN, CONTENT_Y, TW, Inches(1.5),
               "2,596", "GHI real anual del sitio\n(kWh/m²·año, PVGIS TMY)", accent=ACCENT_BLUE)
     stat_tile(slide, MARGIN + TW + Inches(0.4), CONTENT_Y, TW, Inches(1.5),
-              "2,810", "POA en plano inclinado\n(kWh/m²·año, albedo 0.20)", accent=ACCENT_GOLD)
+              "2,810", "POA en plano inclinado\n(kWh/m²·año)", accent=ACCENT_GOLD)
     stat_tile(slide, MARGIN, CONTENT_Y + Inches(1.70), TW, Inches(1.5),
               "2,389", "Yield HIT\n(kWh/kWp·año)", accent=ACCENT_GOLD)
     stat_tile(slide, MARGIN + TW + Inches(0.4), CONTENT_Y + Inches(1.70), TW, Inches(1.5),
