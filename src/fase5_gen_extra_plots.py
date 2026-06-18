@@ -170,7 +170,42 @@ def gen_extra_results():
     plt.savefig(os.path.join(output_dir, 'degradacion_termica_scatter.png'), transparent=True, dpi=150, bbox_inches='tight')
     plt.close()
 
-    print(f"Ciclo 3: Gráficos reconstruidos (IV Curves, Perfil, PR Comparativo y Degradación corregidos en Dark Mode y Transparentes).")
+    # --- GRÁFICO 5: Modificadores Ópticos APLICADOS (IAM y espectral) ---
+    # Panel izq: respuesta angular K_τα(θ) del modelo físico (Snell-Bouguer).
+    # Panel der: factor espectral M vs masa de aire para distintos PW (agua
+    # precipitable), evaluado con el modelo First Solar de pvlib.
+    fig, (axL, axR) = plt.subplots(1, 2, figsize=(14.7, 6.2))
+
+    aoi = np.linspace(0, 90, 181)
+    iam = pvlib.iam.physical(aoi, n=1.526, K=4.0, L=0.002)
+    axL.plot(aoi, iam, color='#00D2FF', linewidth=3.5, label=r'$K_{\tau\alpha}(\theta)$ (físico)')
+    axL.axvspan(0, 60, color='#2ECC71', alpha=0.10, label='Rango operativo típico (<60°)')
+    for ang in (60, 75, 85):
+        axL.scatter([ang], [float(pvlib.iam.physical(ang))], s=55, color='#FF5E3A', zorder=5, edgecolor='white')
+        axL.annotate(f'{float(pvlib.iam.physical(ang)):.2f}', (ang, float(pvlib.iam.physical(ang))),
+                     textcoords='offset points', xytext=(-6, 10), color='#FF5E3A', fontsize=11, fontweight='bold')
+    axL.set_title('Modificador por ángulo de incidencia (IAM)', fontsize=14, fontweight='bold', pad=12)
+    axL.set_xlabel('Ángulo de incidencia θ (°)', fontsize=12)
+    axL.set_ylabel(r'$K_{\tau\alpha}=\tau(\theta)/\tau(0)$', fontsize=12)
+    axL.set_xlim(0, 90); axL.set_ylim(0, 1.05)
+    axL.grid(True, linestyle=':', alpha=0.5); axL.legend(fontsize=11, loc='lower left')
+
+    am = np.linspace(1, 5, 100)
+    for pw, c in [(0.5, '#E8A838'), (1.0, '#00D2FF'), (2.0, '#FF5E3A')]:
+        M = pvlib.spectrum.spectral_factor_firstsolar(np.full_like(am, pw), am, module_type='monosi')
+        axR.plot(am, M, linewidth=3, color=c, label=f'PW = {pw:.1f} cm')
+    axR.axhline(1.0, color='#9AA5B1', linestyle='--', linewidth=1.2, alpha=0.7)
+    axR.set_title('Factor espectral M (First Solar, c-Si)', fontsize=14, fontweight='bold', pad=12)
+    axR.set_xlabel('Masa de aire absoluta AM', fontsize=12)
+    axR.set_ylabel('M (corrección espectral)', fontsize=12)
+    axR.set_ylim(0.92, 1.06)
+    axR.grid(True, linestyle=':', alpha=0.5); axR.legend(fontsize=11, title='Agua precipitable')
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, 'modificadores_opticos.png'), transparent=True, dpi=150, bbox_inches='tight')
+    plt.close()
+
+    print("Gráficos reconstruidos (IV Curves, Perfil, PR Comparativo, Degradación y Modificadores ópticos IAM/AM).")
 
 if __name__ == "__main__":
     gen_extra_results()

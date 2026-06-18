@@ -43,11 +43,16 @@ def simular_desempeno(module_name, params, df):
     
     T_ref = 25 + 273.15
     Tc_k = df['temp_cell'] + 273.15
+    # El denominador del PR (IEC 61724-1) usa la irradiancia de banda ancha en
+    # el plano del arreglo (poa_global). La FOTOGENERACIÓN de corriente (I_L),
+    # en cambio, responde a la irradiancia EFECTIVA = POA · IAM · M (Fase 2):
+    # así el PR captura también las pérdidas óptica y espectral recién añadidas.
     G_ratio = df['poa_global'] / 1000
-    
+    G_efectiva = df['poa_effective'] if 'poa_effective' in df.columns else df['poa_global']
+
     # pvlib.pvsystem.calcparams_desoto hace esto automáticamente
     IL, Io, Rs, Rsh, a = pvlib.pvsystem.calcparams_desoto(
-        df['poa_global'],
+        G_efectiva,
         df['temp_cell'],
         alpha_sc=alpha_isc,
         a_ref=a_ref,
@@ -115,13 +120,22 @@ def simular_desempeno(module_name, params, df):
     
     pr_anual = df['pmp_teorica'].sum() / df['p_ideal_stc'].sum()
     print(f"Performance Ratio Anual: {pr_anual:.4f}")
-    
+
+    # Energía y yield específico integrando con el paso real de 5 minutos.
+    DT_HOURS = 5.0 / 60.0
+    energia_dc = df['pmp_teorica'].sum() * DT_HOURS / 1000.0      # kWh/panel·año
+    yield_esp = energia_dc / (p_stc_val / 1000.0)                 # kWh/kWp·año
+    poa_anual = df['poa_global'].sum() * DT_HOURS / 1000.0        # kWh/m²·año
+    print(f"P_STC (SDM): {p_stc_val:.2f} W | Energía DC anual: {energia_dc:.1f} kWh/panel | "
+          f"Yield: {yield_esp:.0f} kWh/kWp | POA anual: {poa_anual:.0f} kWh/m²")
+
     # GUARDAR RESULTADOS DETALLADOS
     res_path = os.path.join(output_dir, f'Simulacion_{module_name}_Atacama.csv')
     df.to_csv(res_path)
     print(f"Resultados guardados en: {res_path}")
-    
-    return pr_anual
+
+    return {'pr_anual': pr_anual, 'p_stc': p_stc_val, 'energia_dc': energia_dc,
+            'yield': yield_esp, 'poa_anual': poa_anual}
 
 if __name__ == "__main__":
     with open('temp/parametros_desoto.json', 'r') as f:

@@ -5,8 +5,10 @@ FASE 6 — Generador de la presentación final ELI556 Tarea 2 (rediseño v2).
 Narrativa centrada en el TRATAMIENTO DE DATOS y el FLUJO DE LOS CÓDIGOS:
 - Lámina dedicada a la base de datos original NREL Cocoa y a la anatomía del CSV.
 - Diagramas de flujo reales por fase (generados por scratch/gen_diagramas_flujo.py).
-- Contenido alineado 1:1 con lo que el código ejecuta (sin IAM/AM, albedo 0.25,
-  cadencia 5 min, ajuste por minimize+bounds, α_Isc por fallback, etc.).
+- Contenido alineado 1:1 con lo que el código ejecuta (IAM físico + factor
+  espectral aplicados, albedo 0.20, ventana de 12 meses sin doble cobertura,
+  energía integrada a 5 min, track de recurso real PVGIS, ajuste por
+  minimize+bounds, α_Isc por fallback, etc.).
 - Numeración de láminas y referencias cruzadas a anexos calculadas automáticamente.
 
 Salida: output/Presentacion_Final_ELI556_Atacama_POA_Tarea2_revisado.pptx
@@ -57,6 +59,9 @@ IMG = {
     'perfil_dia': 'output/Extra_Resultados/perfil_dia_tipico.png',
     'temp_hist':  'output/Fase1_Resultados/temp_hist_HIT.png',
     'val_scatter':'output/Fase2_Resultados/val_scatter_HIT.png',
+    'optica':     'output/Extra_Resultados/modificadores_opticos.png',
+    'pr_real':    'output/Extra_Resultados/pr_mensual_atacama_real.png',
+    'yield_real': 'output/Extra_Resultados/yield_atacama_real.png',
 }
 
 # ============================================================
@@ -66,8 +71,8 @@ ORDER = [
     'portada', 'intro', 'justificacion', 'marco',
     'pipeline', 'datos', 'ingesta', 'embudo',
     'emu_concepto', 'emu_impl', 'poa_medida',
-    'f2_flujo', 'dia_tipico', 'f3_flujo', 'f3_result', 'f4_flujo',
-    'validacion', 'rs_n', 'perdidas_pr', 'veredicto_eco',
+    'f2_flujo', 'optica', 'dia_tipico', 'f3_flujo', 'f3_result', 'f4_flujo',
+    'validacion', 'rs_n', 'perdidas_pr', 'veredicto_eco', 'recurso_real',
     'cumplimiento', 'limitaciones', 'conclusiones', 'referencias',
     'anexo1', 'anexo2', 'anexo3', 'anexo4', 'anexo5', 'anexo6', 'anexo7', 'anexo8',
     'anexo9', 'anexo10', 'anexo11', 'anexo12', 'anexo13',
@@ -79,11 +84,13 @@ SECTION = {  # (etiqueta kicker, color de sección)
     'datos': ('DATOS', ACCENT_GOLD), 'ingesta': ('DATOS', ACCENT_GOLD),
     'embudo': ('DATOS', ACCENT_GOLD), 'emu_concepto': ('EMULACIÓN', ACCENT_ORANGE),
     'emu_impl': ('EMULACIÓN', ACCENT_ORANGE), 'poa_medida': ('EMULACIÓN', ACCENT_ORANGE),
-    'f2_flujo': ('MODELADO', ACCENT_GOLD), 'dia_tipico': ('MODELADO', ACCENT_GOLD),
+    'f2_flujo': ('MODELADO', ACCENT_GOLD), 'optica': ('MODELADO', ACCENT_GOLD),
+    'dia_tipico': ('MODELADO', ACCENT_GOLD),
     'f3_flujo': ('MODELADO', ACCENT_GOLD), 'f3_result': ('MODELADO', ACCENT_GOLD),
     'f4_flujo': ('MODELADO', ACCENT_GOLD),
     'validacion': ('RESULTADOS', ACCENT_GREEN), 'rs_n': ('RESULTADOS', ACCENT_GREEN),
     'perdidas_pr': ('RESULTADOS', ACCENT_GREEN), 'veredicto_eco': ('RESULTADOS', ACCENT_GREEN),
+    'recurso_real': ('RESULTADOS', ACCENT_GREEN),
     'cumplimiento': ('SÍNTESIS', ACCENT_GREEN), 'limitaciones': ('CIERRE', ACCENT_ORANGE),
     'conclusiones': ('CIERRE', ACCENT_ORANGE), 'referencias': ('CIERRE', ACCENT_ORANGE),
 }
@@ -433,9 +440,9 @@ def s_intro(slide, n):
     panel_with_body(slide, MARGIN + COL_W + GAP, CONTENT_Y, COL_W, H,
         "El Desafío: Estrés Térmico de Operación",
         "• **Calentamiento severo:** las celdas operan sobre 65 °C al mediodía "
-        "solar de verano (máx. simulado: 73.4 °C en HIT).\n\n"
+        "solar de verano (máx. simulado: 73.3 °C en HIT).\n\n"
         "• **Degradación térmica:** la potencia máxima y el voltaje de circuito "
-        "abierto caen al subir la temperatura de celda (T[_c_]).\n\n"
+        "abierto caen al subir la temperatura de celda (T[_c_], máx. simulado 73.3 °C).\n\n"
         "• **Objetivo:** modelar registro a registro (cadencia 5 min) qué "
         "tecnología — **m-Si** o **HIT** — resiste mejor el estrés térmico "
         "desértico durante 2026, y traducirlo a PR anual.",
@@ -484,9 +491,9 @@ def s_marco(slide, n):
         f"con cielo difuso anisotrópico. {A('anexo1')}\n\n"
         "• **Escalamiento De Soto (2006):** traslada los 5 parámetros desde STC a "
         f"condiciones operacionales vía bandgap. {A('anexo6')}\n\n"
-        "• **Marco revisado NO aplicado:** modificadores ópticos IAM y espectral "
-        f"AM [King et al., 2004] — se documentan en {A('anexo2')} y quedan como "
-        "trabajo futuro.",
+        "• **Modificadores ópticos APLICADOS:** IAM físico de Snell-Bouguer y "
+        f"factor espectral por masa de aire [King et al., 2004] — ejecutados en la "
+        f"Fase 2 sobre la POA. {A('anexo2')}",
         accent=ACCENT_BLUE, body_size=15.0, line_space=1.05)
     
     left_panel_x = MARGIN + COL_W + GAP
@@ -573,7 +580,7 @@ def s_ingesta(slide, n):
         "de largo variable y sentinelas `-9999` — anatomía detallada en %s —, lo que impide `pandas.read_csv` directo. "
         "El pipeline implementa un lector en flujo (streaming) que indexa solo las 11 variables útiles; luego "
         "reemplaza `-9999` por `NaN`, descarta filas nulas y recorta irradiancias negativas, conservando "
-        "**97.0 %% (m-Si) y 97.2 %% (HIT)** de registros útiles para el modelado." % A('anexo9'),
+        "**95.8 %% (m-Si) y 96.1 %% (HIT)** de la ventana de 12 meses para el modelado." % A('anexo9'),
         top_in=5.30, h_in=1.60, accent=ACCENT_GOLD, size=16.5)
 
 
@@ -623,8 +630,9 @@ def s_emu_impl(slide, n):
     add_caption(slide,
         "**Proceso de emulación temporal:** el código reescribe el sitio en los metadatos (lat −22.91°, "
         "2,400 m, tilt 22.9°, azimut 0° N) y aplica un desfase de +6 meses a las fechas, proyectando el año a "
-        "2026: verano e invierno coinciden con el hemisferio sur **sin alterar los valores físicos medidos** "
-        "— contraste climático completo en %s." % A('anexo10'),
+        "2026 **sin alterar los valores físicos medidos**. Se conserva solo la **primera ventana de 12 meses** "
+        "[ene-2011, ene-2012): así cada mes se cubre una vez y se elimina la doble cobertura de jul–sep "
+        "— contraste climático en %s." % A('anexo10'),
         top_in=5.00, h_in=1.18, accent=ACCENT_GOLD, size=15.5)
     add_caption(slide,
         "**Límite explícito del método:** se alinean estaciones y geometría solar; las **magnitudes medidas** "
@@ -691,9 +699,10 @@ def s_f2_flujo(slide, n):
     full_width_image(slide, IMG['f2'], max_w=11.5, top_in=1.35, max_bottom=5.20)
     add_caption(slide,
         "**Estimación de la radiación y temperatura:** Tras filtrar y limpiar los registros nulos, "
-        "el código utiliza el modelo difuso de Perez para transponer las irradiancias al plano inclinado (POA). "
-        "Luego, con el modelo de Sandia (SAPM) y asumiendo una velocidad de viento fija de 1 m/s (peor caso de ventilación), "
-        "se estima la temperatura interna de operación de las celdas para cada tecnología (m-Si y HIT).",
+        "el código transpone las irradiancias al plano inclinado (POA) con el modelo difuso de Perez "
+        "(albedo **0.20**). Sobre esa POA se aplican los modificadores ópticos IAM y espectral (lámina "
+        "siguiente). Luego, con el modelo de Sandia (SAPM) y viento fijo de 1 m/s (peor caso de ventilación), "
+        "se estima la temperatura de celda de cada tecnología (m-Si y HIT).",
         top_in=5.30, h_in=1.70, accent=ACCENT_ORANGE)
 
 
@@ -703,7 +712,7 @@ def s_dia_tipico(slide, n):
     add_caption(slide,
         "**El puente entre el dato y la física:** la temperatura de celda sigue fielmente a la irradiancia: al "
         "mediodía la POA roza los **1,000 W/m²** y la celda supera los **60 °C** — 35 °C sobre la condición "
-        "nominal STC. En los días extremos del año la celda llega a **70–73 °C** y HIT acumula 461 registros "
+        "nominal STC. En los días extremos del año la celda llega a **70–73 °C** y HIT acumula 430 registros "
         "sobre 65 °C — distribución en %s. Cada grado extra recorta la potencia útil; cuantificar ese recorte "
         "por tecnología es el objetivo de la sección Resultados." % A('anexo12'),
         top_in=5.45, h_in=1.55, accent=ACCENT_ORANGE, size=15.5)
@@ -727,16 +736,16 @@ def s_f3_result(slide, n):
               "Parámetros nominales ajustados (SRC)", accent=ACCENT_GOLD)
     headers = ["Parámetro", "m-Si (mSi0166)", "HIT (HIT05667)"]
     rows = [
-        ["I[_L,ref_] (A)", "2.769", "5.607"],
-        ["I[_0,ref_] (A)", "4.14 × 10^−9^", "4.68 × 10^−10^"],
+        ["I[_L,ref_] (A)", "2.770", "5.620"],
+        ["I[_0,ref_] (A)", "4.22 × 10^−9^", "4.42 × 10^−10^"],
         ["a[_ref_] (V) → n[_I_]", "1.110 → 1.20", "2.220 → 1.20"],
         ["R[_s,ref_] (Ω)", "0.010 (≈ inicial)", "0.010 (≈ inicial)"],
         ["R[_sh,ref_] (Ω)", "1,000 (≈ inicial)", "1,000 (≈ inicial)"],
         ["N[_s_] (celdas serie)", "36", "72"],
         ["α[_Isc_] (%/°C)", "+0.05 (resguardo)", "+0.05 (resguardo)"],
-        ["β[_Voc_] (%/°C)", "−0.30 (medido)", "−0.21 (medido)"],
-        ["I[_sc,ref_] / V[_oc,ref_]", "2.77 A / 22.5 V", "5.61 A / 51.5 V"],
-        ["P[_STC_] del SDM (W)", "50.17", "236.72"],
+        ["β[_Voc_] (%/°C)", "−0.30 (medido)", "−0.22 (medido)"],
+        ["I[_sc,ref_] / V[_oc,ref_]", "2.77 A / 22.5 V", "5.62 A / 51.6 V"],
+        ["P[_STC_] del SDM (W)", "50.12", "237.96"],
     ]
     add_table(slide, MARGIN + Inches(0.2), CONTENT_Y + Inches(0.62),
               W1 - Inches(0.4), Inches(4.7), headers, rows,
@@ -779,7 +788,7 @@ def s_anexo12(slide, n):
     panel_with_body(slide, X2, CONTENT_Y, W2, Inches(1.55),
         "Picos Térmicos Extremos",
         "**65–73 °C de operación recurrente** al mediodía solar de verano "
-        "(HIT: 461 registros sobre 65 °C).",
+        "(HIT: 430 registros sobre 65 °C).",
         accent=ACCENT_ORANGE, body_size=16.5)
     panel_with_body(slide, X2, CONTENT_Y + Inches(1.75), W2, Inches(3.75),
         "Análisis Crítico de Resultados",
@@ -802,7 +811,7 @@ def s_validacion(slide, n):
     W2 = SLIDE_W - X2 - MARGIN
     panel_with_body(slide, X2, CONTENT_Y, W2, Inches(1.55),
         "Precisión del Modelo de 5 Parámetros",
-        "**R² ≈ 0.99**  |  RMSE ≈ 3 % de P[_STC_] (1.5 W m-Si · 6.7 W HIT).",
+        "**R² ≈ 0.99**  |  RMSE ≈ 3 % de P[_STC_] (1.4 W m-Si · 6.5 W HIT).",
         accent=ACCENT_BLUE, body_size=17.5)
     panel_with_body(slide, X2, CONTENT_Y + Inches(1.75), W2, Inches(3.75),
         "¿Qué valida exactamente este gráfico?",
@@ -873,18 +882,19 @@ def s_veredicto_eco(slide, n):
     add_title(slide, "d) Veredicto Técnico: Performance Ratio y Lectura Económica")
     TW = (COL_W - Inches(0.4)) / 2
     stat_tile(slide, MARGIN, CONTENT_Y, TW, Inches(1.5),
-              "86.92 %", "PR anual HIT\n(mensual 84.9–89.4 %)", accent=ACCENT_GOLD)
+              "84.18 %", "PR anual HIT\n(mensual 81.6–88.2 %)", accent=ACCENT_GOLD)
     stat_tile(slide, MARGIN + TW + Inches(0.4), CONTENT_Y, TW, Inches(1.5),
-              "84.53 %", "PR anual m-Si\n(mensual 82.0–88.0 %)", accent=ACCENT_BLUE)
+              "81.61 %", "PR anual m-Si\n(mensual 78.7–86.9 %)", accent=ACCENT_BLUE)
     stat_tile(slide, MARGIN, CONTENT_Y + Inches(1.70), COL_W, Inches(1.50),
-              "+2.39 puntos", "ventaja neta de HIT en PR anual 2026", accent=ACCENT_GREEN)
-    panel_with_body(slide, MARGIN, CONTENT_Y + Inches(3.40), COL_W, Inches(2.05),
-        "Lectura técnica y económica (100 MWp)",
-        "• El menor coeficiente térmico de HIT (−0.26 vs −0.40 %%/°C) protege "
-        "la potencia al mediodía desértico.\n"
-        "• +2.39 pts ≈ **+6,000 MWh y +USD 270k/año** (recurso escalado); "
-        "~3,300 MWh sin escalar — supuestos en %s." % A('anexo13'),
-        accent=ACCENT_GOLD, body_size=14.0, line_space=1.05)
+              "+2.57 puntos", "ventaja neta de HIT en PR (track validado, R² 0.99)", accent=ACCENT_GREEN)
+    panel_with_body(slide, MARGIN, CONTENT_Y + Inches(3.35), COL_W, Inches(2.10),
+        "Lectura técnica (recurso emulado, validado)",
+        "• Menor coeficiente térmico de HIT (−0.26 vs −0.40 %%/°C): protege la "
+        "potencia al mediodía.\n"
+        "• El PR ya penaliza la pérdida óptica (≈3 %%) y espectral.\n"
+        "• Economía con recurso real (Lám. %d): **+3,294 MWh, +USD 148k/año** "
+        "en 100 MWp." % REF['recurso_real'],
+        accent=ACCENT_GOLD, body_size=13.5, line_space=1.04)
     X2 = MARGIN + COL_W + GAP
     add_panel(slide, X2, CONTENT_Y, COL_W, Inches(5.45),
               "PR mensual comparativo (2026)", accent=ACCENT_BLUE)
@@ -893,11 +903,11 @@ def s_veredicto_eco(slide, n):
 
 
 def s_anexo13(slide, n):
-    add_title(slide, "Anexo XIII: Lectura Económica Detallada (Planta de 100 MWp)")
+    add_title(slide, "Anexo XIII: Lectura Económica con Recurso REAL (Planta de 100 MWp)")
     TW = (SLIDE_W - 2 * MARGIN - 2 * Inches(0.3)) / 3
-    tiles = [("~6,000 MWh", "energía adicional anual de HIT\n(recurso escalado a Atacama)", ACCENT_GOLD),
-             ("+USD 270k", "facturación neta anual extra\n(a 45 USD/MWh)", ACCENT_GREEN),
-             ("~3,300 MWh", "escenario conservador con el\nrecurso simulado sin escalar", ACCENT_BLUE)]
+    tiles = [("+3,294 MWh", "energía adicional anual de HIT\n(recurso real Atacama, 100 MWp)", ACCENT_GOLD),
+             ("+USD 148k", "facturación neta anual extra\n(a 45 USD/MWh)", ACCENT_GREEN),
+             ("33 kWh/kWp", "diferencia de yield específico\nHIT − m-Si (PVGIS TMY)", ACCENT_BLUE)]
     for i, (v, l, c) in enumerate(tiles):
         stat_tile(slide, MARGIN + i * (TW + Inches(0.3)), CONTENT_Y,
                   TW, Inches(1.5), v, l, accent=c)
@@ -905,20 +915,22 @@ def s_anexo13(slide, n):
     H2 = Inches(3.70)
     panel_with_body(slide, MARGIN, Y2, COL_W, H2,
         "Supuestos explícitos del cálculo",
-        "• **Recurso escalado:** POA ≈ 2,500 kWh/m²·año en Atacama (el recurso "
-        "simulado conserva magnitudes de Florida: 1,363–1,422 kWh/m²·año).\n\n"
-        "• ΔPR +2.39 pts → ≈ +60 kWh/kWp·año → **~6,000 MWh** en 100 MWp.\n\n"
-        "• Precio de venta ≈ 45 USD/MWh → **~USD 270k/año**.",
-        accent=ACCENT_GOLD, body_size=18.0)
+        "• **Recurso REAL (no escalado):** PVGIS TMY de San Pedro de Atacama, "
+        "POA ≈ 2,810 kWh/m²·año (track de la Lám. %d).\n\n"
+        "• ΔPR +1.17 pts (HIT 84.99 %% vs m-Si 83.82 %%) → Δyield 33 kWh/kWp·año.\n\n"
+        "• 33 kWh/kWp × 100,000 kWp = **+3,294 MWh/año**.\n\n"
+        "• Precio de venta ≈ 45 USD/MWh → **+USD 148k/año**." % REF['recurso_real'],
+        accent=ACCENT_GOLD, body_size=16.5)
     panel_with_body(slide, MARGIN + COL_W + GAP, Y2, COL_W, H2,
         "Conclusión de diseño",
-        "• La prima CAPEX de los módulos HIT se **amortiza con holgura** en "
-        "plantas desérticas de alta irradiancia y temperatura.\n\n"
-        "• El beneficio crece con el recurso: a mayor POA real, mayor el valor "
-        "absoluto de cada punto de PR.\n\n"
-        "• Cifras conservadoras: sin escalar el recurso, ~3,300 MWh y "
-        "~USD 150k/año siguen favoreciendo a HIT.",
-        accent=ACCENT_GREEN, body_size=18.0)
+        "• La prima CAPEX de los módulos HIT se **amortiza** por su mayor yield "
+        "en el recurso desértico de clase mundial (≈2,370 kWh/kWp).\n\n"
+        "• La ventaja relativa de HIT es **menor** que en climas cálidos: el aire "
+        "de altura de Atacama enfría la celda (≈58–62 °C), reduciendo el castigo "
+        "térmico que favorece a HIT.\n\n"
+        "• Aun así HIT gana en PR, energía y facturación en ambos escenarios de "
+        "recurso (emulado y real).",
+        accent=ACCENT_GREEN, body_size=16.5)
 
 
 def s_cumplimiento(slide, n):
@@ -928,10 +940,10 @@ def s_cumplimiento(slide, n):
               accent=ACCENT_GREEN)
     headers = ["Requisito (pauta Tarea 2)", "Cómo se resolvió", "Evidencia", "Resultado clave"]
     rows = [
-        ["Recurso solar: transposición G[_poa_]",
-         "Perez vía `pvlib` (`get_total_irradiance`)",
-         "Lám. %d · Anexo I" % REF['f2_flujo'],
-         "POA 5-min, año 2026"],
+        ["Recurso solar: G[_poa_] + óptica",
+         "Perez + IAM físico + factor espectral",
+         "Lám. %d–%d · Anexos I–II" % (REF['f2_flujo'], REF['optica']),
+         "POA efectiva 5-min, 2026"],
         ["Perfil térmico T[_c_] — ec. (1)",
          "Sandia/SAPM, viento 1 m/s",
          "Lám. %d · Anexo III" % REF['dia_tipico'],
@@ -946,10 +958,10 @@ def s_cumplimiento(slide, n):
          "n[_I_] = 1.20; bounds activos"],
         ["PR anual 2026 — ec. (3)",
          "Σ P[_mp_] / Σ P[_STC_]·G/1000 (IEC 61724-1)",
-         "Lám. %d · Anexo VII" % REF['veredicto_eco'],
-         "HIT 86.92 % · m-Si 84.53 %"],
+         "Lám. %d, %d · Anexo VII" % (REF['veredicto_eco'], REF['recurso_real']),
+         "HIT 84.18 % · m-Si 81.61 %"],
         ["Supuestos propuestos y justificados",
-         "tilt 22.9° = lat · azimut 0° N · viento 1 m/s · albedo 0.25",
+         "tilt 22.9° = lat · azimut 0° N · viento 1 m/s · albedo 0.20",
          "Lám. %d y %d" % (REF['emu_impl'], REF['limitaciones']),
          "Declarados + limitaciones"],
     ]
@@ -963,31 +975,28 @@ def s_limitaciones(slide, n):
     add_title(slide, "d) Limitaciones del Estudio y Alcance de Validez")
     H = Inches(5.45)
     panel_with_body(slide, MARGIN, CONTENT_Y, COL_W, H,
-        "Limitaciones de los datos",
-        "• **Magnitudes de Florida:** la emulación alinea estaciones y geometría "
-        "solar, pero la irradiancia, temperatura y humedad conservan los valores "
-        "medidos en Cocoa (POA anual ≈ 1,400 kWh/m² vs ≳2,500 esperables en "
-        "Atacama). La comparación m-Si vs HIT es válida; los valores absolutos de "
-        "energía son conservadores.\n\n"
-        "• **Cobertura temporal:** cadencia 5 min, solo horas de sol; julio–"
-        "septiembre 2026 promedian dos veranos (2011 y 2012).\n\n"
-        "• **α[_Isc_] de literatura:** la regresión experimental falló (espectro/"
-        "estacionalidad) y se usó +0.05 %/°C — impacto menor: la corriente domina "
-        "por G, no por T.",
-        accent=ACCENT_ORANGE, body_size=17.5, line_space=1.05)
+        "Resuelto en esta versión",
+        "• **Modificadores ópticos APLICADOS:** IAM físico + factor espectral en "
+        "Fase 2 " + A('anexo2') + " (≈3 %% de pérdida óptica ya penalizada).\n\n"
+        "• **Recurso REAL de Atacama:** track con PVGIS TMY (Lám. %d) entrega "
+        "energía y economía absolutas (POA ≈ 2,810 kWh/m²·año).\n\n"
+        "• **Doble cobertura corregida:** ventana de 12 meses contiguos → cada mes "
+        "se cubre una sola vez (antes jul–sep duplicaban temporada).\n\n"
+        "• **Albedo declarado 0.20** y energía integrada al paso real de 5 min."
+        % REF['recurso_real'],
+        accent=ACCENT_GREEN, body_size=15.5, line_space=1.05)
     panel_with_body(slide, MARGIN + COL_W + GAP, CONTENT_Y, COL_W, H,
-        "Limitaciones del modelo",
-        "• **Sin pérdidas ópticas/espectrales:** IAM y corrección AM revisados "
-        "pero no aplicados " + A('anexo2') + " — su omisión sobreestima levemente "
-        "la energía en ángulos rasantes (amanecer/ocaso).\n\n"
-        "• **Albedo fijo 0.25** (default pvlib) y **viento fijo 1 m/s** — "
-        "escenario térmico conservador.\n\n"
-        "• **P[_STC_] del SDM** (50.2 / 236.7 W) difiere ~7–9 % del promedio "
-        "empírico medido (46.7 / 217.5 W): el denominador del PR usa el primero, "
-        "criterio consistente entre ambas tecnologías.\n\n"
-        "• **Sin soiling ni mismatch:** pérdidas de planta real no modeladas — el "
-        "PR aquí es un PR de módulo, no de planta.",
-        accent=ACCENT_BLUE, body_size=17.5, line_space=1.05)
+        "Limitaciones que permanecen",
+        "• **Validación eléctrica con datos de Florida:** el R² ≈ 0.99 se valida "
+        "contra mediciones de Cocoa; Atacama no tiene un módulo PV de referencia "
+        "medido, por lo que el track real usa TMY satelital (PVGIS), no in-situ.\n\n"
+        "• **α[_Isc_] de literatura:** la regresión experimental falló y se usó "
+        "+0.05 %/°C — impacto de segundo orden (la corriente la domina G).\n\n"
+        "• **P[_STC_] del SDM** (50.1 / 238.0 W) difiere ~7–9 % del promedio "
+        "empírico (46.7 / 218.4 W); criterio consistente entre tecnologías.\n\n"
+        "• **Sin soiling, BOS ni mismatch:** PR de módulo, no de planta; modelo "
+        "de un diodo.",
+        accent=ACCENT_BLUE, body_size=15.5, line_space=1.05)
 
 
 def s_conclusiones(slide, n):
@@ -999,24 +1008,23 @@ def s_conclusiones(slide, n):
         "(+6 meses, año 2026) mantuvo la coherencia de solsticios y permitió "
         "simular Atacama con datos experimentales reales.\n\n"
         "2. **Pipeline de datos robusto:** la ingesta en streaming resolvió "
-        "archivos irregulares de ~110 MB conservando el 97 % de los registros.\n\n"
-        "3. **Ajuste robusto:** el SDM de 5 parámetros reprodujo la potencia "
-        "medida con R² ≈ 0.99 y RMSE ≈ 3 % de P[_STC_].\n\n"
-        "4. **HIT vencedor:** +2.39 puntos de PR anual (86.92 % vs 84.53 %) por "
-        "su menor coeficiente térmico — superior para plantas desérticas.",
+        "archivos irregulares de ~110 MB conservando ~96 % de la ventana de 12 meses.\n\n"
+        "3. **Ajuste robusto:** el SDM de 5 parámetros, con IAM y corrección "
+        "espectral aplicados, reprodujo la potencia medida con R² ≈ 0.99.\n\n"
+        "4. **HIT vencedor:** +2.57 pts de PR validado (84.18 % vs 81.61 %); con "
+        "el recurso real de Atacama, +3,294 MWh y +USD 148k/año en 100 MWp.",
         accent=ACCENT_GOLD, body_size=16.0, line_space=1.05)
     panel_with_body(slide, MARGIN + COL_W + GAP, CONTENT_Y, COL_W, H,
         "Propuestas de Trabajos Futuros",
-        "• **Aplicar IAM y corrección espectral AM** ya documentados %s, "
-        "cerrando la brecha óptica del pipeline actual.\n\n"
-        "• **Escalar el recurso a magnitudes de Atacama** (TMY local o "
-        "Explorador Solar) manteniendo la validación eléctrica con datos NREL.\n\n"
-        "• **Bifacialidad:** aporte del albedo desértico (ρ > 0.25) en la cara "
-        "posterior.\n\n"
+        "• **Validación in-situ:** contrastar contra un módulo PV medido en "
+        "Atacama (estación de referencia), no solo TMY satelital.\n\n"
         "• **Soiling desértico:** acumulación de polvo, factor crítico de "
         "pérdida en Atacama.\n\n"
+        "• **Pérdidas de planta (BOS):** cableado, inversor y mismatch para pasar "
+        "de PR de módulo a PR de planta.\n\n"
+        "• **Bifacialidad:** aporte del albedo desértico en la cara posterior.\n\n"
         "• **Modelo de doble diodo:** capturar recombinación no ideal a baja "
-        "irradiancia." % A('anexo2'),
+        "irradiancia.",
         accent=ACCENT_BLUE, body_size=16.0, line_space=1.05)
 
 
@@ -1055,7 +1063,7 @@ def s_anexo1(slide, n):
              "Donde:\n"
              "• G[_b_] / G[_d_] / G: irradiancia directa, difusa y global (W/m²).\n"
              "• β: inclinación del panel = 22.91° (latitud del sitio).\n"
-             "• ρ: albedo = 0.25 (default `pvlib`, suelo genérico).\n"
+             "• ρ: albedo = 0.20 (suelo desértico, declarado explícitamente).\n"
              "• R[_beam_]: factor geométrico de transposición directa.\n"
              "• G[_d,perez_]: difusa anisotrópica de Perez (circumsolar +\n"
              "  brillo de horizonte), evaluada por `pvlib.get_total_irradiance`.",
@@ -1068,14 +1076,14 @@ def s_anexo1(slide, n):
         "• `irradiance.get_extra_radiation(times)` → irradiancia extraterrestre "
         "para el modelo anisotrópico.\n\n"
         "• `irradiance.get_total_irradiance(tilt, az, dni, ghi, dhi, ..., "
-        "model='perez')` → directa + difusa Perez + reflejada.\n\n"
-        "• Salida: `poa_global` con `clip(≥0)`, irradiancia efectiva del SDM "
-        "(sin modificadores ópticos — Anexo II).",
+        "albedo=0.20, model='perez')` → directa + difusa Perez + reflejada.\n\n"
+        "• Salida: `poa_global` (banda ancha) → entra a los modificadores "
+        "ópticos IAM y espectral del Anexo II para dar la irradiancia efectiva.",
         accent=ACCENT_GOLD, body_size=16.0)
 
 
 def s_anexo2(slide, n):
-    add_title(slide, "Anexo II: Marco NO Aplicado — Modificadores Ópticos (IAM y AM)")
+    add_title(slide, "Anexo II: Modificadores Ópticos APLICADOS (IAM y Espectral)")
     H = Inches(4.4)
     add_panel(slide, MARGIN, CONTENT_Y, COL_W, H,
               "Modificador por Ángulo de Incidencia (IAM)", accent=ACCENT_BLUE)
@@ -1098,14 +1106,15 @@ def s_anexo2(slide, n):
            r"AM=\frac{1}{\cos(\theta_z)+0.5057\,(96.08-\theta_z)^{-1.634}}",
            X2 + Inches(0.35), CONTENT_Y + Inches(1.6), Inches(0.65), max_width=Inches(5.6))
     add_text(slide, X2 + Inches(0.22), CONTENT_Y + Inches(2.7), COL_W - Inches(0.44), Inches(1.5),
-             "Corrige el desajuste espectral según la atmósfera atravesada; a[_0_]…a[_4_] son "
-             "coeficientes empíricos de cada celda [King et al., 2004].",
+             "Implementado con `pvlib.spectrum.spectral_factor_firstsolar` (agua precipitable de "
+             "humedad+T y masa de aire absoluta), módulo c-Si ('monosi').",
              size=16.5, color=ACCENT_GOLD, line_space=1.15)
     add_caption(slide,
-        "**Estado en este estudio:** ecuaciones revisadas en la literatura pero **no ejecutadas por el "
-        "pipeline** (la POA de Perez ingresa directa al SDM). Su incorporación es la primera propuesta de "
-        "trabajo futuro — la omisión sobreestima levemente la energía en ángulos de incidencia rasantes.",
-        top_in=5.80, h_in=1.30, accent=ACCENT_ORANGE)
+        "**Estado en este estudio: EJECUTADO en la Fase 2.** El IAM directo usa `pvlib.iam.physical` "
+        "(n=1.526, K=4, L=2 mm) y la difusa los factores de Marion; el factor espectral usa First Solar. "
+        "La irradiancia efectiva = POA·IAM·M alimenta el SDM. Efecto en Atacama: ≈3 % de pérdida óptica y "
+        "espectral casi neutra (cielo seco y limpio).",
+        top_in=5.80, h_in=1.30, accent=ACCENT_GREEN)
 
 
 def s_anexo3(slide, n):
@@ -1264,7 +1273,7 @@ def s_anexo7(slide, n):
         "Glosario de Variables",
         "• P[_mp,t_]: potencia MPP del SDM en el registro t (cadencia 5 min).\n"
         "• P[_STC_]: potencia nominal del **mismo SDM** evaluado a 1000 W/m² y "
-        "25 °C — m-Si: 50.17 W · HIT: 236.72 W (criterio consistente).\n"
+        "25 °C — m-Si: 50.1 W · HIT: 238.0 W (criterio consistente).\n"
         "• G[_poa,t_]: irradiancia instantánea en el plano del panel (W/m²).\n"
         "• G[_ref_]: irradiancia de referencia STC (1000 W/m²).",
         accent=ACCENT_GOLD, body_size=15.0)
@@ -1311,6 +1320,49 @@ def s_anexo8(slide, n):
         accent=ACCENT_ORANGE, body_size=15.5)
 
 
+def s_optica(slide, n):
+    add_title(slide, "Procedimiento: Modificadores Ópticos APLICADOS — IAM y Espectral (Fase 2)")
+    full_width_image(slide, IMG['optica'], max_w=12.2, top_in=1.28, max_bottom=5.15)
+    add_caption(slide,
+        "**Pérdidas ópticas y espectrales ahora ejecutadas en el pipeline:** sobre la POA de Perez (albedo "
+        "**0.20**) se aplica el **IAM físico** de Snell-Bouguer (`pvlib.iam.physical`, n=1.526, K=4 m⁻¹, L=2 mm) "
+        "a la directa y los factores de Marion a la difusa, y el **factor espectral** First Solar "
+        "(`spectral_factor_firstsolar`, agua precipitable + masa de aire). El resultado es la **irradiancia "
+        "efectiva** que fotogenera I[_L_] en la Fase 4. Efecto en Atacama: pérdida óptica ≈ **3.0 %%** "
+        "(ángulos rasantes) y espectral ≈ **neutra** (cielo seco y limpio) — ecuaciones en %s." % A('anexo2'),
+        top_in=5.25, h_in=1.75, accent=ACCENT_GOLD, size=15.5)
+
+
+def s_recurso_real(slide, n):
+    add_title(slide, "Resultado: Recurso REAL de Atacama (PVGIS TMY) — Magnitudes Absolutas")
+    TW = (COL_W - Inches(0.4)) / 2
+    stat_tile(slide, MARGIN, CONTENT_Y, TW, Inches(1.5),
+              "2,596", "GHI real anual del sitio\n(kWh/m²·año, PVGIS TMY)", accent=ACCENT_BLUE)
+    stat_tile(slide, MARGIN + TW + Inches(0.4), CONTENT_Y, TW, Inches(1.5),
+              "2,810", "POA en plano inclinado\n(kWh/m²·año, albedo 0.20)", accent=ACCENT_GOLD)
+    stat_tile(slide, MARGIN, CONTENT_Y + Inches(1.70), TW, Inches(1.5),
+              "2,389", "Yield HIT\n(kWh/kWp·año)", accent=ACCENT_GOLD)
+    stat_tile(slide, MARGIN + TW + Inches(0.4), CONTENT_Y + Inches(1.70), TW, Inches(1.5),
+              "2,356", "Yield m-Si\n(kWh/kWp·año)", accent=ACCENT_BLUE)
+    panel_with_body(slide, MARGIN, CONTENT_Y + Inches(3.35), COL_W, Inches(2.25),
+        "Lectura con recurso real (planta 100 MWp)",
+        "• **Fuente:** PVGIS (JRC, UE), base satelital SARAH — TMY horario de "
+        "San Pedro de Atacama.\n"
+        "• HIT gana **+1.17 pts de PR**; el aire frío de altura modera la celda "
+        "a ≈ 58–62 °C.\n"
+        "• Δyield 33 kWh/kWp → **+3,294 MWh, +USD 148k/año** (100 MWp) %s." % A('anexo13'),
+        accent=ACCENT_GREEN, body_size=13.5, line_space=1.04)
+    X2 = MARGIN + COL_W + GAP
+    add_panel(slide, X2, CONTENT_Y, COL_W, Inches(5.45),
+              "PR mensual con recurso real (PVGIS TMY)", accent=ACCENT_BLUE)
+    add_image(slide, IMG['pr_real'], X2 + Inches(0.22), CONTENT_Y + Inches(1.35),
+              width=Inches(5.85), height=Inches(2.78))
+    add_text(slide, X2 + Inches(0.22), CONTENT_Y + Inches(4.35), COL_W - Inches(0.44), Inches(0.95),
+             "El recurso real ≈ 2.3× el emulado (Florida): la energía absoluta se "
+             "dispara, y HIT mantiene la ventaja aunque el sitio sea térmicamente más benigno.",
+             size=13.5, color=TEXT_GREY, line_space=1.05)
+
+
 BUILDERS = {
     'portada': s_portada, 'intro': s_intro, 'justificacion': s_justificacion,
     'marco': s_marco, 'pipeline': s_pipeline, 'datos': s_datos,
@@ -1319,6 +1371,7 @@ BUILDERS = {
     'poa_medida': s_poa_medida, 'f2_flujo': s_f2_flujo,
     'dia_tipico': s_dia_tipico, 'f3_flujo': s_f3_flujo,
     'f3_result': s_f3_result, 'f4_flujo': s_f4_flujo,
+    'optica': s_optica, 'recurso_real': s_recurso_real,
     'validacion': s_validacion, 'rs_n': s_rs_n,
     'perdidas_pr': s_perdidas_pr, 'veredicto_eco': s_veredicto_eco,
     'cumplimiento': s_cumplimiento, 'limitaciones': s_limitaciones,
@@ -1341,15 +1394,15 @@ NOTES = {
               "y el calor degrada la potencia. Objetivo: cuantificar qué tecnología resiste mejor."),
     'justificacion': (50, "De las 5 familias del dataset elegimos los 2 extremos térmicos "
                       "comercialmente viables: m-Si (estándar, sensible) vs HIT (premium, tolerante)."),
-    'marco': (50, "Cuatro modelos publicados encadenados: Perez (POA), Sandia (Tc), "
-              "De Soto SDM (eléctrico) y su escalamiento. IAM/AM revisados pero NO aplicados — honestidad."),
+    'marco': (50, "Modelos publicados encadenados: Perez (POA), Sandia (Tc), De Soto SDM (eléctrico) y su "
+              "escalamiento, MÁS los modificadores ópticos IAM y espectral, ahora aplicados en Fase 2."),
     'pipeline': (60, "Mapa del trabajo: 5 fases automatizadas desde 1.2 GB de CSV crudos hasta el PR. "
                  "Esta lámina es la guía de las secciones siguientes."),
     'datos': (50, "La base: 11 módulos medidos en simultáneo cada 5 min por NREL. Usamos 11 columnas "
               "de 43; cada registro es una curva I-V real con su meteorología."),
     'ingesta': (45, "Los archivos no se pueden abrir con read_csv: fila variable + sentinelas -9999. "
-                "Lector streaming propio → 97 % de registros útiles."),
-    'embudo': (45, "Trazabilidad completa: de 420 mil curvas brutas a 73 mil registros simulados. "
+                "Lector streaming propio → ~96 % de la ventana de 12 meses."),
+    'embudo': (45, "Trazabilidad completa: de 420 mil curvas brutas a ~64 mil registros simulados. "
                "Cada filtro tiene número y razón."),
     'emu_concepto': (60, "Idea clave de la emulación: +6 meses alinea los solsticios entre hemisferios. "
                      "Sin esto, simularíamos un Atacama con verano en julio."),
@@ -1359,6 +1412,9 @@ NOTES = {
                    "los sensores son consistentes y la comparación entre módulos es justa."),
     'f2_flujo': (45, "Fase 2: Perez transpone GHI/DNI/DHI al plano del panel; Sandia estima la "
                  "temperatura de celda con viento conservador de 1 m/s."),
+    'optica': (45, "Ahora SÍ aplicamos los modificadores ópticos: IAM físico (pérdida ~3 % en ángulos "
+               "rasantes) y factor espectral (neutro en el cielo seco de Atacama). La irradiancia efectiva "
+               "alimenta el modelo eléctrico — antes era trabajo futuro, ahora está ejecutado."),
     'dia_tipico': (40, "Para no expertos: en un día despejado la celda sigue al sol y supera los 60 °C. "
                    "Cada grado sobre 25 °C cuesta potencia — eso es lo que vamos a medir."),
     'f3_flujo': (45, "Fase 3: coeficientes térmicos por regresión (β medido; α de literatura porque "
@@ -1373,14 +1429,18 @@ NOTES = {
              "Mitigación: bounds + inicialización analítica. Evidencia: nI=1.20 en ambas tecnologías."),
     'perdidas_pr': (55, "El gráfico clave: la pendiente térmica de m-Si es el doble de empinada. "
                     "El calor castiga justo al mediodía, cuando más energía hay en juego."),
-    'veredicto_eco': (70, "Veredicto: HIT 86.92 % vs m-Si 84.53 % → +2.39 puntos. En 100 MWp son "
-                      "~6,000 MWh y ~USD 270k al año. La prima CAPEX de HIT se justifica."),
+    'veredicto_eco': (65, "Veredicto del track validado (recurso emulado, R²=0.99): HIT 84.18 % vs m-Si "
+                      "81.61 % → +2.57 puntos. La caída frente al deck previo es el ~3 % óptico que ahora SÍ "
+                      "penalizamos. La prima CAPEX de HIT se justifica."),
+    'recurso_real': (55, "Con el recurso REAL de Atacama (PVGIS TMY): yields ~2,360-2,390 kWh/kWp (2.3× el "
+                     "emulado). HIT gana +1.17 pts de PR — menos que en Florida porque el aire de altura es "
+                     "frío (Tc ~58-62 °C) — pero son +3,294 MWh y +USD 148k al año en 100 MWp."),
     'cumplimiento': (40, "Cierre de consultoría: cada requisito de la pauta tiene método, lámina de "
                      "evidencia y resultado. Nada quedó sin responder."),
-    'limitaciones': (60, "Transparencia: las magnitudes siguen siendo de Florida (comparación válida, "
-                     "valores absolutos conservadores), α de literatura, sin pérdidas ópticas ni de planta."),
-    'conclusiones': (60, "HIT gana por física (menor coeficiente térmico) con metodología validada. "
-                     "Futuro: aplicar IAM/AM, escalar recurso a TMY de Atacama, soiling y doble diodo."),
+    'limitaciones': (60, "Transparencia: resolvimos IAM/espectral, albedo 0.20, doble cobertura y recurso "
+                     "real. Permanece: validación eléctrica con datos de Florida, α de literatura, sin soiling ni BOS."),
+    'conclusiones': (60, "HIT gana por física (menor coeficiente térmico) con metodología validada e "
+                     "IAM/espectral aplicados. Futuro: validación in-situ, soiling, BOS y doble diodo."),
     'referencias': (10, "Referencias disponibles. Gracias — abrimos la ronda de preguntas."),
 }
 

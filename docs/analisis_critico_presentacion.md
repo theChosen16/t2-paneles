@@ -4,6 +4,25 @@ Auditoría realizada contrastando cada lámina contra el código fuente real (`s
 
 ---
 
+## ✅ ESTADO DE RESOLUCIÓN (actualización metodológica)
+
+Varias incoherencias de esta auditoría **ya fueron resueltas** implementando la metodología que antes solo se describía:
+
+| Issue | Estado | Cómo se resolvió |
+|---|---|---|
+| **A1** IAM/AM presentados pero no ejecutados | ✅ RESUELTO | IAM físico + factor espectral aplicados en `fase2` (irradiancia efectiva = POA·IAM·M). Anexo II ahora dice "APLICADO". |
+| **A4** Cadencia "minutal" falsa | ✅ RESUELTO | Texto corregido a "5 min" y energía integrada con Δt = 5/60 h. |
+| **A5** Albedo 0.20 vs 0.25 | ✅ RESUELTO | `albedo=0.20` declarado explícitamente en código y deck. |
+| **A9** Recurso de Florida, no Atacama | ✅ RESUELTO (añadido) | Nueva `fase8` con TMY real de PVGIS (POA ≈ 2,810 kWh/m²·año); el track emulado se conserva para validar el modelo eléctrico. |
+| **A10** Economía con escalado no declarado | ✅ RESUELTO | Economía recalculada con el recurso real: +3,294 MWh/+USD 148k (sin supuestos ocultos). |
+| **A12** Meses con doble cobertura | ✅ RESUELTO | Ventana de 12 meses contiguos en `fase1` + dedup en `fase2`. |
+| **A6** P_STC del PR | ✅ Declarado | Deck usa P_STC del SDM (50.1/238.0 W) y lo declara explícitamente. |
+| **A2, A3, A7, A8, A11, A13–A15** | ✅ Ya corregidos | en la reestructura previa del deck (24+13 → 26+13). |
+
+**Números vigentes (post-mejoras):** PR emulado m-Si 81.61 % / HIT 84.18 % (+2.57 pts); PR real m-Si 83.82 % / HIT 84.99 % (+1.17 pts). El detalle histórico de cada issue se conserva abajo como referencia.
+
+---
+
 ## A. Incoherencias código ↔ presentación (críticas)
 
 **A1. IAM y modificador espectral (AM) presentados como aplicados, pero NO se ejecutan.**

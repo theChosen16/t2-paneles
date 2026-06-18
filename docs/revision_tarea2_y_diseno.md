@@ -1,5 +1,7 @@
 # Revisión Tarea 2 y Diseño - Presentación ELI556
 
+> **Actualización (mejoras metodológicas):** el deck pasó a **26 láminas principales + 13 anexos** (39 en total) al añadir "Modificadores ópticos APLICADOS" y "Recurso REAL de Atacama (PVGIS TMY)". Se implementaron IAM + corrección espectral, albedo 0.20, integración de energía a 5 min, recorte de doble cobertura (ventana de 12 meses) y un track con recurso meteorológico real de Atacama (fuente: PVGIS / JRC, Comisión Europea). Resultados vigentes: PR emulado m-Si 81.61 % / HIT 84.18 % (+2.57 pts); PR real m-Si 83.82 % / HIT 84.99 % (+1.17 pts); economía 100 MWp +3,294 MWh / +USD 148k al año. La numeración del footer ahora es N/39. El checklist de cumplimiento de la pauta (abajo) sigue satisfecho en todos sus ítems.
+
 ## Entregables generados
 - Gráfica POA: `C:\Users\alean\Desktop\Tareas\T2 paneles\outputs\poa_irradiance_cmp22.png`
 - Presentación revisada: `C:\Users\alean\Desktop\Tareas\T2 paneles\output\Presentacion_Final_ELI556_Atacama_POA_Tarea2_revisado.pptx`

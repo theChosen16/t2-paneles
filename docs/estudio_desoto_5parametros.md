@@ -100,6 +100,9 @@ $$\frac{R_{sh}}{R_{sh,ref}} = \frac{S_{ref}}{S}$$
 
 ## 5. Modificador por Ángulo de Incidencia $K_{\tau\alpha}(\theta)$
 
+> [!NOTE]
+> **Implementado en el pipeline (Fase 2).** Las secciones 5, 6 y 7 (IAM, masa de aire y irradiancia absorbida) **ya se ejecutan** en `fase2_recurso_solar.py`: el IAM directo con `pvlib.iam.physical` (n=1.526, K=4 m⁻¹, L=2 mm), la difusa con `pvlib.iam.marion_diffuse`, y el factor espectral con `pvlib.spectrum.spectral_factor_firstsolar` (agua precipitable + masa de aire). El resultado es la irradiancia efectiva $S$ que alimenta el modelo eléctrico (antes era trabajo futuro).
+
 ### Método basado en Snell y Bouguer (no requiere datos experimentales)
 
 1. **Ley de Snell** — ángulo de refracción:

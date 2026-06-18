@@ -53,7 +53,7 @@ Se descartaron CdTe, CIGS y a-Si porque no ofrecen un contraste metodológico ta
 
 ---
 
-## 3. El Pipeline de Trabajo (8 Fases)
+## 3. El Pipeline de Trabajo (9 Fases)
 
 El proyecto está completamente automatizado en Python. Cada fase es un script independiente que toma la salida de la fase anterior:
 
@@ -63,21 +63,25 @@ El proyecto está completamente automatizado en Python. Cada fase es un script i
 │                                                                   │
 │ Fase 0: Exploración de bases de datos pvlib (búsqueda de módulos)│
 │    ↓                                                              │
-│ Fase 1: Emulación geográfica (Florida → Atacama)                 │
+│ Fase 1: Emulación geográfica (Florida → Atacama, ventana 12 mes) │
 │    ↓                                                              │
-│ Fase 2: Recurso solar (transposición POA + temperatura de celda) │
+│ Fase 2: Recurso solar (POA Perez + IAM + espectral + Tc SAPM)    │
 │    ↓                                                              │
 │ Fase 3: Extracción de 5 parámetros De Soto                      │
 │    ↓                                                              │
 │ Fase 4: Simulación anual y cálculo de Performance Ratio          │
 │    ↓                                                              │
-│ Fase 5: Gráficos adicionales (curvas I-V, día típico, etc.)     │
+│ Fase 5: Gráficos adicionales (curvas I-V, día típico, IAM, etc.) │
 │    ↓                                                              │
 │ Fase 6: Generación automática de la presentación PPTX            │
 │    ↓                                                              │
 │ Fase 7: Exportación de previsualizaciones de láminas             │
+│    ↓                                                              │
+│ Fase 8: Simulación con recurso REAL de Atacama (PVGIS TMY)       │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+> La Fase 8 es un track paralelo: reutiliza los parámetros De Soto de la Fase 3 pero los alimenta con el recurso meteorológico real de Atacama en lugar del emulado.
 
 ---
 
@@ -110,8 +114,20 @@ El proyecto está completamente automatizado en Python. Cada fase es un script i
    - Inclinación del panel (tilt): 22.91° (igual a la latitud, regla estándar)
    - Azimut: 0° (orientado al Norte, porque estamos en el hemisferio sur)
 
+#### Resolución del problema de "meses con doble cobertura" (NUEVO)
+
+**¿Por qué ocurría?** El dataset Cocoa abarca 21-ene-2011 → 04-mar-2012 (~13.5 meses), así que la temporada **21-ene → 04-mar aparece dos veces** (una en 2011 y otra en 2012). Al sumar +6 meses y forzar el año 2026, ambas copias caían sobre los mismos meses de destino (**jul–sep 2026**): esos meses recibían el doble de registros, **inflando la POA mensual y la energía anual** (~2×). El Performance Ratio, al ser un cociente, no se veía afectado, pero las magnitudes absolutas sí.
+
+**Solución implementada:** `fase1` conserva únicamente la **primera ventana contigua de 12 meses** `[2011-01-21, 2012-01-21)`, de modo que cada mes calendario queda cubierto **una sola vez** (p. ej. enero = días 21-31 de 2011 + días 1-20 de 2012, sin solape; juntos forman un enero completo). Adicionalmente, `fase2` aplica una **red de seguridad** que elimina timestamps duplicados (575 en m-Si, 542 en HIT) generados por el recorte de fin de mes de `relativedelta(months=6)` (p. ej. 31-ago → 28-feb). Conteos resultantes:
+
+| Etapa | m-Si | HIT |
+|---|---|---|
+| Filas crudas | 36,765 | 38,377 |
+| Tras ventana de 12 meses | 32,961 | 34,169 |
+| Válidas (dedup + limpieza) | 31,578 (95.8%) | 32,844 (96.1%) |
+
 > [!IMPORTANT]
-> **Limitación clave:** Las *magnitudes físicas* de irradiancia, temperatura, humedad, etc., **NO se modifican**. Siguen siendo las de Florida. Esto significa que la POA anual simulada (~1,400 kWh/m²) es mucho menor que la real de Atacama (~2,500 kWh/m²). Sin embargo, el **Performance Ratio es un cociente normalizado**, así que la comparación relativa m-Si vs HIT **sigue siendo válida**.
+> **Doble track de recurso (la limitación de "magnitudes de Florida" ahora tiene contraparte):** La emulación **NO modifica** las magnitudes físicas de irradiancia/temperatura/humedad: siguen siendo las de Florida (POA emulada ≈ 1,217–1,265 kWh/m²·año). Esto se conserva porque permite **validar el modelo eléctrico** contra la potencia medida real (R² ≈ 0.99). Para obtener **energía y economía con magnitudes reales de Atacama**, se añadió la **Fase 8** (sección 4.8), que alimenta exactamente la misma metodología con el recurso TMY real de San Pedro de Atacama (POA ≈ 2,810 kWh/m²·año). Así, el PR comparativo m-Si vs HIT es válido en ambos tracks, y los valores absolutos provienen del recurso real.
 
 ---
 
@@ -131,7 +147,20 @@ Pero el panel no está horizontal — está inclinado. Se usa el **Modelo de Per
 
 $$G_{POA} = G_{directa,panel} + G_{difusa,panel} + G_{reflejada,suelo}$$
 
-Esto es lo que `pvlib.irradiance.get_total_irradiance(model='perez')` calcula.
+Esto es lo que `pvlib.irradiance.get_total_irradiance(model='perez', albedo=0.20)` calcula. El **albedo se declara explícitamente en 0.20** (suelo desértico genérico), resolviendo la antigua discrepancia entre la presentación (0.20) y el código (que usaba el default 0.25 de pvlib).
+
+#### A-bis) Modificadores Ópticos: IAM y Corrección Espectral (NUEVO)
+
+Antes, la POA de Perez entraba **directa** al modelo eléctrico. Ahora se aplican los dos modificadores documentados en el marco teórico (De Soto 2006 §5-7; King 2004), produciendo la **irradiancia efectiva** que realmente fotogenera corriente:
+
+1. **IAM (Incidence Angle Modifier)** — pérdidas por reflexión en ángulos de incidencia oblicuos:
+   - Directa: modelo físico de Snell-Bouguer `pvlib.iam.physical(aoi, n=1.526, K=4, L=0.002)` (vidrio 2 mm).
+   - Difusa: factores integrados de Marion para cielo y suelo (`pvlib.iam.marion_diffuse`).
+2. **Factor espectral M** — desajuste entre el espectro real y AM1.5: `pvlib.spectrum.spectral_factor_firstsolar(pw, AM_abs)`, con agua precipitable derivada de humedad+temperatura (`gueymard94_pw`) y masa de aire absoluta.
+
+$$G_{efectiva} = \big(G_{b}\,K_{\tau\alpha,b} + G_{d,cielo}\,K_{\tau\alpha,cielo} + G_{d,suelo}\,K_{\tau\alpha,suelo}\big)\cdot M$$
+
+**Efecto en Atacama (track emulado):** pérdida óptica IAM ≈ **3.0%** (concentrada en amanecer/ocaso) y desajuste espectral ≈ **neutro** (cielo seco y limpio, agua precipitable baja). La POA efectiva anual es 1,180 (m-Si) / 1,229 (HIT) kWh/m² frente a la POA de banda ancha 1,217 / 1,265. La temperatura de celda sigue accionada por la POA de **banda ancha** (la absorción térmica es de banda ancha), mientras que `I_L` responde a la POA **efectiva**.
 
 #### B) Temperatura de Celda (Modelo SAPM de Sandia)
 
@@ -145,8 +174,10 @@ donde $T_{POA,back}$ depende del tipo de encapsulado del módulo:
 
 Se asume velocidad de viento constante = 1 m/s (clima desértico suave).
 
+> **Cadencia / integración de energía (corregido):** La base NREL registra una curva I-V cada **5 minutos**. La energía se integra explícitamente como $\sum P\cdot\Delta t$ con $\Delta t = 5/60$ h; antes el código omitía el paso temporal, sobreestimando la energía ×12. Con el paso correcto, la POA anual emulada queda en ~1,217–1,265 kWh/m² (antes el print reportaba un valor sin integrar).
+
 **Outputs de esta fase:**
-- Archivos CSV con datos limpios + columnas `poa_global` y `temp_cell`
+- Archivos CSV con datos limpios + columnas `poa_global`, `poa_effective`, `iam_beam`, `spectral_factor` y `temp_cell`
 - Gráficos de POA mensual y histogramas de temperatura
 
 ---
@@ -175,8 +206,8 @@ Los **5 parámetros** del circuito son:
 1. **Coeficientes de temperatura:**
    - Se filtran puntos con irradiancia alta (800-1200 W/m²) para aislar el efecto térmico
    - **β_Voc** (coeficiente de Voc vs temperatura): se obtiene por regresión lineal
-     - m-Si: −0.0666 V/°C
-     - HIT: −0.1075 V/°C
+     - m-Si: −0.0666 V/°C (−0.30%/°C)
+     - HIT: −0.1115 V/°C (−0.22%/°C)
    - **α_Isc** (coeficiente de Isc vs temperatura): la regresión dio **pendiente negativa** (físicamente inválida — efecto espectral/estacional contamina). Se usó el fallback de literatura: +0.05%/°C
 
 2. **Parámetros SRC (1000 W/m², 25°C):**
@@ -219,7 +250,7 @@ Para **cada registro de 5 minutos** del año, toma las condiciones de operación
 1. **Escala los 5 parámetros** desde las condiciones SRC a las condiciones actuales usando las ecuaciones de De Soto:
    - $a = a_{ref} \cdot T_c / T_{ref}$ (factor de idealidad escala con temperatura)
    - $I_0 = I_{0,ref} \cdot (T_c/T_{ref})^3 \cdot \exp[...]$ (corriente de saturación crece con temperatura → más pérdidas)
-   - $I_L = (G/G_{ref}) \cdot [I_{L,ref} + \alpha \cdot (T_c - T_{ref})]$ (corriente proporcional a irradiancia)
+   - $I_L = (G_{efectiva}/G_{ref}) \cdot [I_{L,ref} + \alpha \cdot (T_c - T_{ref})]$ (la corriente responde a la irradiancia **efectiva** = POA · IAM · M)
    - $R_{sh} = R_{sh,ref} \cdot (G_{ref}/G)$ (resistencia shunt inversamente proporcional a irradiancia)
    - $R_s = R_{s,ref}$ (se asume constante)
 
@@ -230,6 +261,9 @@ Para **cada registro de 5 minutos** del año, toma las condiciones de operación
 $$PR = \frac{\sum P_{mp,simulada}(t)}{\sum \frac{G_{POA}(t)}{G_{ref}} \cdot P_{STC}}$$
 
 Donde $P_{STC}$ se obtiene resolviendo el mismo modelo a exactamente 1000 W/m² y 25°C.
+
+> [!NOTE]
+> **Numerador con irradiancia efectiva, denominador con POA de banda ancha:** la potencia simulada (numerador) ya incluye las pérdidas óptica (IAM) y espectral, mientras que la referencia ideal (denominador) usa la POA de banda ancha en el plano (criterio IEC 61724-1). Por eso, al aplicar IAM+espectral el PR **baja ~3 puntos** respecto a la versión previa: ahora penaliza correctamente esas pérdidas ópticas.
 
 **Interpretación del PR:** Es la fracción de la energía *teórica ideal* que realmente se produce. Un PR de 85% significa que se pierde un 15% por efectos térmicos, resistivos y otros.
 
@@ -245,60 +279,90 @@ Se compara la potencia simulada vs la potencia medida por el trazador I-V del NR
 ### 4.6 Fase 5: Gráficos Adicionales
 **Script:** [fase5_gen_extra_plots.py](../src/fase5_gen_extra_plots.py)
 
-Genera 4 gráficos clave:
+Genera 5 gráficos clave:
 1. **Curvas I-V y P-V en SRC** — Muestra la forma de la curva de cada tecnología
 2. **Perfil de un día despejado** (28 enero 2026) — Irradiancia y temperatura de celda hora a hora
 3. **PR mensual comparativo** — La diferencia m-Si vs HIT mes a mes
 4. **Degradación térmica** — Scatter de potencia normalizada vs temperatura de celda (el gráfico que demuestra la pendiente más pronunciada de m-Si)
+5. **Modificadores ópticos (NUEVO)** — Respuesta angular del IAM $K_{\tau\alpha}(\theta)$ y factor espectral M vs masa de aire para distintos niveles de agua precipitable.
 
 ### 4.7 Fases 6 y 7: Presentación PPTX
 **Scripts:** [fase6_gen_presentation.py](../src/fase6_gen_presentation.py) y [fase7_export_slides.py](../src/fase7_export_slides.py)
 
-Generan la presentación PPTX automáticamente con un "Design System" visual (modo oscuro, acentos dorados, layouts de doble panel).
+Generan la presentación PPTX automáticamente con un "Design System" visual (modo oscuro, acentos dorados, layouts de doble panel). La estructura actual es de **26 láminas principales + 13 anexos** (39 en total).
+
+### 4.8 Fase 8: Simulación con Recurso REAL de Atacama (NUEVO)
+**Script:** [fase8_atacama_real.py](../src/fase8_atacama_real.py)
+
+**Motivación:** El track principal (Fases 1-4) valida el modelo eléctrico con datos medidos, pero conserva magnitudes de Florida. Esta fase **añade** (sin reemplazar nada) un segundo track alimentado con el recurso solar **real** de San Pedro de Atacama, para entregar energía y economía con valores absolutos representativos.
+
+**Fuente de datos:** **PVGIS** (Photovoltaic Geographical Information System), del **Joint Research Centre de la Comisión Europea**, base satelital **SARAH**. Se descarga el **Año Meteorológico Típico (TMY)** horario para (lat −22.91°, lon −68.20°) con `pvlib.iotools.get_pvgis_tmy` (sin clave de API) y se cachea en `data/Atacama_TMY/`. **GHI anual ≈ 2,596 kWh/m²·año** (recurso desértico real).
+
+**Metodología:** idéntica al track emulado — Perez (POA, albedo 0.20) → IAM + factor espectral → Tc Sandia (SAPM, con viento real del TMY) → De Soto con los **mismos 5 parámetros extraídos de las mediciones NREL** (Fase 3) → PR, energía y yield (paso horario).
+
+**Hallazgo clave:** En Atacama real, el aire de altura es frío (T_aire máx 29 °C, media 15.5 °C) y el viento medio es 2.67 m/s, por lo que la **temperatura de celda solo llega a ~58–62 °C** (más baja que los 70–73 °C del track emulado con calor húmedo de Florida y viento fijo de 1 m/s). Como el castigo térmico es menor, la **ventaja de HIT se reduce a +1.17 pts de PR** (vs +2.57 en el escenario emulado), pero la **energía absoluta se duplica** (~2.3×) por la enorme irradiancia.
 
 ---
 
 ## 5. Resultados Principales
 
-### 5.1 Performance Ratio Anual (Atacama 2026)
+### 5.1 Performance Ratio Anual (dos tracks)
+
+**Track emulado (validado, magnitudes de Florida) — con IAM + espectral + albedo 0.20:**
 
 | Métrica | m-Si (mSi0166) | HIT (HIT05667) | Ventaja HIT |
 |---|---|---|---|
-| **PR Anual** | **84.53%** | **86.92%** | **+2.39 puntos** |
-| PR mensual (rango) | 82.0% – 88.0% | 84.9% – 89.4% | — |
-| Energía DC anual | 57.8 kWh/panel | 292.6 kWh/panel | — |
-| Yield específico | 1,152 kWh/kWp | 1,236 kWh/kWp | +7.3% |
+| **PR Anual** | **81.61%** | **84.18%** | **+2.57 puntos** |
+| PR mensual (rango) | 78.7% – 86.9% | 81.6% – 88.2% | — |
+| Energía DC anual | 49.8 kWh/panel | 253.4 kWh/panel | — |
+| Yield específico | 993 kWh/kWp | 1,065 kWh/kWp | +7.3% |
+
+**Track real (recurso PVGIS TMY de San Pedro de Atacama):**
+
+| Métrica | m-Si (mSi0166) | HIT (HIT05667) | Ventaja HIT |
+|---|---|---|---|
+| **PR Anual** | **83.82%** | **84.99%** | **+1.17 puntos** |
+| Yield específico | 2,356 kWh/kWp | 2,389 kWh/kWp | +1.4% |
+| Energía DC anual | 118 kWh/panel | 568 kWh/panel | — |
+| Tc máx | 58.6 °C | 62.0 °C | — |
+
+> El PR del track emulado **bajó** respecto a la versión previa (84.53/86.92%) porque ahora se penalizan las pérdidas óptica (~3%) y espectral recién aplicadas. HIT gana en **ambos** tracks.
 
 ### 5.2 Interpretación Física
 
-- La diferencia de +2.39% en PR se explica **casi completamente por el coeficiente de temperatura**.
+- La ventaja de HIT en PR se explica **casi completamente por el coeficiente de temperatura**.
 - **m-Si** pierde ~0.40% de potencia por cada °C sobre 25°C.
 - **HIT** pierde solo ~0.26% de potencia por cada °C sobre 25°C.
-- En Atacama, con temperaturas de celda que superan 65°C frecuentemente, esta diferencia se acumula de forma significativa.
+- En el escenario emulado (calor húmedo de Florida + viento fijo 1 m/s) la celda supera 65°C frecuentemente (máx 70–73°C) y la brecha de PR es mayor (+2.57 pts).
+- En el recurso **real** de Atacama, el aire de altura es frío y ventilado: la celda solo llega a ~58–62°C, el castigo térmico es menor y la brecha se reduce a +1.17 pts — pero la energía absoluta es ~2.3× mayor.
 - El gráfico de "degradación térmica" muestra que la **pendiente de m-Si es casi el doble** que la de HIT.
 
-### 5.3 Impacto Económico (con supuestos)
+### 5.3 Impacto Económico (recurso real, sin escalado arbitrario)
 
-Para una planta de 100 MWp con recurso de Atacama real (~2,500 kWh/m² POA):
-- ΔE ≈ 6,000 MWh/año
-- ΔUSD ≈ 270,000/año (a 45 USD/MWh)
+Para una planta de **100 MWp** con el recurso **real** de Atacama (PVGIS TMY, POA ≈ 2,810 kWh/m²·año):
+- Δyield (HIT − m-Si) = **33 kWh/kWp·año**
+- ΔE ≈ **3,294 MWh/año**
+- ΔUSD ≈ **148,000/año** (a 45 USD/MWh)
 
-> [!CAUTION]
-> Estos números económicos requieren escalar el recurso al valor real de Atacama. Con el recurso simulado (Florida, ~1,400 kWh/m²), los números serían ~3,300 MWh y ~150k USD.
+> [!NOTE]
+> A diferencia de la versión previa (que necesitaba "escalar" el recurso a un valor supuesto para llegar a +6,000 MWh/+USD 270k), estos números provienen **directamente** de la simulación con el recurso real medido por satélite, sin supuestos no declarados.
 
-### 5.4 Datos Duros Verificados
+### 5.4 Datos Duros Verificados (track emulado)
 
 | Métrica | m-Si | HIT |
 |---|---|---|
 | Filas brutas del CSV | 36,765 | 38,377 |
-| Filas válidas tras limpieza | 35,669 (97.0%) | 37,313 (97.2%) |
-| β_Voc medido | −0.0666 V/°C (−0.30%/°C) | −0.1075 V/°C (−0.21%/°C) |
+| Tras ventana de 12 meses | 32,961 | 34,169 |
+| Filas válidas (dedup + limpieza) | 31,578 (95.8%) | 32,844 (96.1%) |
+| β_Voc medido | −0.0666 V/°C (−0.30%/°C) | −0.1115 V/°C (−0.22%/°C) |
 | α_Isc | fallback +0.05%/°C | fallback +0.05%/°C |
 | Ns (celdas en serie) | 36 | 72 |
-| Isc_ref / Voc_ref | 2.769 A / 22.55 V | 5.607 A / 51.51 V |
-| P_STC (SDM ajustado) | 50.17 W | 236.72 W |
-| POA anual | 1,363 kWh/m² | 1,422 kWh/m² |
-| Tc máx | 70.2 °C | 73.4 °C |
+| Isc_ref / Voc_ref | 2.770 A / 22.53 V | 5.620 A / 51.65 V |
+| P_STC (SDM ajustado) | 50.12 W | 237.96 W |
+| Pérdida óptica IAM / espectral | ~3.0% / ~neutra | ~3.0% / ~neutra |
+| POA banda ancha / efectiva | 1,217 / 1,180 kWh/m² | 1,265 / 1,229 kWh/m² |
+| Tc máx / Tc>65°C | 70.2 °C / 58 reg | 73.3 °C / 430 reg |
+| Validación | R² ≈ 0.991, RMSE 1.4 W | R² ≈ 0.991, RMSE 6.5 W |
 
 ---
 
@@ -333,37 +397,43 @@ La regresión experimental de Isc normalizada vs temperatura dio pendiente negat
 > [!IMPORTANT]
 > Estas limitaciones son cruciales para la defensa. Demuestran madurez académica.
 
-1. **Recurso solar de Florida, no de Atacama:** Las magnitudes de irradiancia y temperatura son las medidas en Cocoa, FL. La emulación solo alinea estaciones y geometría. La comparación relativa m-Si vs HIT es válida, pero los valores absolutos de energía son conservadores.
+### 7.1 Resuelto en esta versión
 
-2. **IAM y corrección espectral NO aplicados:** Las láminas del marco teórico los describen, pero el código no los implementa. Son "trabajo futuro".
+1. **IAM y corrección espectral APLICADOS:** ya se ejecutan en la Fase 2 (≈3% de pérdida óptica penalizada en el PR).
+2. **Recurso real de Atacama incorporado:** la Fase 8 añade un track con PVGIS TMY (POA ≈ 2,810 kWh/m²·año) para energía/economía absolutas, sin perder la validación eléctrica con datos NREL.
+3. **Doble cobertura corregida:** ventana de 12 meses contiguos → cada mes se cubre una sola vez.
+4. **Albedo declarado 0.20** (antes el código usaba el default 0.25, en contradicción con la presentación).
+5. **Cadencia 5 min integrada correctamente:** la energía usa $\Delta t = 5/60$ h (antes el paso temporal se omitía).
 
-3. **Meses con doble cobertura:** El dataset cubre 13.5 meses. Tras +6 meses y forzar 2026, julio–septiembre mezclan datos de dos años distintos.
+### 7.2 Limitaciones que permanecen
 
-4. **Sin pérdidas de planta (BOS):** No se modelan pérdidas por cableado, inversores, soiling, mismatch, etc. Solo se simula el módulo aislado.
-
-5. **Albedo discrepancia:** La presentación dice 0.20, el código usa 0.25 (default de pvlib).
-
-6. **Cadencia "minutal" → realmente son cada 5 minutos.**
+1. **Validación eléctrica con datos de Florida:** el R² ≈ 0.99 se valida contra mediciones de Cocoa; Atacama no dispone de un módulo PV de referencia medido, por lo que el track real usa TMY satelital (PVGIS), no mediciones in-situ.
+2. **α_Isc de literatura:** la regresión experimental falló (espectro/estacionalidad) y se usó +0.05%/°C — impacto de segundo orden (la corriente la domina G).
+3. **P_STC del SDM** (50.1 / 238.0 W) difiere ~7–9% del promedio empírico (46.7 / 218.4 W); criterio consistente entre tecnologías.
+4. **Sin pérdidas de planta (BOS):** no se modelan cableado, inversores, soiling ni mismatch — el PR aquí es de módulo, no de planta.
+5. **Modelo de un diodo:** no captura recombinación no ideal a baja irradiancia (un modelo de doble diodo sería más preciso).
 
 ---
 
-## 8. Estructura de la Presentación (24 + 13)
+## 8. Estructura de la Presentación (26 + 13)
 
-La presentación tiene **24 láminas principales** (para 20 min de exposición) y **13 láminas de anexo** (solo para responder preguntas).
+La presentación tiene **26 láminas principales** y **13 láminas de anexo** (solo para responder preguntas), 39 en total. Respecto a la versión previa se agregaron dos láminas principales: **"Modificadores Ópticos APLICADOS"** (lámina 13, IAM + espectral) y **"Recurso REAL de Atacama (PVGIS TMY)"** (lámina 22, magnitudes absolutas).
 
 ### Flujo narrativo:
 1. **Láminas 1-3:** Contexto → ¿Por qué Atacama? ¿Por qué m-Si vs HIT?
 2. **Láminas 4-5:** Marco teórico y pipeline de trabajo
 3. **Láminas 6-8:** Base de datos, ingesta y embudo de datos
 4. **Láminas 9-12:** Emulación geográfica y cálculo de POA + Tc
-5. **Lámina 13:** Día despejado (puente divulgativo)
-6. **Láminas 14-16:** Modelo eléctrico (De Soto) y simulación
-7. **Láminas 17-19:** Validación, puntos conflictuales, degradación térmica
-8. **Lámina 20:** Veredicto final + impacto económico
-9. **Láminas 21-24:** Cumplimiento, limitaciones, conclusiones, referencias
+5. **Lámina 13:** Modificadores ópticos IAM y espectral (NUEVA)
+6. **Lámina 14:** Día despejado (puente divulgativo)
+7. **Láminas 15-17:** Modelo eléctrico (De Soto) y simulación
+8. **Láminas 18-20:** Validación, puntos conflictuales, degradación térmica
+9. **Lámina 21:** Veredicto técnico (PR validado)
+10. **Lámina 22:** Recurso real de Atacama + economía (NUEVA)
+11. **Láminas 23-26:** Cumplimiento, limitaciones, conclusiones, referencias
 
 ### Presupuesto de tiempo:
-- Total: ~19.4 min (35 s de colchón)
+- Total: ~21.0 min (las dos láminas nuevas añaden ~1.6 min; usar las marcadas ⚡ para comprimir si se excede el límite)
 - Láminas marcadas ⚡ pueden explicarse en una sola frase si vas atrasado
 
 ---
@@ -374,7 +444,10 @@ La presentación tiene **24 láminas principales** (para 20 min de exposición) 
 **R:** Con solo 3 condiciones (Isc, Voc, MPP), el residuo es casi insensible a Rs y Rsh: es la manifestación directa del mal condicionamiento Rs–n. Los bounds y la inicialización analítica garantizan valores físicamente plausibles, y la validación R² ≈ 0.99 confirma que el conjunto reproduce la potencia medida.
 
 ### P2: "¿El PR no debería usar el recurso real de Atacama?"
-**R:** La emulación alinea estaciones y geometría; las magnitudes son de Florida. El PR es un cociente normalizado por el propio recurso, así que la comparación m-Si vs HIT es válida; los valores absolutos de energía son conservadores.
+**R:** Tenemos dos tracks. El **emulado** alinea estaciones y geometría con datos NREL medidos para **validar el modelo eléctrico** (R² ≈ 0.99); ahí las magnitudes son de Florida. El **track real** (Fase 8) usa el TMY de PVGIS para San Pedro de Atacama (POA ≈ 2,810 kWh/m²·año) y entrega energía y economía absolutas. HIT gana en ambos: +2.57 pts (emulado) y +1.17 pts (real). El menor margen en el real se debe a que el aire frío de altura modera la temperatura de celda (~58–62 °C).
+
+### P2-bis: "¿Por qué la ventaja de HIT es menor con el recurso real?"
+**R:** Porque San Pedro de Atacama está a 2,400 m: el aire es frío (máx 29 °C) y ventilado (2.67 m/s), así que la celda solo llega a ~58–62 °C, frente a los 70–73 °C del escenario emulado (calor húmedo de Florida + viento fijo 1 m/s). Menor temperatura → menor castigo térmico → menor brecha entre tecnologías. Aun así HIT gana, y la energía absoluta es ~2.3× mayor.
 
 ### P3: "¿Por qué α_Isc de literatura?"
 **R:** La regresión experimental dio pendiente negativa (efecto espectral/estacional dominante). +0.05%/°C es el valor estándar y su impacto en el PR es de segundo orden porque la corriente la domina G.
@@ -394,9 +467,10 @@ T2 paneles/
 │   ├── fase2_recurso_solar.py    # POA (Perez) + Tc (SAPM)
 │   ├── fase3_extraccion_parametros.py  # 5 parámetros De Soto
 │   ├── fase4_simulacion_final.py # Simulación anual + PR
-│   ├── fase5_gen_extra_plots.py  # Gráficos adicionales
+│   ├── fase5_gen_extra_plots.py  # Gráficos adicionales (incl. IAM/espectral)
 │   ├── fase6_gen_presentation.py # Generador PPTX
-│   └── fase7_export_slides.py    # Exportador de previews
+│   ├── fase7_export_slides.py    # Exportador de previews
+│   └── fase8_atacama_real.py     # Track con recurso REAL de Atacama (PVGIS TMY)
 │
 ├── docs/                         # Documentación
 │   ├── Tarea 2.pdf               # Enunciado original de la tarea
@@ -411,7 +485,8 @@ T2 paneles/
 │
 ├── data/
 │   ├── Cocoa/                    # CSVs originales de NREL
-│   └── Atacama_2026/             # CSVs emulados
+│   ├── Atacama_2026/             # CSVs emulados (Florida → Atacama)
+│   └── Atacama_TMY/              # TMY real de PVGIS (San Pedro de Atacama)
 │
 ├── output/
 │   ├── Fase1_Resultados/         # POA mensuales, histogramas Tc
@@ -420,7 +495,8 @@ T2 paneles/
 │   └── Presentacion_Final_*.pptx # La presentación final
 │
 └── temp/                         # Archivos intermedios
-    └── parametros_desoto.json    # Los 5 parámetros extraídos
+    ├── parametros_desoto.json    # Los 5 parámetros extraídos
+    └── resultados_atacama_real.json  # Resultados del track real (Fase 8)
 ```
 
 ---
@@ -435,8 +511,10 @@ T2 paneles/
 | **PR** | Performance Ratio — eficiencia real vs ideal |
 | **SDM** | Single Diode Model — el modelo del circuito equivalente |
 | **SAPM** | Sandia Array Performance Model — modelo térmico |
-| **IAM** | Incidence Angle Modifier — pérdida por ángulo (NO aplicada) |
-| **AM** | Air Mass — masa de aire óptica |
+| **IAM** | Incidence Angle Modifier — pérdida por ángulo (APLICADA, modelo físico) |
+| **AM** | Air Mass — masa de aire óptica (usada en el factor espectral, APLICADO) |
+| **TMY** | Typical Meteorological Year — año meteorológico típico (PVGIS) |
+| **PVGIS** | Photovoltaic Geographical Information System (JRC, Comisión Europea) |
 | **Ns** | Número de celdas en serie |
 | **nI** | Factor de idealidad del diodo |
 | **Lambert W** | Función especial que resuelve analíticamente la ec. del diodo |
@@ -445,11 +523,11 @@ T2 paneles/
 
 ## 12. Conclusión del Trabajo
 
-> **HIT gana por física:** Su menor coeficiente de temperatura le da una ventaja de +2.39 puntos de PR en condiciones desérticas. Esta ventaja se traduce en miles de MWh y cientos de miles de dólares anuales en una planta de escala.
+> **HIT gana por física:** Su menor coeficiente de temperatura le da ventaja en PR en condiciones desérticas. En el track **validado** (R² ≈ 0.99) la ventaja es **+2.57 puntos** (84.18% vs 81.61%); con el recurso **real** de Atacama (PVGIS TMY) es **+1.17 puntos** y se traduce en **+3,294 MWh y +USD 148k/año** en una planta de 100 MWp. HIT gana en ambos escenarios.
 
-**Trabajos futuros sugeridos:**
-- Implementar IAM (pérdidas por ángulo de incidencia) y corrección espectral
-- Usar datos meteorológicos reales de Atacama (TMY)
-- Incluir soiling (ensuciamiento)
-- Modelo de doble diodo para mayor precisión
-- Pérdidas de Balance of System (inversores, cableado, etc.)
+**Trabajos futuros sugeridos** (los previos IAM/espectral y recurso TMY ya están implementados):
+- Validación in-situ contra un módulo PV medido en Atacama (no solo TMY satelital)
+- Incluir soiling (ensuciamiento), factor crítico en el desierto
+- Pérdidas de Balance of System (inversores, cableado, mismatch) → PR de planta
+- Bifacialidad: aporte del albedo desértico en la cara posterior
+- Modelo de doble diodo para mayor precisión a baja irradiancia

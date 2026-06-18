@@ -57,6 +57,7 @@ def procesar_fase1(file_path, output_dir):
                     'vmp': float(row[11]),
                     'voc': float(row[13]),
                     'temp_air': float(row[20]),
+                    'rh': float(row[22]),       # humedad relativa (%) → agua precipitable
                     'pressure': float(row[24]),
                     'dni': float(row[27]),
                     'ghi': float(row[30]),
@@ -78,22 +79,38 @@ def procesar_fase1(file_path, output_dir):
     # Asegurar que el tiempo esté localizado
     if df.index.tz is None:
         df.index = df.index.tz_localize(tz)
-    
+
+    # Red de seguridad ante doble cobertura: el desfase de +6 meses con
+    # relativedelta colapsa los días 29-31 de los meses largos sobre el último
+    # día de los meses cortos (p. ej. 31-ago → 28-feb), generando timestamps
+    # idénticos. Se conserva la primera ocurrencia para no doble-contar.
+    n_dup = df.index.duplicated(keep='first').sum()
+    if n_dup:
+        df = df[~df.index.duplicated(keep='first')]
+        print(f"Timestamps duplicados eliminados (red de seguridad): {n_dup}")
+
     # 3. Limpieza de datos (Quitar valores negativos o faltantes en irradiancia)
     df = df.replace(-9999, np.nan)
     df.dropna(subset=['ghi', 'dni', 'dhi', 'temp_air'], inplace=True)
     df['ghi'] = df['ghi'].clip(lower=0)
     df['dni'] = df['dni'].clip(lower=0)
     df['dhi'] = df['dhi'].clip(lower=0)
-    
+
+    # Humedad relativa y presión para la corrección espectral (rellenar huecos
+    # con la mediana para no perder registros eléctricos válidos).
+    df['rh'] = df['rh'].clip(lower=0, upper=100)
+    df['rh'] = df['rh'].fillna(df['rh'].median())
+    df['pressure'] = df['pressure'].fillna(df['pressure'].median())
+
     # Velocidad de viento asumida (constante, clima desértico suave)
-    df['wind_speed'] = 1.0 
+    df['wind_speed'] = 1.0
     
     # 4. Transposición de Irradiancia (POA)
     print("Calculando irradiancia en el Plano del Arreglo (POA)...")
+    ALBEDO = 0.20  # suelo desértico genérico (declarado explícitamente, antes default 0.25)
     solar_position = location.get_solarposition(times=df.index)
     dni_extra = pvlib.irradiance.get_extra_radiation(df.index)
-    
+
     poa_irrad = pvlib.irradiance.get_total_irradiance(
         surface_tilt=tilt,
         surface_azimuth=azimuth,
@@ -103,10 +120,60 @@ def procesar_fase1(file_path, output_dir):
         solar_zenith=solar_position['apparent_zenith'],
         solar_azimuth=solar_position['azimuth'],
         dni_extra=dni_extra,
+        albedo=ALBEDO,
         model='perez'
     )
+    # POA de banda ancha (broadband): mueve la temperatura de celda y es el
+    # denominador del PR (irradiancia incidente en el plano, IEC 61724-1).
     df['poa_global'] = poa_irrad['poa_global'].clip(lower=0)
-    
+
+    # ----------------------------------------------------------------------
+    # 4b. Irradiancia EFECTIVA: pérdidas ópticas (IAM) + desajuste espectral (AM)
+    # ----------------------------------------------------------------------
+    # Antes la POA de Perez entraba directa al modelo eléctrico. Ahora se aplican
+    # los dos modificadores documentados en el marco teórico (De Soto 2006 §5-7,
+    # King 2004): el factor por ángulo de incidencia K_τα(θ) y el factor
+    # espectral M(AM, PW). El resultado, poa_effective, es la irradiancia que
+    # realmente fotogenera corriente (I_L) en la Fase 4.
+    print("Aplicando modificador por ángulo de incidencia (IAM) y corrección espectral (AM)...")
+
+    aoi = pvlib.irradiance.aoi(tilt, azimuth,
+                               solar_position['apparent_zenith'],
+                               solar_position['azimuth'])
+
+    # IAM directo: modelo físico de Snell-Bouguer (n=1.526 vidrio, K=4 m⁻¹, L=2 mm).
+    iam_beam = pvlib.iam.physical(aoi, n=1.526, K=4.0, L=0.002)
+    # IAM de la difusa: factores integrados de Marion para cielo y suelo a este tilt.
+    iam_dif = pvlib.iam.marion_diffuse('physical', tilt, n=1.526, K=4.0, L=0.002)
+    iam_sky, iam_ground = iam_dif['sky'], iam_dif['ground']
+
+    poa_after_iam = (poa_irrad['poa_direct'].clip(lower=0) * iam_beam
+                     + poa_irrad['poa_sky_diffuse'].clip(lower=0) * iam_sky
+                     + poa_irrad['poa_ground_diffuse'].clip(lower=0) * iam_ground)
+
+    # Factor espectral de First Solar (módulo c-Si ≈ 'monosi' para m-Si y HIT):
+    # depende del agua precipitable (humedad+T) y de la masa de aire absoluta.
+    pw = pvlib.atmosphere.gueymard94_pw(df['temp_air'], df['rh'])          # cm
+    am_rel = pvlib.atmosphere.get_relative_airmass(solar_position['apparent_zenith'])
+    am_abs = pvlib.atmosphere.get_absolute_airmass(am_rel, df['pressure'] * 100.0)  # mb→Pa
+    spectral_factor = pvlib.spectrum.spectral_factor_firstsolar(pw, am_abs, module_type='monosi')
+    spectral_factor = spectral_factor.fillna(1.0).clip(lower=0.8, upper=1.1)
+
+    df['iam_beam'] = iam_beam
+    df['spectral_factor'] = spectral_factor
+    df['poa_after_iam'] = poa_after_iam.clip(lower=0)
+    df['poa_effective'] = (poa_after_iam * spectral_factor).clip(lower=0)
+
+    # Reporte de la magnitud de las nuevas pérdidas (sobre horas de sol).
+    sun = df['poa_global'] > 50
+    e_glob = df.loc[sun, 'poa_global'].sum()
+    e_iam = df.loc[sun, 'poa_after_iam'].sum()
+    e_eff = df.loc[sun, 'poa_effective'].sum()
+    if e_glob > 0:
+        print(f"  Pérdida óptica IAM: {100*(1-e_iam/e_glob):.2f}%  |  "
+              f"Pérdida espectral AM: {100*(1-e_eff/e_iam):.2f}%  |  "
+              f"Efectiva/Global anual: {100*e_eff/e_glob:.2f}%")
+
     # 5. Modelo Térmico (Sandia)
     print("Calculando Temperatura de Celda (SAPM)...")
     # Extraemos parámetros empíricos según la tecnología
@@ -130,8 +197,12 @@ def procesar_fase1(file_path, output_dir):
     module_name = 'mSi' if 'mSi' in file_path else 'HIT'
     
     print("Generando Gráficos...")
-    # POA Mensual
-    poa_monthly = df['poa_global'].resample('ME').sum() / 1000 # kWh/m2
+    # Paso temporal real de la base NREL: una curva I-V cada 5 minutos.
+    # La energía se integra como Σ(W/m²)·Δt, con Δt = 5/60 h (antes se omitía
+    # el paso, sobreestimando la energía ×12).
+    DT_HOURS = 5.0 / 60.0
+    # POA Mensual (kWh/m²): potencia media por intervalo × paso temporal.
+    poa_monthly = df['poa_global'].resample('ME').sum() * DT_HOURS / 1000  # kWh/m2
     plt.figure(figsize=(10, 5))
     plot_color = '#E8A838' if module_name == 'HIT' else '#007ACC'
     poa_monthly.plot(kind='bar', color=plot_color, edgecolor='white', alpha=0.9)
@@ -156,8 +227,10 @@ def procesar_fase1(file_path, output_dir):
     plt.savefig(os.path.join(output_dir, f'temp_hist_{module_name}.png'), transparent=True, dpi=150, bbox_inches='tight')
     plt.close()
     
-    recurso_total = df['poa_global'].sum() / 1000
-    print(f"Recurso Solar Total Anual POA: {recurso_total:.2f} kWh/m2")
+    recurso_total = df['poa_global'].sum() * DT_HOURS / 1000
+    recurso_efectivo = df['poa_effective'].sum() * DT_HOURS / 1000
+    print(f"Recurso Solar Total Anual POA (broadband): {recurso_total:.1f} kWh/m2")
+    print(f"Recurso Solar Total Anual POA efectiva (IAM+AM): {recurso_efectivo:.1f} kWh/m2")
     
     # Guardar dataframe limpio para la Fase 2 (Extracción de parámetros)
     print("Guardando datos limpios para Fase 2...")

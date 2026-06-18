@@ -113,7 +113,7 @@ box(ax, 0.74, 0.525, 0.248, 0.41, "Decisión de ingesta",
     ["Lector streaming (csv) que indexa", "solo 11 columnas por posición fija", "y descarta la cola I-V al vuelo."],
     edge=C_GOLD, fs_title=17.0, fs_body=13.5)
 box(ax, 0.74, 0.065, 0.248, 0.41, "Limpieza aplicada",
-    ["Reemplazo de -9999 → NaN,", "dropna, clip(≥0) en irradiancias.", "Válidos: 97.0% (m-Si) y 97.2% (HIT)."],
+    ["Reemplazo de -9999 → NaN,", "dropna, clip(≥0) en irradiancias.", "Válidos: 95.8% (m-Si) y 96.1% (HIT)."],
     edge=C_ORANGE, fs_title=17.0, fs_body=13.5)
 arrow(ax, 0.672, 0.62, 0.737, 0.70, color=C_GOLD, lw=2, ms=14)
 arrow(ax, 0.672, 0.38, 0.737, 0.29, color=C_ORANGE, lw=2, ms=14)
@@ -128,7 +128,7 @@ box(ax, 0.173, Y, W, H, "1 · Metadatos",
 box(ax, 0.385, Y, W, H, "2 · Desfase +6 meses",
     ["relativedelta(months=6)", "invierno ⇄ verano:", "solsticios alineados"], edge=C_GOLD, fs_title=13.5, fs_body=11.8)
 box(ax, 0.597, Y, W, H, "3 · Proyección 2026",
-    ["Fuerza año = 2026", "29-feb → 28-feb", "jul–sep: 2 veranos"], edge=C_GOLD, fs_title=13.5, fs_body=11.8)
+    ["Fuerza año = 2026", "29-feb → 28-feb", "ventana 12 meses única"], edge=C_GOLD, fs_title=13.5, fs_body=11.8)
 filebox(ax, 0.818, Y+0.12, 0.165, 0.30, "Atacama2026_*.csv", edge=C_ORANGE)
 for x1, x2 in [(0.147, 0.170), (0.354, 0.382), (0.566, 0.594), (0.778, 0.815)]:
     arrow(ax, x1, Y+0.27, x2, Y+0.27)
@@ -144,15 +144,15 @@ box(ax, 0.155, Y, W, H, "1 · Ingesta",
     ["csv.reader fila a fila;", "11 columnas por índice;", "descarta cola I-V"], edge=C_CYAN, fs_title=13.5, fs_body=11.8)
 box(ax, 0.348, Y, W, H, "2 · Limpieza",
     ["-9999 → NaN, dropna,", "clip(≥0) irradiancias,", "viento fijo = 1 m/s"], edge=C_CYAN, fs_title=13.5, fs_body=11.8)
-box(ax, 0.541, Y, W, H, "3 · POA (Perez)",
-    ["get_solarposition +", "get_total_irradiance", "(albedo default 0.25)"], edge=C_GOLD, fs_title=13.5, fs_body=11.8)
+box(ax, 0.541, Y, W, H, "3 · POA + óptica",
+    ["Perez (albedo 0.20) +", "IAM físico + espectral", "→ irradiancia efectiva"], edge=C_GOLD, fs_title=13.5, fs_body=11.8)
 box(ax, 0.734, Y, W, H, "4 · Tc (SAPM)",
     ["sapm_cell, coeficientes", "open_rack: glass_polymer", "(m-Si) / glass_glass (HIT)"], edge=C_ORANGE, fs_title=13.5, fs_body=11.8)
 filebox(ax, 0.922, Y+0.12, 0.07, 0.30, "Datos_\nFase2_*", edge=C_ORANGE)
 for x1, x2 in [(0.128, 0.152), (0.323, 0.345), (0.516, 0.538), (0.709, 0.731), (0.902, 0.919)]:
     arrow(ax, x1, Y+0.27, x2, Y+0.27)
-ax.text(0.5, 0.07, "Honestidad metodológica: SIN modificadores IAM ni corrección espectral AM — POA Perez entra directa al SDM.",
-        ha='center', fontsize=13, color=C_ORANGE, style='italic')
+ax.text(0.5, 0.07, "Irradiancia efectiva = POA Perez × IAM físico × factor espectral — entra al SDM (≈3 % de pérdida óptica).",
+        ha='center', fontsize=13, color=C_GOLD, style='italic')
 save(fig, 'flujo_fase2.png')
 
 # ---------- 5) FASE 3 ----------
@@ -177,17 +177,17 @@ fig, ax = new_fig(12.8, 5.2)
 Y, H, W = 0.27, 0.57, 0.165
 filebox(ax, 0.008, 0.40, 0.105, 0.30, "JSON +\nDatos_Fase2", edge=C_CYAN)
 box(ax, 0.140, Y, W, H, "1 · Escalamiento",
-    ["calcparams_desoto:", "IL, Io, a, Rsh según", "G y Tc del registro", "(Rs constante)"], edge=C_CYAN, fs_title=13.5, fs_body=11.8)
+    ["calcparams_desoto:", "IL con G efectiva", "(IAM+espectral) y Tc", "(Rs constante)"], edge=C_CYAN, fs_title=13.5, fs_body=11.8)
 box(ax, 0.333, Y, W, H, "2 · Circuito SDM",
     ["singlediode resuelve", "la ec. trascendental", "(Lambert W) → Pmp", "por registro 5-min"], edge=C_GOLD, fs_title=13.5, fs_body=11.8)
 box(ax, 0.526, Y, W, H, "3 · Referencia STC",
-    ["Mismo SDM evaluado", "a 1000 W/m², 25 °C →", "P_STC 50.2 W (m-Si)", "236.7 W (HIT)"], edge=C_GOLD, fs_title=13.5, fs_body=11.8)
+    ["Mismo SDM evaluado", "a 1000 W/m², 25 °C →", "P_STC 50.1 W (m-Si)", "238.0 W (HIT)"], edge=C_GOLD, fs_title=13.5, fs_body=11.8)
 box(ax, 0.719, Y, W, H, "4 · Energía y PR",
     ["PR = ΣPmp / ΣP_ideal", "PR mensual + anual", "integral", "(IEC 61724-1)"], edge=C_ORANGE, fs_title=13.5, fs_body=11.8)
 filebox(ax, 0.908, 0.40, 0.084, 0.30, "Simulacion\n_*.csv", edge=C_ORANGE)
 for x1, x2 in [(0.115, 0.137), (0.308, 0.330), (0.501, 0.523), (0.694, 0.716), (0.887, 0.905)]:
     arrow(ax, x1, 0.55, x2, 0.55)
-ax.text(0.5, 0.07, "Resultado 2026:  PR m-Si 84.53 %   |   PR HIT 86.92 %   →   ventaja HIT +2.39 puntos.",
+ax.text(0.5, 0.07, "Resultado 2026:  PR m-Si 81.61 %   |   PR HIT 84.18 %   →   ventaja HIT +2.57 puntos.",
         ha='center', fontsize=13.5, color=C_GOLD, style='italic')
 save(fig, 'flujo_fase4.png')
 
@@ -196,11 +196,11 @@ fig, ax = new_fig(12.8, 6.6)
 etapas = [
     ("Base original NREL Cocoa", "11 módulos · ~420,000 curvas I-V · ~1.2 GB", 1.00, C_CYAN),
     ("Selección de tecnologías (Fase 0)", "mSi0166 (36,765) + HIT05667 (38,377) = 75,142 filas", 0.84, C_CYAN),
-    ("Emulación Atacama 2026 (Fase 1)", "75,142 filas re-fechadas — sin pérdida de registros", 0.84, C_GOLD),
-    ("Limpieza e ingesta (Fase 2)", "m-Si 35,669 (97.0 %) + HIT 37,313 (97.2 %) = 72,982", 0.74, C_GOLD),
-    ("Ventana térmica 800–1200 W/m² (Fase 3)", "8,635 + 9,004 → regresiones α_Isc / β_Voc", 0.62, C_ORANGE),
-    ("Ventana SRC 900–1100 W/m² (Fase 3)", "5,791 + 6,027 → puntos de referencia STC", 0.52, C_ORANGE),
-    ("Simulación anual completa (Fase 4)", "72,982 registros simulados con SDM → PR anual", 0.74, C_GREEN),
+    ("Emulación + ventana 12 meses (Fase 1)", "m-Si 32,961 + HIT 34,169 = 67,130 (sin doble cobertura)", 0.78, C_GOLD),
+    ("Limpieza e ingesta (Fase 2)", "m-Si 31,578 (95.8 %) + HIT 32,844 (96.1 %) = 64,422", 0.70, C_GOLD),
+    ("Ventana térmica 800–1200 W/m² (Fase 3)", "7,749 + 8,079 → regresiones α_Isc / β_Voc", 0.60, C_ORANGE),
+    ("Ventana SRC 900–1100 W/m² (Fase 3)", "5,149 + 5,389 → puntos de referencia STC", 0.50, C_ORANGE),
+    ("Simulación anual completa (Fase 4)", "64,422 registros simulados con SDM → PR anual", 0.70, C_GREEN),
 ]
 y = 0.965
 for i, (t, sub, frac, col) in enumerate(etapas):
@@ -235,7 +235,7 @@ box(ax, xs[2], Y, BW, BH, "3 · Limpieza y QA",
     edge=C_ORANGE, fs_title=24.0, fs_body=20.0, linespacing=1.85)
 
 box(ax, xs[3], Y, BW, BH, "4 · Dataset Final",
-    ["Registros válidos:", "m-Si: 97.0% (35,669/36,765)", "HIT: 97.2% (37,313/38,377)", "No requiere filtro nocturno"],
+    ["Tras ventana 12 meses:", "m-Si: 95.8% (31,578/32,961)", "HIT: 96.1% (32,844/34,169)", "Sin doble cobertura"],
     edge=C_GREEN, fs_title=24.0, fs_body=20.0, linespacing=1.85)
 
 for i in range(3):

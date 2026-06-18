@@ -105,3 +105,30 @@
 5. **Notas del expositor embebidas** en el PPTX con presupuesto de tiempo acumulado por lámina + `docs/guion_presentacion.md` con guion, mapa de anexos y respuestas preparadas.
 6. **Guard anti-desbordes** en `fase6` (`_check_overflow`): estima la altura del texto y avisa con `[OVERFLOW]` al generar; deck actual con cero avisos y verificación visual de las 37 láminas exportadas.
 7. **Bug corregido (A15):** `fase3` crea `temp/` antes de escribir el JSON.
+
+---
+
+## Fase 7 (mejoras metodológicas): IAM, espectral, recurso real, doble cobertura
+
+### Decisiones - Mejoras metodológicas
+
+1. **IAM y corrección espectral APLICADOS (antes "trabajo futuro"):** En `fase2` se calcula la **irradiancia efectiva** = POA · IAM · M. El IAM directo usa el modelo físico de Snell-Bouguer (`pvlib.iam.physical`, n=1.526, K=4 m⁻¹, L=2 mm), la difusa los factores de Marion, y el factor espectral el modelo First Solar (`pvlib.spectrum.spectral_factor_firstsolar`) con agua precipitable (de humedad+T) y masa de aire absoluta. `fase4` usa la POA efectiva para la fotogeneración `I_L` y mantiene la POA de banda ancha como referencia del PR (IEC 61724-1). Efecto: el PR baja ~3 puntos (pérdida óptica ahora penalizada); la validación se mantiene en R² ≈ 0.99 con sesgo casi nulo.
+
+2. **Recurso REAL de Atacama (nueva `fase8_atacama_real.py`):** Track paralelo que descarga el **TMY horario de PVGIS** (Joint Research Centre, Comisión Europea, base satelital SARAH) para San Pedro de Atacama vía `pvlib.iotools.get_pvgis_tmy` (cacheado en `data/Atacama_TMY/`). Aplica la misma metodología (Perez + IAM + espectral + SAPM) con los parámetros De Soto de la `fase3`. GHI real ≈ 2,596 kWh/m²·año; POA ≈ 2,810; yields ~2,356 (m-Si) / 2,389 (HIT) kWh/kWp. Resuelve la limitación de "magnitudes de Florida" sin eliminar la validación eléctrica.
+
+3. **Doble cobertura corregida:** `fase1` recorta a la primera ventana contigua de 12 meses `[2011-01-21, 2012-01-21)` (cada mes una sola vez); `fase2` deduplica timestamps residuales del recorte de fin de mes de `relativedelta`. Conteos: m-Si 36,765 → 32,961 → 31,578; HIT 38,377 → 34,169 → 32,844.
+
+4. **Albedo declarado 0.20** explícitamente en `get_total_irradiance` (antes default 0.25, en contradicción con la presentación).
+
+5. **Cadencia 5 min integrada correctamente:** la energía usa Δt = 5/60 h (antes el paso temporal se omitía, sobreestimando ×12).
+
+### Resultados - Mejoras metodológicas
+
+- **Track emulado (validado):** PR m-Si **81.61 %** · HIT **84.18 %** → **+2.57 pts**. Tc máx 70.2/73.3 °C.
+- **Track real (PVGIS TMY):** PR m-Si **83.82 %** · HIT **84.99 %** → **+1.17 pts**. Tc máx 58.6/62.0 °C (aire de altura frío). Economía 100 MWp: Δyield 33 kWh/kWp → **+3,294 MWh/año** ≈ **+USD 148k/año**.
+- **Veredicto:** HIT gana en ambos escenarios de recurso.
+
+### Presentación
+
+- Deck reestructurado a **26 láminas + 13 anexos** (2 nuevas: "Modificadores ópticos APLICADOS" y "Recurso REAL de Atacama"). Guion ~21.0 min. Diagramas de flujo y embudo regenerados con los nuevos conteos. Triple revisión visual de las 39 láminas exportadas; corregidos dos artefactos de render `%%`→`%` en las láminas de limitaciones y Anexo II.
+- Todos los documentos `.md` actualizados en consecuencia (`guia_estudio_completa`, `guion_presentacion`, `analisis_critico_presentacion`, `revision_tarea2_y_diseno`, `estudio_desoto_5parametros`).
