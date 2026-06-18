@@ -17,7 +17,7 @@ Varias incoherencias de esta auditoría **ya fueron resueltas** implementando la
 | **A10** Economía con escalado no declarado | ✅ RESUELTO | Economía recalculada con el recurso real: +3,294 MWh/+USD 148k (sin supuestos ocultos). |
 | **A12** Meses con doble cobertura | ✅ RESUELTO | Ventana de 12 meses contiguos en `fase1` + dedup en `fase2`. |
 | **A6** P_STC del PR | ✅ Declarado | Deck usa P_STC del SDM (50.1/238.0 W) y lo declara explícitamente. |
-| **A2, A3, A7, A8, A11, A13–A15** | ✅ Ya corregidos | en la reestructura previa del deck (24+13 → 26+13). |
+| **A2, A3, A7, A8, A11, A13–A15** | ✅ Ya corregidos | en la reestructura del deck (24+13 → 26+14, con anexo de herramientas). |
 
 **Números vigentes (post-mejoras):** PR emulado m-Si 81.61 % / HIT 84.18 % (+2.57 pts); PR real m-Si 83.82 % / HIT 84.99 % (+1.17 pts). El detalle histórico de cada issue se conserva abajo como referencia.
 

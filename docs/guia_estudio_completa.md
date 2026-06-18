@@ -289,7 +289,7 @@ Genera 5 gráficos clave:
 ### 4.7 Fases 6 y 7: Presentación PPTX
 **Scripts:** [fase6_gen_presentation.py](../src/fase6_gen_presentation.py) y [fase7_export_slides.py](../src/fase7_export_slides.py)
 
-Generan la presentación PPTX automáticamente con un "Design System" visual (modo oscuro, acentos dorados, layouts de doble panel). La estructura actual es de **26 láminas principales + 13 anexos** (39 en total).
+Generan la presentación PPTX automáticamente con un "Design System" visual (modo oscuro, acentos dorados, layouts de doble panel). La estructura actual es de **26 láminas principales + 14 anexos** (40 en total).
 
 ### 4.8 Fase 8: Simulación con Recurso REAL de Atacama (NUEVO)
 **Script:** [fase8_atacama_real.py](../src/fase8_atacama_real.py)
@@ -415,9 +415,9 @@ La regresión experimental de Isc normalizada vs temperatura dio pendiente negat
 
 ---
 
-## 8. Estructura de la Presentación (26 + 13)
+## 8. Estructura de la Presentación (26 + 14)
 
-La presentación tiene **26 láminas principales** y **13 láminas de anexo** (solo para responder preguntas), 39 en total. Respecto a la versión previa se agregaron dos láminas principales: **"Modificadores Ópticos APLICADOS"** (lámina 13, IAM + espectral) y **"Recurso REAL de Atacama (PVGIS TMY)"** (lámina 22, magnitudes absolutas).
+La presentación tiene **26 láminas principales** y **14 láminas de anexo** (solo para responder preguntas), 40 en total. Respecto a la versión previa se agregaron dos láminas principales: **"Modificadores Ópticos APLICADOS"** (lámina 13, IAM + espectral) y **"Recurso REAL de Atacama (PVGIS TMY)"** (lámina 22, magnitudes absolutas); y un anexo inicial de **"Librerías y Herramientas de Código"** (lámina 27).
 
 ### Flujo narrativo:
 1. **Láminas 1-3:** Contexto → ¿Por qué Atacama? ¿Por qué m-Si vs HIT?

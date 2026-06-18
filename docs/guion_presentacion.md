@@ -1,6 +1,6 @@
 # Guion de la Defensa — ELI556 Tarea 2
 
-Deck: `output/Presentacion_Final_ELI556_Atacama_POA_Tarea2_revisado.pptx` — **26 láminas presentadas + 13 anexos de respaldo** (no se presentan; se usan en la ronda de preguntas). Cada lámina del PPTX lleva la misma nota en el panel de notas del expositor (vista Presentador de PowerPoint).
+Deck: `output/Presentacion_Final_ELI556_Atacama_POA_Tarea2_revisado.pptx` — **26 láminas presentadas + 14 anexos de respaldo** (40 en total; los anexos no se presentan, se usan en la ronda de preguntas). Cada lámina del PPTX lleva la misma nota en el panel de notas del expositor (vista Presentador de PowerPoint).
 
 Presupuesto total: **~21.0 min**. Respecto a la versión previa se agregaron dos láminas (13 "Modificadores ópticos" y 22 "Recurso real de Atacama"); si vas justo de tiempo, las láminas marcadas ⚡ pueden contarse en una sola frase y las dos nuevas pueden resumirse en 20–25 s cada una.
 
@@ -37,19 +37,20 @@ Presupuesto total: **~21.0 min**. Respecto a la versión previa se agregaron dos
 
 | Anexo | Lámina | Úsalo si preguntan por… |
 |---|---|---|
-| I | 27 | Ecuación de transposición de Perez / albedo 0.20 |
-| II | 28 | IAM y corrección espectral (marco APLICADO en Fase 2) |
-| III | 29 | Ecuación SAPM y coeficientes a, b, ΔT |
-| IV | 30 | Ecuación del diodo / factor de idealidad |
-| V | 31 | Cómo se ajustaron los 5 parámetros (minimize + bounds) |
-| VI | 32 | Escalamiento De Soto a condiciones de operación |
-| VII | 33 | Definición exacta del PR (IEC 61724-1) |
-| VIII | 34 | Diccionario de columnas del CSV |
-| IX | 35 | Anatomía del archivo y decisiones de ingesta |
-| X | 36 | Contraste climático Florida vs Atacama |
-| XI | 37 | Verificación del recurso (notas metodológicas) |
-| XII | 38 | Distribución anual de temperatura de celda |
-| XIII | 39 | Supuestos del cálculo económico (recurso real) |
+| Herramientas | 27 | Librerías/herramientas de código usadas (pvlib, pandas, scipy, pptx, PVGIS…) |
+| I | 28 | Ecuación de transposición de Perez / albedo 0.20 |
+| II | 29 | IAM y corrección espectral (marco APLICADO en Fase 2) |
+| III | 30 | Ecuación SAPM y coeficientes a, b, ΔT |
+| IV | 31 | Ecuación del diodo / factor de idealidad |
+| V | 32 | Cómo se ajustaron los 5 parámetros (minimize + bounds) |
+| VI | 33 | Escalamiento De Soto a condiciones de operación |
+| VII | 34 | Definición exacta del PR (IEC 61724-1) |
+| VIII | 35 | Diccionario de columnas del CSV |
+| IX | 36 | Anatomía del archivo y decisiones de ingesta |
+| X | 37 | Contraste climático Florida vs Atacama |
+| XI | 38 | Verificación del recurso (notas metodológicas) |
+| XII | 39 | Distribución anual de temperatura de celda |
+| XIII | 40 | Supuestos del cálculo económico (recurso real) |
 
 ## Respuestas preparadas (anticipación de preguntas)
 

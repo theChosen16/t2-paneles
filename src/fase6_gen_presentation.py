@@ -74,6 +74,7 @@ ORDER = [
     'f2_flujo', 'optica', 'dia_tipico', 'f3_flujo', 'f3_result', 'f4_flujo',
     'validacion', 'rs_n', 'perdidas_pr', 'veredicto_eco', 'recurso_real',
     'cumplimiento', 'limitaciones', 'conclusiones', 'referencias',
+    'anexo_tools',
     'anexo1', 'anexo2', 'anexo3', 'anexo4', 'anexo5', 'anexo6', 'anexo7', 'anexo8',
     'anexo9', 'anexo10', 'anexo11', 'anexo12', 'anexo13',
 ]
@@ -1049,6 +1050,46 @@ def s_referencias(slide, n):
         accent=ACCENT_ORANGE, body_size=15.5, line_space=1.08)
 
 
+def s_anexo_tools(slide, n):
+    add_title(slide, "Anexo · Librerías y Herramientas de Código Utilizadas")
+    H1 = Inches(2.62)
+    gap_v = Inches(0.22)
+    X2 = MARGIN + COL_W + GAP
+    panel_with_body(slide, MARGIN, CONTENT_Y, COL_W, H1,
+        "Lenguaje y núcleo científico",
+        "• **Python 3.12** en entorno virtual (`venv`).\n"
+        "• **pvlib 0.15** — modelado fotovoltaico (transposición, IAM, espectral, "
+        "térmico, modelo de diodo, lectura PVGIS).\n"
+        "• **NumPy 2.4** — cálculo numérico vectorizado.\n"
+        "• **pandas 3.0** — series temporales, `resample`, limpieza.\n"
+        "• **SciPy** — `optimize.minimize`/`fsolve` (ajuste de 5 parámetros).",
+        accent=ACCENT_BLUE, body_size=14.0, line_space=1.06)
+    panel_with_body(slide, MARGIN, CONTENT_Y + H1 + gap_v, COL_W, H1,
+        "Funciones pvlib utilizadas (por fase)",
+        "• `irradiance.get_total_irradiance` (Perez), `aoi`, `get_extra_radiation`.\n"
+        "• `iam.physical` + `iam.marion_diffuse` (IAM directo y difuso).\n"
+        "• `spectrum.spectral_factor_firstsolar`, `atmosphere.gueymard94_pw` + airmass.\n"
+        "• `temperature.sapm_cell` (modelo térmico Sandia).\n"
+        "• `pvsystem.calcparams_desoto` · `singlediode` · `i_from_v` (Lambert W).\n"
+        "• `iotools.get_pvgis_tmy` · `location.Location`.",
+        accent=ACCENT_GOLD, body_size=14.0, line_space=1.06)
+    panel_with_body(slide, X2, CONTENT_Y, COL_W, H1,
+        "Visualización y generación de entregables",
+        "• **Matplotlib** — gráficos (modo oscuro, `mathtext` para ecuaciones).\n"
+        "• **python-pptx** — generación automática del archivo PPTX.\n"
+        "• **Pillow (PIL)** — recorte e inserción de imágenes y ecuaciones.\n"
+        "• **pywin32** (`win32com`) — exporta cada lámina a PNG vía PowerPoint.",
+        accent=ACCENT_GREEN, body_size=14.0, line_space=1.06)
+    panel_with_body(slide, X2, CONTENT_Y + H1 + gap_v, COL_W, H1,
+        "Utilidades y datos externos",
+        "• **python-dateutil** (`relativedelta`) — desfase estacional de +6 meses.\n"
+        "• **stdlib:** `csv`, `json`, `os`, `re`, `datetime`, `hashlib`, `math`.\n"
+        "• **Dataset NREL Cocoa** — mediciones experimentales (11 módulos).\n"
+        "• **PVGIS TMY** (JRC, Comisión Europea, base SARAH) — recurso real de "
+        "Atacama (Fase 8).",
+        accent=ACCENT_ORANGE, body_size=14.0, line_space=1.06)
+
+
 def s_anexo1(slide, n):
     add_title(slide, "Anexo I: Transposición de Irradiancia al Plano del Arreglo (Perez)")
     H = Inches(5.45)
@@ -1376,6 +1417,7 @@ BUILDERS = {
     'perdidas_pr': s_perdidas_pr, 'veredicto_eco': s_veredicto_eco,
     'cumplimiento': s_cumplimiento, 'limitaciones': s_limitaciones,
     'conclusiones': s_conclusiones, 'referencias': s_referencias,
+    'anexo_tools': s_anexo_tools,
     'anexo1': s_anexo1, 'anexo2': s_anexo2,
     'anexo3': s_anexo3, 'anexo4': s_anexo4, 'anexo5': s_anexo5,
     'anexo6': s_anexo6, 'anexo7': s_anexo7, 'anexo8': s_anexo8,

@@ -130,5 +130,5 @@
 
 ### Presentación
 
-- Deck reestructurado a **26 láminas + 13 anexos** (2 nuevas: "Modificadores ópticos APLICADOS" y "Recurso REAL de Atacama"). Guion ~21.0 min. Diagramas de flujo y embudo regenerados con los nuevos conteos. Triple revisión visual de las 39 láminas exportadas; corregidos dos artefactos de render `%%`→`%` en las láminas de limitaciones y Anexo II.
+- Deck reestructurado a **26 láminas + 14 anexos** (40 en total; nuevas: "Modificadores ópticos APLICADOS", "Recurso REAL de Atacama" y un anexo inicial de "Librerías y Herramientas de Código"). Guion ~21.0 min. Diagramas de flujo y embudo regenerados con los nuevos conteos. Triple revisión visual de las láminas exportadas; corregidos dos artefactos de render `%%`→`%` en las láminas de limitaciones y Anexo II.
 - Todos los documentos `.md` actualizados en consecuencia (`guia_estudio_completa`, `guion_presentacion`, `analisis_critico_presentacion`, `revision_tarea2_y_diseno`, `estudio_desoto_5parametros`).
